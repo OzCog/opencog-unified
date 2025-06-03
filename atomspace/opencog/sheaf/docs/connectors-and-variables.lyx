@@ -1,0 +1,2914 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\begin_preamble
+\usepackage{url} 
+\end_preamble
+\use_default_options false
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding utf8
+\fontencoding global
+\font_roman "times" "default"
+\font_sans "helvet" "default"
+\font_typewriter "courier" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry false
+\use_package amsmath 2
+\use_package amssymb 2
+\use_package cancel 1
+\use_package esint 0
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 0
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Connectors and Variables
+\end_layout
+
+\begin_layout Author
+Linas Vepstas
+\end_layout
+
+\begin_layout Date
+17 December 2021
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Revised version; earlier versions: 2 May 2020; 21 August 2020
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Abstract
+Almost all classical work on logic and symbolic reasoning, and indeed, much
+ of mathematics, including lambda calculus and term algebras, are built
+ on the intuitive foundation of 
+\begin_inset Quotes eld
+\end_inset
+
+variables
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+functions
+\begin_inset Quotes erd
+\end_inset
+
+ that map between them.
+ Modern work on linguistics and category theory indicates an alternative
+ viewpoint: that of 
+\begin_inset Quotes eld
+\end_inset
+
+connectors
+\begin_inset Quotes erd
+\end_inset
+
+.
+ In this view, the act of replacing a variable by a value, and 
+\begin_inset Quotes eld
+\end_inset
+
+plugging it into a function
+\begin_inset Quotes erd
+\end_inset
+
+ (beta-reduction) is a special case of connecting a pair of connectors.
+\end_layout
+
+\begin_layout Abstract
+This is a short note clarifying the relationship between these two concepts.
+ Noteworthy is that the concept of connectors is 
+\begin_inset Quotes eld
+\end_inset
+
+more general
+\begin_inset Quotes erd
+\end_inset
+
+, and that, as a mathematical framework, it is far less explored.
+\end_layout
+
+\begin_layout Abstract
+As a footnote, it is noted that the use of connectors (and the implied sheaf
+ theory) appears to have impact on a number of philosophical arguments,
+ ranging from mereology to postmodernism(!) This is a surprise.
+ (The author acknowledges that it sounds perhaps cranky to place such claims
+ in the abstract, but the notions are heart-felt.)
+\end_layout
+
+\begin_layout Section*
+Introduction
+\end_layout
+
+\begin_layout Standard
+In elementary mathematics, it is commonplace to speak of a variable, such
+ as 
+\begin_inset Formula $x$
+\end_inset
+
+, and functions of that variable, such as 
+\begin_inset Formula $f(x)$
+\end_inset
+
+.
+ The power of this abstraction is that variables can be assigned a value,
+ and that value can be 
+\begin_inset Quotes eld
+\end_inset
+
+plugged into
+\begin_inset Quotes erd
+\end_inset
+
+ a function.
+ For example, one asserts that 
+\begin_inset Formula $x=42$
+\end_inset
+
+ and then ponders 
+\begin_inset Formula $f(42)$
+\end_inset
+
+.
+ This act of 
+\begin_inset Quotes eld
+\end_inset
+
+plugging in
+\begin_inset Quotes erd
+\end_inset
+
+ is formally called 
+\begin_inset Quotes eld
+\end_inset
+
+beta reduction
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+This process of 
+\begin_inset Quotes eld
+\end_inset
+
+plugging in
+\begin_inset Quotes erd
+\end_inset
+
+ can be compared to the process of 
+\begin_inset Quotes eld
+\end_inset
+
+connecting
+\begin_inset Quotes erd
+\end_inset
+
+, for example, connecting together two jigsaw-puzzle pieces.
+ When mating together connectors, one typically has a matched pair that
+ can be mated: a plug that can be plugged into a socket.
+ It should be clear that beta reduction is a special case of this: that
+ 
+\begin_inset Formula $f(x)$
+\end_inset
+
+ is a 
+\begin_inset Quotes eld
+\end_inset
+
+socket
+\begin_inset Quotes erd
+\end_inset
+
+ into which values can be plugged into.
+\end_layout
+
+\begin_layout Standard
+This observation seems nearly trivial; it is so painfully obvious that one
+ wonders what more can be said.
+ Yet there are tremendous consequences that arise from this, consequences
+ that are in some sense equally trivial and obvious.
+ That something is 
+\begin_inset Quotes eld
+\end_inset
+
+obvious
+\begin_inset Quotes erd
+\end_inset
+
+ is perhaps an indicator that it is important.
+ This note dwells on these 
+\begin_inset Quotes eld
+\end_inset
+
+obvious
+\begin_inset Quotes erd
+\end_inset
+
+ ideas, and demonstrates their importance.
+ The problem with 
+\begin_inset Quotes eld
+\end_inset
+
+obviousness
+\begin_inset Quotes erd
+\end_inset
+
+ is that it frames all manner of thinking: it is Aristotle's 
+\begin_inset Quotes eld
+\end_inset
+
+formal cause
+\begin_inset Quotes erd
+\end_inset
+
+, applied to thinking.
+ It is provides a normative framework in which all conversation takes place.
+ Design and thinking happen in the foreground; there is a 
+\begin_inset Quotes eld
+\end_inset
+
+figure
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+ground
+\begin_inset Quotes erd
+\end_inset
+
+, and anything that is obvious falls into the background, becomes implicit,
+ and serves as a barrier to further thought and examination.
+ Thus, the impetus for this note.
+\end_layout
+
+\begin_layout Standard
+The starting point of this note is that, when one thinks of variables and
+ functions, one is inevitably lead to the notion of 
+\begin_inset Quotes eld
+\end_inset
+
+directed acyclic graphs
+\begin_inset Quotes erd
+\end_inset
+
+ (DAGs).
+ That is, plugging variables into functions, and those into other functions
+ invariably leads to a DAG, because the sense of direction of 
+\begin_inset Quotes eld
+\end_inset
+
+plugging in
+\begin_inset Quotes erd
+\end_inset
+
+ must be preserved: one cannot plug a variable into a value; one cannot
+ plug a function into a value; the plugging is always directed.
+ One is a receptacle, the other is not.
+ By contrast, that act of connecting together connectors has no such constraint:
+ a jigsaw puzzle is not a DAG; there is no jigsaw piece 
+\begin_inset Quotes eld
+\end_inset
+
+at the top
+\begin_inset Quotes erd
+\end_inset
+
+, and none 
+\begin_inset Quotes eld
+\end_inset
+
+at the bottom
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Although the connectors in a jigsaw puzzle have a polarity, the sense of
+ direction that they offer is immaterial to the final construction.
+\end_layout
+
+\begin_layout Standard
+The desired conclusion is that by approaching knowledge representation as
+ an assemblage of connections, rather than as a unidirectional network of
+ inferences, one can gain considerable power in working with the common
+ problems and stumbling blocks of AI and AGI, including problems of planning,
+ inference, constraint satisfaction, combinatorial explosion and the 
+\begin_inset Quotes eld
+\end_inset
+
+frame problem
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+This note begins with a long review of everywhere that the notion of variables
+ and functions appear, or, more generally, of arrows and directed graphs.
+ This may seem pointless, but serves only to underscore their ubiquity.
+ This is followed by a section that develops the proposed alternative.
+ Along the way, assorted commentary is made with regards to outstanding
+ philosophical problems, as befits any exploration that belabors the 
+\begin_inset Quotes eld
+\end_inset
+
+obvious
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section*
+Arrows
+\end_layout
+
+\begin_layout Standard
+Arrows, and usually accompanying DAGs are everywhere.
+ They really are pervasive in descriptions of mathematics, in symbolic AI
+ and knowledge representation, and even underpin vast tracts of philosophy.
+ This is, again, so potently 
+\begin_inset Quotes eld
+\end_inset
+
+obvious
+\begin_inset Quotes erd
+\end_inset
+
+ that an explicit review is called for.
+\end_layout
+
+\begin_layout Subsubsection*
+In philosophy:
+\end_layout
+
+\begin_layout Standard
+Here's a hint of how pervasively important the concept of variables and
+ values can be.
+ Some philosophers use these notions to anchor the idea of 
+\begin_inset Quotes eld
+\end_inset
+
+objects
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+things
+\begin_inset Quotes erd
+\end_inset
+
+ that 
+\begin_inset Quotes eld
+\end_inset
+
+exist
+\begin_inset Quotes erd
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Quotes eld
+\end_inset
+
+An object is anything that can be the value of a variable, that is, anything
+ we can talk about using pronouns, that is, anything.
+\begin_inset Quotes erd
+\end_inset
+
+ (Van Inwagen 2002, 180)
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Inwagen2002"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This conception of an object then leads to confused discussions about the
+ identity of indiscernibles, and the importance of location (space-time)
+ in mereology.
+ The notion of connectors can be used as an alternate foundation for the
+ conception of 
+\begin_inset Quotes eld
+\end_inset
+
+objects
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+identity
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+location
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Specifically, one can instead define objects as 
+\begin_inset Quotes eld
+\end_inset
+
+things that can participate in relationships
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection*
+In term algebra:
+\end_layout
+
+\begin_layout Standard
+The theory of term algebras is a specific branch of mathematics that deals
+ with the abstract process of performing generic algebraic manipulations,
+ as any mathematician or engineer might do when working with pencil and
+ paper.
+ It is important for the theory of computation, because much what we do
+ with computers is to manipulate symbols; term algebras provide a coherent
+ vocabulary of ideas for thinking about algorithms that manipulate symbols.
+ This is, in turn, important for both logic, and for symbolic AI, since
+ reasoning engines and algorithmic theorem provers are built on such symbolic
+ manipulations.
+\end_layout
+
+\begin_layout Standard
+Consider a typical definition of a term algebra.
+ It consists of:
+\end_layout
+
+\begin_layout Itemize
+A set of constants 
+\begin_inset Formula $c_{0},c_{1},\cdots$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+A set of variables 
+\begin_inset Formula $x,y,z,\cdots$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+A set of 
+\begin_inset Formula $n$
+\end_inset
+
+-ary function symbols 
+\begin_inset Formula $f\left(x_{1},\cdots,x_{n}\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The terms of a term algebra are then anything that can be constructed from
+ the above, by recursively 
+\begin_inset Quotes eld
+\end_inset
+
+plugging in
+\begin_inset Quotes erd
+\end_inset
+
+.
+ That the resulting terms always have the structure of a DAG should be intuitive
+ly obvious.
+\end_layout
+
+\begin_layout Standard
+In type theory, it is common to assign types to the different constants,
+ variables and function symbols; this does not alter the result that the
+ terms are DAGs.
+\end_layout
+
+\begin_layout Subsubsection*
+In set theory:
+\end_layout
+
+\begin_layout Standard
+In (well-founded) (naive) set theory, there is effectively just one function
+ symbol: the set, and only one constant: the empty set.
+ There are no variables, in the sense that proper sets do not contain variables
+ in them.
+ Of course, in the definition of the axioms (and axiom schemas!) that define
+ set theory, and in the articulation of the theory itself, it is impossible
+ to avoid variables; its just that variables are not set elements.
+ By definition, 
+\begin_inset Quotes eld
+\end_inset
+
+well-foundedness
+\begin_inset Quotes erd
+\end_inset
+
+ disallows infinitely recursive sets.
+ Thus, effectively, all finite sets in set theory have the shape of a DAG
+ (they form a partial order).
+\end_layout
+
+\begin_layout Subsubsection*
+In computer science:
+\end_layout
+
+\begin_layout Standard
+Lambda calculus can be thought of as having arbitrary constants and variables,
+ but only one function symbol: the lambda.
+ It is effectively a theory of linear strings (sequences) of symbols arranged
+ in order, on a line.
+ Insofar as lambda expressions can be beta-reduced, they form a DAG.
+ Lambda calculus is manifestly finite: it is very unusual to study countable
+ or uncountable limits of lambda calculus.
+ In general, lambda calculus is always assumed to be well-founded, so that
+ the expressions are always DAGs.
+ An exception to this is chem-lambda (Buliga 2003), which redefines lambda
+ as having input and output connectors, thus allowing looping connections
+ to be made.
+\end_layout
+
+\begin_layout Standard
+The general typed lambda calculus famously corresponds to computer programs,
+ this is the Curry-Howard correspondence.
+ Infinite loops can be thought of in two ways in computing.
+ One way is as a directed graph containing a loop: the arrows denote a function
+ that recursively calls back to itself.
+ The state transitions are described by points (for states) and arrows (denoting
+ state transitions), arranged such that one (or more!) collections of arrows
+ can be traced in a circular loop.
+ The other way of thinking of infinite loops is as recursive structures:
+ one unrolls the loop so that it becomes an infinitely-long unterminating
+ sequence of arrows.
+ Roughly speaking, infinite loops correspond to ill-founded sets.
+ They are the 
+\begin_inset Quotes eld
+\end_inset
+
+gunk
+\begin_inset Quotes erd
+\end_inset
+
+ of philosophy.
+\end_layout
+
+\begin_layout Standard
+The moral of the story that is being presented here is that almost all of
+ computer science is founded on a theory of DAGs.
+ Even when loops are allowed, the graphs are formed from edges that are
+ directed: the edges are always arrows.
+ This is not the same as a general theory of connectors connecting things
+ together.
+\end_layout
+
+\begin_layout Subsubsection*
+In topology:
+\end_layout
+
+\begin_layout Standard
+The infinite binary tree provides a simple example of unrolling a pair of
+ interconnected loops.
+ Axiomatically, a binary tree is constructed from a pair of left-right elements,
+ and each element can be another pair, or the termination symbol.
+ In this sense, both the left and right elements can loop back onto themselves;
+ when the loops are unrolled, the tree becomes infinite DAG (rather than
+ a small graph containing a pair of loops).
+ The endpoints of a binary tree form the Cantor set; there are an uncountable
+ infinity of them.
+ These are the 
+\begin_inset Quotes eld
+\end_inset
+
+points
+\begin_inset Quotes erd
+\end_inset
+
+ of point-set topology.
+\end_layout
+
+\begin_layout Standard
+One can also have a point-free topology, built on top of lattice theory.
+ Rather than considering points as mereological simples, one instead focuses
+ on the directedness of set inclusion.
+ Starting with the notion of a partially-ordered set, the axioms of lattice
+ theory allow one to concentrate on meets and joins, filters and ideals,
+ frames and locales, without once bringing up the notion of a point.
+ Yet, in the end, partial orders are founded on the idea of direction, of
+ inclusion, with set theoretic notions of the same providing much of the
+ intuitive grounding.
+ There is a DAG, even if discussion of terminal elements is avoided.
+\end_layout
+
+\begin_layout Subsubsection*
+In category theory:
+\end_layout
+
+\begin_layout Standard
+The simply typed lambda calculus is important, as it is the 
+\begin_inset Quotes eld
+\end_inset
+
+internal language
+\begin_inset Quotes erd
+\end_inset
+
+ of 
+\begin_inset Quotes eld
+\end_inset
+
+Cartesian closed categories
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The Cartesian-closed categories naturally describe 
+\begin_inset Quotes eld
+\end_inset
+
+tuples
+\begin_inset Quotes erd
+\end_inset
+
+ of 
+\begin_inset Quotes eld
+\end_inset
+
+things
+\begin_inset Quotes erd
+\end_inset
+
+: that is, things that can be placed in an ordered list (a 
+\begin_inset Quotes eld
+\end_inset
+
+Cartesian product
+\begin_inset Quotes erd
+\end_inset
+
+).
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+things
+\begin_inset Quotes erd
+\end_inset
+
+ are presumed to be discernible items
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+One could say 
+\begin_inset Quotes eld
+\end_inset
+
+objects
+\begin_inset Quotes erd
+\end_inset
+
+ instead of 
+\begin_inset Quotes eld
+\end_inset
+
+items
+\begin_inset Quotes erd
+\end_inset
+
+, as that is the appropriate term for category theory.
+ It is, however, useful in the present case to use the slightly more vague
+ term 
+\begin_inset Quotes eld
+\end_inset
+
+items
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+ that have an identity.
+ Indiscernibles are not described by Cartesian closed categories; for this,
+ needs symmetric monoidal categories.
+ Tensors and tensor algebras, vector spaces and Hilbert spaces famously
+ belong to this category; the internal language is 
+\begin_inset Quotes eld
+\end_inset
+
+linear logic
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Yet, the tensor category is dagger-compact: it has a left-right symmetry
+ to it that constrains structure.
+\end_layout
+
+\begin_layout Standard
+A pending critique of neural nets is that they are founded on vector spaces
+ (and thus are part of the tensor category, which is symmetric) whereas
+ natural language is described by monoidal categories that are manifestly
+ not symmetric.
+ This observation has been pursued elsewhere, in various writings by this
+ author.
+\end_layout
+
+\begin_layout Standard
+Category theory itself is a theory of dots and arrows.
+ Every dot has an arrow back to itself (thus, a loop), and arrows can be
+ composed: if there is a sequence of two arrows connecting three dots, then
+ there always is an arrow, going in the same sense, between the two endpoints.
+ This is all that a category is.
+ Deep theorems follow, such as the existence of all limits, given only spans
+ and equalizers! Category theory is surprising in it's power.
+\end_layout
+
+\begin_layout Standard
+The moral of the story that is being presented here is that almost all of
+ computer science is founded on a theory of DAGs.
+ Even when loops are allowed, the graphs are formed from edges that are
+ directed: the edges are always arrows.
+ This is not the same as a general theory of connectors connecting things
+ together.
+\end_layout
+
+\begin_layout Subsubsection*
+In model theory:
+\end_layout
+
+\begin_layout Standard
+Model theory takes the idea of a term algebra, and supplements it with relations.
+ Relations are 
+\begin_inset Formula $n$
+\end_inset
+
+-ary predicates 
+\begin_inset Formula $P\left(t_{1},\cdots,t_{n}\right)$
+\end_inset
+
+ of terms 
+\begin_inset Formula $t_{k}$
+\end_inset
+
+ from the term algebra.
+ A predicate is either true, or it is false: it either holds or does not.
+ The most famous predicate is that of equality; the 
+\begin_inset Quotes eld
+\end_inset
+
+theory of pure equality
+\begin_inset Quotes erd
+\end_inset
+
+ is a term algebra supplemented with a predicate defining equality.
+\end_layout
+
+\begin_layout Standard
+Predicates are useless unless they can be combined using the operators of
+ logic: 
+\begin_inset Quotes eld
+\end_inset
+
+and
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+or
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+not
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+there exists
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+for all
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Curiously enough, the rules for combining these operators again form a
+ DAG: the sigma-pi hierarchy.
+ Combining terms with predicates seems nearly enough to serve as a foundation
+ for all mathematics.
+ The sigma-pi hierarchy, taken on set theory, is extremely powerful.
+ Just the first few levels: first-order logic and second-order logic are
+ enough to meet the concerns of most classical mathematics.
+ Even things that are 
+\begin_inset Quotes eld
+\end_inset
+
+larger
+\begin_inset Quotes erd
+\end_inset
+
+ than set theory can be represented in this hierarchy: this is the content
+ of the Yoneda lemma.
+\end_layout
+
+\begin_layout Standard
+The moral of the story is as before: when viewed from the meta-perspective,
+ DAGs appear to be sufficient to describe all of mathematics.
+ It is hardly a surprise that they are part of the ground, the background,
+ and not a part of the figure.
+ They are a part of the under-pinnings of the meta-mathematics, and are
+ almost never overtly discussed.
+\end_layout
+
+\begin_layout Subsubsection*
+In relational algebras:
+\end_layout
+
+\begin_layout Standard
+Removing the term algebra but keeping the relations results in a 
+\begin_inset Quotes eld
+\end_inset
+
+relational algebra
+\begin_inset Quotes erd
+\end_inset
+
+, with examples of relations being 
+\begin_inset Quotes eld
+\end_inset
+
+is-a
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+has-a
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+part-of
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Limiting oneself to a single part-whole relationship, one arrives at mereology
+ as a possible alternative to set theory as a foundation for mathematics.
+ But one also arrives the the notion of 
+\begin_inset Quotes eld
+\end_inset
+
+gunk
+\begin_inset Quotes erd
+\end_inset
+
+ in philosophy (that, roughly speaking, infinite recursion is possible,
+ when considering the structure of physical reality), as well as a number
+ of puzzles dating to Ancient Greece (the Ship of Theseus: what happens
+ when parts are replaced? The Statue and the Lump of Clay: what happens
+ when parts are rearranged?).
+ That there are such puzzles is perhaps endemic to the desire to apply part-whol
+e relationships, and the adduced DAG partial orders as a fundamental ground
+ on which to build philosophical discussions.
+\end_layout
+
+\begin_layout Subsubsection*
+In knowledge representation:
+\end_layout
+
+\begin_layout Standard
+A practical application of relational algebras can be found in the field
+ of knowledge representation.
+ Practical systems embodying relational algebras include key-value databases
+ and SQL databases.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+key
+\begin_inset Quotes erd
+\end_inset
+
+ is a named slot, the 
+\begin_inset Quotes eld
+\end_inset
+
+value
+\begin_inset Quotes erd
+\end_inset
+
+ is the item that is attached to the key (that occupies the 
+\begin_inset Quotes eld
+\end_inset
+
+slot
+\begin_inset Quotes erd
+\end_inset
+
+ named by the key).
+ Hierarchical relations can be built by placing keys into slots: thus, for
+ example, the Unix file-system is effectively a key-value database.
+ On the surface, SQL databases seem to be quite different, having a tabular
+ structure, consisting of a fixed schema (a fixed 
+\begin_inset Formula $n$
+\end_inset
+
+-ary predicate), the instances of which are rows in a table.
+ Yet it is famously the case that SQL and key-value databases are categorial
+ opposites to one-another: if one takes the arrow relationships in one,
+ and reverses the sense of the arrows, one obtains the other.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Meijer2011"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Actual data-sets occurring in knowledge representation include WordNet,
+ which provides synonym, holonym and meronym relations.
+ The urge to solve the 
+\begin_inset Quotes eld
+\end_inset
+
+grounding problem
+\begin_inset Quotes erd
+\end_inset
+
+ leads to 
+\begin_inset Quotes eld
+\end_inset
+
+upper ontologies
+\begin_inset Quotes erd
+\end_inset
+
+, such as SUMO, which asserts that things are objects, and classifies types
+ of things.
+ Ontologies themselves force the user to make distinctions between intensional
+ and extensional membership, intensional and extensional inheritance.
+ For example, one can assert that dogs are a kind of animal (intensional)
+ and then assert that 
+\begin_inset Quotes eld
+\end_inset
+
+Fluffy
+\begin_inset Quotes erd
+\end_inset
+
+ is an example of a dog (extensional - belongs to the class of dogs).
+\end_layout
+
+\begin_layout Standard
+Ontologies provide only a handful of such relationships (is-a, has-a, part-of).
+ To generalize to a greater number of relations, one arrives at the notion
+ of 
+\begin_inset Quotes eld
+\end_inset
+
+semantic triples
+\begin_inset Quotes erd
+\end_inset
+
+: these are effectively labeled arrows: the two endpoints (head and tail)
+ of the arrow, and a label for the relationship type.
+\end_layout
+
+\begin_layout Standard
+As before, the presence of arrows implies ordering relationships, with concomita
+nt notions of transitivity, (anti-)reflexivity, (anti-)symmetry, even when
+ they may be a good bit more fuzzy and vague, as in the domain of 
+\begin_inset Quotes eld
+\end_inset
+
+common sense
+\begin_inset Quotes erd
+\end_inset
+
+.
+ As Spock might say, human gut feels are not logical.
+\end_layout
+
+\begin_layout Section*
+Graphs
+\end_layout
+
+\begin_layout Standard
+Unlike the examples above, graph theory offers a different possibility:
+ the undirected edge.
+ Unfortunately, this is again 
+\begin_inset Quotes eld
+\end_inset
+
+painfully obvious
+\begin_inset Quotes erd
+\end_inset
+
+, and we'll have to slog through a lot of rather obvious observations to
+ make anything resembling progress.
+\end_layout
+
+\begin_layout Standard
+The canonical definition of a graph is that of two sets: a set 
+\begin_inset Formula $V$
+\end_inset
+
+ of vertices and a set 
+\begin_inset Formula $E$
+\end_inset
+
+ of edges.
+ An edge 
+\begin_inset Formula $e_{k}\in E$
+\end_inset
+
+ is a pair 
+\begin_inset Formula $e_{k}=\left\{ v_{i},v_{j}\right\} $
+\end_inset
+
+ of vertices, with each 
+\begin_inset Formula $v_{i}\in V$
+\end_inset
+
+.
+ Although this definition is adequate for most mathematical applications,
+ it is severely deficient for algorithmic applications.
+ The biggest issue is that of non-locality of data.
+ If one merely stuffs the vertices and edges into a table, then a graph
+ walk in general appears to look like a uniformly distributed random hop
+ through those tables: terrible for modern computers which rely on locality,
+ so that caches can speed data access performance.
+\end_layout
+
+\begin_layout Standard
+This section develops an alternative representation for graphs, and argues
+ that it is foundational in nature.
+ It addresses not only some of the practical problems in the DAG-view of
+ the world (of the noosphere) but also provides an alternative to some of
+ the philosophical foundations of the same.
+\end_layout
+
+\begin_layout Subsubsection*
+Seeds
+\end_layout
+
+\begin_layout Standard
+The problem of locality can be (partly) solved by defining graphs in a different
+ way: in terms of vertexes, and the (half-)edges that attach to each vertex.
+ In this case, one creates a table of pairs 
+\begin_inset Formula $\left(v_{i},\left\{ e_{i1},e_{i2},\cdots,e_{ik}\right\} \right)$
+\end_inset
+
+ of a vertex 
+\begin_inset Formula $v_{i}$
+\end_inset
+
+ and the set of all edges landing on that vertex.
+ It is convenient to think of the edges as 
+\begin_inset Quotes eld
+\end_inset
+
+half-edges
+\begin_inset Quotes erd
+\end_inset
+
+, as it is enough to identify the remote end to which they connect; the
+ local end is implicit: it is just the vertex 
+\begin_inset Formula $v_{i}$
+\end_inset
+
+ at the 
+\begin_inset Quotes eld
+\end_inset
+
+center
+\begin_inset Quotes erd
+\end_inset
+
+.
+ As this is obvious, it can be belabored with a diagram.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename graphics/seed.eps
+	lyxscale 60
+	width 25col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The black dot represents the vertex; the open circles represent the unconnected
+ half-edges.
+ As this vaguely resembles a burr, this general shape will be referred to
+ as a 
+\begin_inset Quotes eld
+\end_inset
+
+seed
+\begin_inset Quotes erd
+\end_inset
+
+, or sometimes a 
+\begin_inset Quotes eld
+\end_inset
+
+germ
+\begin_inset Quotes erd
+\end_inset
+
+ in what follows.
+ Connecting these proceeds in the 
+\begin_inset Quotes eld
+\end_inset
+
+obvious
+\begin_inset Quotes erd
+\end_inset
+
+ fashion, and so a pair of connected seeds is shown below:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename graphics/seeds-two.eps
+	lyxscale 60
+	width 30col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The unconnected dots, the half-edges, can be called connectors, in which
+ the jigsaw-puzzle piece analogy comes into full force.
+ Another 
+\begin_inset Quotes eld
+\end_inset
+
+obvious
+\begin_inset Quotes erd
+\end_inset
+
+ diagram illustrates this:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename graphics/puzzle.eps
+	lyxscale 60
+	width 45col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The explicit polarity of the mating, despite the fact that the resulting
+ edge is an undirected edge, serves several purposes.
+ Foremost, it helps avoid mating errors: if the connectors do not have opposite
+ polarity, they cannot attach.
+ Secondly, they can be used to establish directionality, when that is needed.
+ As the previous section noted, directed edges are everywhere; this did
+ not mean to imply that they are useless! The collection of tabs and sockets
+ can come in a large variety of shapes.
+ These shapes correspond to the 
+\begin_inset Quotes eld
+\end_inset
+
+types
+\begin_inset Quotes erd
+\end_inset
+
+ of 
+\begin_inset Quotes eld
+\end_inset
+
+type theory
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Most importantly, the concept of vertices adorned with connectors allows
+ one to define a concept of a grammar.
+\end_layout
+
+\begin_layout Subsubsection*
+Sections and Compostionality
+\end_layout
+
+\begin_layout Standard
+The burrs/seeds/puzzle-pieces, as presented above, are obviously 
+\begin_inset Quotes eld
+\end_inset
+
+compositional
+\begin_inset Quotes erd
+\end_inset
+
+, in that there is an obvious way to connect them together.
+ Once connected, the resulting structure is again of the same form: some
+ network of vertices connected with edges, and some unconnected half-edges
+ sticking out of it.
+ Furthermore, it should be clear that the order in which pieces are assembled
+ is immaterial: one obtains the same figure, no matter what the sequence.
+\end_layout
+
+\begin_layout Subsubsection*
+Polarity (Sexuality)
+\end_layout
+
+\begin_layout Standard
+The above presentation of the concept of jigsaw pieces is misleading in
+ one important sense, which should be clarified.
+ The jigsaw pieces, as drawn, are explicitly heterosexual (bipolar), in
+ that there are explicit male and female connectors.
+ In general, this need not be the case: one can have monopolar (asexual)
+ connectors, or tri-sexual connectors, or connectors of arbitrary complexity.
+ 
+\end_layout
+
+\begin_layout Standard
+This is worth articulating.
+ In the previous diagram, there was a slot and a tab, which can be indicated
+ as 
+\begin_inset Formula $-$
+\end_inset
+
+ and 
+\begin_inset Formula $+$
+\end_inset
+
+.
+ They had an explicit shape, which we can call 
+\begin_inset Quotes eld
+\end_inset
+
+type A
+\begin_inset Quotes erd
+\end_inset
+
+.
+ A different shape might be called 
+\begin_inset Quotes eld
+\end_inset
+
+type B
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The connection rules are such that 
+\begin_inset Formula $A+$
+\end_inset
+
+ can only connect to 
+\begin_inset Formula $A-$
+\end_inset
+
+ and never to 
+\begin_inset Formula $B+$
+\end_inset
+
+ or 
+\begin_inset Formula $B-$
+\end_inset
+
+.
+ But also, 
+\begin_inset Formula $A+$
+\end_inset
+
+ cannot connect to other 
+\begin_inset Formula $A+$
+\end_inset
+
+'s.
+ This 
+\begin_inset Quotes eld
+\end_inset
+
+makes sense
+\begin_inset Quotes erd
+\end_inset
+
+, and is a desirable property if one is using jigsaw pieces to model beta
+ reduction: a variable of type 
+\begin_inset Formula $A$
+\end_inset
+
+ can only be beta-reduced with a term of type 
+\begin_inset Formula $A$
+\end_inset
+
+.
+ That is, variables are always 
+\begin_inset Formula $-$
+\end_inset
+
+ and those things that can be 
+\begin_inset Quotes eld
+\end_inset
+
+plugged into
+\begin_inset Quotes erd
+\end_inset
+
+ variables are always 
+\begin_inset Formula $+$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+There are other possibilities.
+ The monosexual (monopolar) case would be a connector direction of 
+\begin_inset Formula $*$
+\end_inset
+
+ with a rule that any 
+\begin_inset Formula $A*$
+\end_inset
+
+ can connect to any other connector of type 
+\begin_inset Formula $A*$
+\end_inset
+
+ but never to a connector of type 
+\begin_inset Formula $B*$
+\end_inset
+
+.
+ There is no real analog of this in term algebras: such algebras always
+ make a sharp distinction between variables and constants; yet the monopolar
+ case fails to distinguish these.
+ Connecting two connectors together is still like beta reduction; but the
+ sense of direction is lost.
+\end_layout
+
+\begin_layout Standard
+An example of a trisexual connector would require connectivity rules similar
+ to the following.
+ There are three direction types, 
+\begin_inset Formula $\#$
+\end_inset
+
+, 
+\begin_inset Formula $\$$
+\end_inset
+
+ and 
+\begin_inset Formula $\%$
+\end_inset
+
+ and the rules are that 
+\begin_inset Formula $\$$
+\end_inset
+
+ can connect to # and 
+\begin_inset Formula $\$$
+\end_inset
+
+ can connect to 
+\begin_inset Formula $\%$
+\end_inset
+
+ but 
+\begin_inset Formula $\#$
+\end_inset
+
+ cannot connect to 
+\begin_inset Formula $\%$
+\end_inset
+
+.
+ Nor can 
+\begin_inset Formula $\$$
+\end_inset
+
+ connect to 
+\begin_inset Formula $\$$
+\end_inset
+
+.
+ (Confused? Look at the US keyboard layout: these three keys are in order,
+ with 
+\begin_inset Formula $\$$
+\end_inset
+
+ in the middle.
+ The rule is 
+\begin_inset Quotes eld
+\end_inset
+
+neighbors can connect, but not otherwise
+\begin_inset Quotes erd
+\end_inset
+
+).
+ There are still the connector-shape types 
+\begin_inset Formula $A,B,\cdots$
+\end_inset
+
+ and so we extrapolate that 
+\begin_inset Formula $A\$$
+\end_inset
+
+ can connect to 
+\begin_inset Formula $A\#$
+\end_inset
+
+ and to 
+\begin_inset Formula $A\%$
+\end_inset
+
+ but not to 
+\begin_inset Formula $B\$$
+\end_inset
+
+ or to 
+\begin_inset Formula $B\#$
+\end_inset
+
+ or 
+\begin_inset Formula $B\%$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Neither the monosexual nor the trisexual cases are easy to illustrate in
+ terms of pretty hand-drawn pictures of jigsaw pieces.
+ The strict idea of jigsaw pieces does break down.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+Representation of Sexuality
+\end_layout
+
+\begin_layout Standard
+Wandering a bit off-topic, it is worth pointing out that there is a representati
+on theory of the multi-polar direction types in terms of monopolar and bipolar
+ direction types, together with strings of connector-types.
+ 
+\end_layout
+
+\begin_layout Standard
+This is illustrated here.
+ For the connector strings, lower-case letters will be used.
+ For 
+\begin_inset Formula $\#$
+\end_inset
+
+ write the string 
+\begin_inset Formula $r*-$
+\end_inset
+
+ and for 
+\begin_inset Formula $\$$
+\end_inset
+
+ write 
+\begin_inset Formula $rs+$
+\end_inset
+
+ and for 
+\begin_inset Formula $\%$
+\end_inset
+
+ write 
+\begin_inset Formula $*s-$
+\end_inset
+
+.
+ Now the mating rules are these: the wild-card 
+\begin_inset Formula $*$
+\end_inset
+
+ matches any lower-case letter; otherwise lower-case letters must match
+ exactly.
+ As before, 
+\begin_inset Formula $+$
+\end_inset
+
+ can only pair with 
+\begin_inset Formula $-$
+\end_inset
+
+.
+ Thus, 
+\begin_inset Formula $r*-$
+\end_inset
+
+ can mate with 
+\begin_inset Formula $rs+$
+\end_inset
+
+ because the 
+\begin_inset Formula $r$
+\end_inset
+
+ matches, the 
+\begin_inset Formula $*$
+\end_inset
+
+ matches anything, and the 
+\begin_inset Formula $+$
+\end_inset
+
+ and 
+\begin_inset Formula $-$
+\end_inset
+
+ will mate.
+ Likewise, 
+\begin_inset Formula $rs+$
+\end_inset
+
+ can mate with 
+\begin_inset Formula $*s-$
+\end_inset
+
+.
+ However, 
+\begin_inset Formula $r*-$
+\end_inset
+
+ and 
+\begin_inset Formula $*s-$
+\end_inset
+
+ cannot mate: although the wild-cards allow this, the poles do not.
+\end_layout
+
+\begin_layout Standard
+This remark was necessary, since Link Grammar
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Sleator1991,Sleator1993"
+literal "false"
+
+\end_inset
+
+ uses this style for indicating connectivity.
+ Capital letters must match exactly; strings of lower-case letters with
+ embedded wild-cards match is the strings match, and the poles match.
+ Thus, the theory can be understood as having bipolar connection directions,
+ with complex string-matching rules, or as simple upper-case types, and
+ multi-sexual connector directions.
+ As per usual, a rigorous mathematical treatment of this representation
+ theory may reveal subtleties beyond what has been said here.
+ Or maybe not.
+ That this string representation is sufficient to represent any kind of
+ sexual mating remains an unproven conjecture at this point.
+\end_layout
+
+\begin_layout Subsection*
+In proof theory:
+\end_layout
+
+\begin_layout Standard
+A simple variant of the idea of a jigsaw piece can be found in proof theory,
+ where it is called a 
+\begin_inset Quotes eld
+\end_inset
+
+context
+\begin_inset Quotes erd
+\end_inset
+
+ or a 
+\begin_inset Quotes eld
+\end_inset
+
+formula occurrence
+\begin_inset Quotes erd
+\end_inset
+
+.
+ See, for example Troelstra & Schwichtenberg, 
+\begin_inset Quotes eld
+\end_inset
+
+Basic Proof Theory
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Troelstra2000"
+literal "false"
+
+\end_inset
+
+ section 1.1.4.
+ A 
+\begin_inset Quotes eld
+\end_inset
+
+context
+\begin_inset Quotes erd
+\end_inset
+
+ is a 
+\begin_inset Quotes eld
+\end_inset
+
+formula
+\begin_inset Quotes erd
+\end_inset
+
+ with a 
+\begin_inset Quotes eld
+\end_inset
+
+hole cut out of it
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The hole is called a 
+\begin_inset Quotes eld
+\end_inset
+
+placeholder
+\begin_inset Quotes erd
+\end_inset
+
+ or a 
+\begin_inset Quotes eld
+\end_inset
+
+special propositional variable
+\begin_inset Quotes erd
+\end_inset
+
+, sometimes denoted with a star-character.
+ The star is outside of the language of predicate logic; it's in the meta-langua
+ge.
+ A 
+\begin_inset Quotes eld
+\end_inset
+
+formula occurrence
+\begin_inset Quotes erd
+\end_inset
+
+ is a subformula together with a context.
+ Roughly speaking, it is a subformula cut out of a formula, leaving a hole
+ in it's place.
+ That pairing, of a subformula and the place it was cut from, is the 
+\begin_inset Quotes eld
+\end_inset
+
+formula occurrence
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Presumably it is self-evident that this resembles the pair of unconnected
+ jigsaw pieces in the diagram above.
+ Perhaps not, so we belabor it.
+ Here is the context:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename graphics/puzzle-left.eps
+	lyxscale 60
+	width 18col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The formula is 
+\begin_inset Formula $v_{1}$
+\end_inset
+
+ and the hole is 
+\begin_inset Formula $v_{2}$
+\end_inset
+
+.
+ Here is the subformula: 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename graphics/puzzle-right.eps
+	lyxscale 60
+	width 18col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Quotes eld
+\end_inset
+
+actual
+\begin_inset Quotes erd
+\end_inset
+
+ subformula is 
+\begin_inset Formula $v_{2}$
+\end_inset
+
+ but we've drawn a little more, here: the 
+\begin_inset Formula $v_{1}$
+\end_inset
+
+ is the shadow of the formula from which the subformula as cut.
+ 
+\end_layout
+
+\begin_layout Standard
+These two pieces together constitute the original formula:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename graphics/puzzle-connected.eps
+	lyxscale 60
+	width 23col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Drawn assembled like this, this is just the formula.
+ Drawn disassembled gives the formula occurrence.
+\end_layout
+
+\begin_layout Subsection*
+In lambda calculus
+\end_layout
+
+\begin_layout Standard
+The sketch of contexts and formula occurrences in proof theory resembles
+ the concept of eta expansion in lambda calculus.
+ In lambda calculus, if 
+\begin_inset Formula $f$
+\end_inset
+
+ is an expression with some free variable in it, then 
+\begin_inset Formula $\lambda x.f(x)$
+\end_inset
+
+ is it's eta expansion.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+See nLab, 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://ncatlab.org/nlab/show/eta-conversion
+\end_layout
+
+\end_inset
+
+ for a reasonable review, or Barndregt for an expanded treatment.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Barendregt1984"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ Roughly speaking, this reads as the operation: 
+\begin_inset Quotes eld
+\end_inset
+
+cut out the free variable 
+\begin_inset Formula $x$
+\end_inset
+
+ from 
+\begin_inset Formula $f$
+\end_inset
+
+, leaving a hole, and then mark the location of that hole with a bound variable
+ 
+\begin_inset Formula $x$
+\end_inset
+
+, binding that variable with lambda, so that we know where that hole is.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Presumably it is self-evident that eta expansion can be understood as jigsaw
+ connectors.
+ But then again, it is worth belaboring this point.
+ So here is a diagram showing the expression 
+\begin_inset Formula $f$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename graphics/puzzle-connected.eps
+	lyxscale 60
+	width 23col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+More precisely, the above shows the expression 
+\begin_inset Formula $f$
+\end_inset
+
+ as 
+\begin_inset Formula $v_{1}$
+\end_inset
+
+ and with 
+\begin_inset Formula $v_{2}$
+\end_inset
+
+ being some free variable inside of it.
+ Disconnecting this gives the expression 
+\begin_inset Formula $f(x)$
+\end_inset
+
+ below:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename graphics/puzzle-left.eps
+	lyxscale 60
+	width 18col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the above, the 
+\begin_inset Formula $v_{1}$
+\end_inset
+
+ is the expression 
+\begin_inset Formula $f$
+\end_inset
+
+, with the 
+\begin_inset Formula $v_{2}$
+\end_inset
+
+ explicitly providing the location of the 
+\begin_inset Formula $x$
+\end_inset
+
+.
+ What is the lambda? Well it is just this, below:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename graphics/puzzle-right.eps
+	lyxscale 60
+	width 18col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It is tempting to say that the above is just 
+\begin_inset Formula $\lambda x$
+\end_inset
+
+, but it is actually just a bit more: it is 
+\begin_inset Formula $\lambda x$
+\end_inset
+
+ with the shadow of 
+\begin_inset Formula $f$
+\end_inset
+
+ as 
+\begin_inset Formula $v_{1}$
+\end_inset
+
+ still visible.
+ The eta expansion 
+\begin_inset Formula $\lambda x.f\left(x\right)$
+\end_inset
+
+ is just the two jigsaw pieces, disassembled.
+\end_layout
+
+\begin_layout Standard
+Caution: the above is an analogy, and not a strict equivalence.
+ The expression 
+\begin_inset Formula $\lambda x$
+\end_inset
+
+ is not strictly a part of lambda calculus; it is a notational fragment
+ used to indicate variable binding.
+ The jigsw connectors serve two purposes: when connected, they indicate
+ what is connected to what, just as an ordinary graph drawing would do.
+ When disconnected, the jigsaw connectors indicate what can be connected
+ to what: the connectors represent types, the kinds of things that can potential
+ly be connected together.
+\end_layout
+
+\begin_layout Subsection*
+In type theory
+\end_layout
+
+\begin_layout Standard
+The phrase 
+\begin_inset Quotes eld
+\end_inset
+
+shadow of
+\begin_inset Quotes erd
+\end_inset
+
+ in the above text is perhaps disconcerting.
+ This is where type theory can come to the rescue.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+shadow
+\begin_inset Quotes erd
+\end_inset
+
+ is the type.
+ The matching of the type of the variable, to the type of what can be plugged
+ into the variable, is what the shape of the connector implies.
+ So, again, her e is 
+\begin_inset Formula $f(x)$
+\end_inset
+
+ below, where 
+\begin_inset Formula $v_{2}$
+\end_inset
+
+ is understood as the free variable 
+\begin_inset Formula $x$
+\end_inset
+
+ being of type 
+\begin_inset Formula $A$
+\end_inset
+
+: 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename graphics/puzzle-left.eps
+	lyxscale 60
+	width 18col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here is the bound variable 
+\begin_inset Formula $\lambda x$
+\end_inset
+
+ which is again of type 
+\begin_inset Formula $A$
+\end_inset
+
+: 
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename graphics/puzzle-right.eps
+	lyxscale 60
+	width 18col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+That is, 
+\begin_inset Formula $x$
+\end_inset
+
+ itself is just 
+\begin_inset Formula $v_{2}$
+\end_inset
+
+, and it takes the half-edge to indicate that it's type is 
+\begin_inset Formula $A$
+\end_inset
+
+.
+ The connector itself is the type.
+\end_layout
+
+\begin_layout Standard
+Again, this may seem strange and foreign, which might be clarified with
+ a more complex example.
+ The type constructor 
+\begin_inset Formula $A\to B$
+\end_inset
+
+ constructs functions.
+ it can be understood as a lambda expression, in the sense that given a
+ term 
+\begin_inset Formula $b$
+\end_inset
+
+ of type 
+\begin_inset Formula $B$
+\end_inset
+
+, containing a free variable 
+\begin_inset Formula $x$
+\end_inset
+
+ of type 
+\begin_inset Formula $A$
+\end_inset
+
+, then 
+\begin_inset Formula $\lambda x.b$
+\end_inset
+
+ is a term of type 
+\begin_inset Formula $A\to B$
+\end_inset
+
+.
+ How is this to be represented in terms of jigsaws? With the diagram below:
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename graphics/puzzle-function.eps
+	lyxscale 60
+	width 25col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This time, the connectors have been explicitly labeled with the types.
+ The above is explicitly an instance of the type 
+\begin_inset Formula $A\to B$
+\end_inset
+
+.
+ The open circle with the capital 
+\begin_inset Formula $A$
+\end_inset
+
+ indicates that anything that is of type 
+\begin_inset Formula $A$
+\end_inset
+
+ can be connected there; connecting-together is beta-reduction.
+ The open circle labeled with 
+\begin_inset Formula $B$
+\end_inset
+
+ denotes that this jigsaw (labeled 
+\begin_inset Formula $f$
+\end_inset
+
+) can be plugged into anything that is expecting type 
+\begin_inset Formula $B$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The above exercise hopefully shows how connectors can be understood as types.
+ However, the theory of jigsaw pieces is not type theory.
+ The type constructor 
+\begin_inset Formula $A\to B$
+\end_inset
+
+ is explicitly directional, the jigsaw pieces are not: a jigsaw piece that
+ is flipped, rotated, inverted is still a jigsaw piece; functions are always
+ directional.
+ Reversing the arrow gives an inverse function, but an inverse function
+ is still directional, just going the other way.
+ This is in part because type theory is closely tied to the internal language
+ of category theory, which is itself a theory of dots and arrows.
+ By contrast, the jigsaw conception provided here is derived from a graph
+ theory where the directionality of the edges is immaterial, or of secondary
+ importance.
+ 
+\end_layout
+
+\begin_layout Subsection*
+In philosophy:
+\end_layout
+
+\begin_layout Standard
+The paradoxes of mereology were touched on in the section on relational
+ algebras.
+ For an extended discussion of the philosophical issues, see the text titled
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Mereology and Postmodernism
+\begin_inset Quotes erd
+\end_inset
+
+, in 
+\begin_inset Quotes eld
+\end_inset
+
+mereology.pdf
+\begin_inset Quotes erd
+\end_inset
+
+ in this directory.
+\end_layout
+
+\begin_layout Section*
+Tensors
+\end_layout
+
+\begin_layout Standard
+The idea of jigaw pieces with typed monopolar or bipolar connectors can
+ be modelled by tensors.
+ Thus, connecting two connectors (of matching type) can be understood as
+ contracting a pair of tensor indexes (of the appropriate type).
+ Covariant and contravariant tensor indexes are naturally bipolar (heterosexual)
+ as described above; when the indexes are just 
+\begin_inset Quotes eld
+\end_inset
+
+plain
+\begin_inset Quotes erd
+\end_inset
+
+ indexes, they are monopolar: they can be contracted as long as they are
+ of the same type.
+ Conventional tensors do not have any corresponding notion of multi-sexual
+ connectors, as described above.
+\end_layout
+
+\begin_layout Standard
+The similarity btween tensors and jigsaw pieces is ultimately anchored on
+ just one commonality: it takes two, and exactly two connectors, to connect
+ and form a link.
+ One cannot form a link from zero, onje, three or more connectors.
+ Likewise, tensor indexes contract by pairs: once cannot contract three
+ or more indexes together.
+ There is no loss of generality from this restriction; one emulates multi-index
+ contraction by using diagonal tensors: those whose entries are zero everywhere
+ except on the diagonal.
+ Likewise for the jigsaw conception: if one wishes to connect together three
+ (or more) connectors into one unit, one creates (without loss of generality)
+ a 
+\begin_inset Quotes eld
+\end_inset
+
+diagonal
+\begin_inset Quotes erd
+\end_inset
+
+ jigsaw pieces with three (or more) connectors on it.
+\end_layout
+
+\begin_layout Standard
+A deeper exploration is given in 
+\begin_inset Quotes eld
+\end_inset
+
+tensors.pdf
+\begin_inset Quotes erd
+\end_inset
+
+ in this directory.
+\end_layout
+
+\begin_layout Subsubsection*
+Types and fibers
+\end_layout
+
+\begin_layout Standard
+TODO: talk about how vectors can have different indexes of different types
+ on them.
+ A prototypical example are the quark wave functions, which have a color
+ index, a flavor index, a spin index and a momentum index.
+\end_layout
+
+\begin_layout Standard
+Follow outline given in email.
+\end_layout
+
+\begin_layout Section*
+Sheaf Axioms
+\end_layout
+
+\begin_layout Standard
+Individual jigsaw pieces, and partially-assembled assemblies obey the sheaf
+ axioms.
+ Roughly speaking, the sheaf axioms just state that two assembled (connected)
+ jigsaw pieces are effectively still a jigsaw piece, in that there are still
+ (unconnected) connectors on it, and that larger assemblies decompose into
+ smaller sub-assemblies that are still consistently assembled according
+ to the connection rules.
+ See 
+\begin_inset Quotes eld
+\end_inset
+
+sheaf-axioms.pdf
+\begin_inset Quotes erd
+\end_inset
+
+ in this directory.
+\end_layout
+
+\begin_layout Section*
+Learning
+\end_layout
+
+\begin_layout Standard
+Searching, parsing and learning are closely related.
+ See 
+\begin_inset Quotes eld
+\end_inset
+
+learning.pdf
+\begin_inset Quotes erd
+\end_inset
+
+ in this directory.
+\end_layout
+
+\begin_layout Section*
+Applications
+\end_layout
+
+\begin_layout Subsubsection*
+In linguistics:
+\end_layout
+
+\begin_layout Standard
+Why, link-grammar, of course.
+ its a grammar.
+ Its a categorial grammar.
+ Type theory.
+ Pre-group grammar.
+ Stay and Baez Rosetta stone.
+ And
+\end_layout
+
+\begin_layout Subsubsection*
+In AI:
+\end_layout
+
+\begin_layout Standard
+Inference, theorem proving, planning, constraint satisfaction.
+\end_layout
+
+\begin_layout Standard
+The planning aspect is that one can arrange a collection of unconnected
+ connectors at one end (the starting state) and another at the other end
+ (the goal state) and build a bridge between the two.
+\end_layout
+
+\begin_layout Standard
+frame problem, combinatorial explosion.
+\end_layout
+
+\begin_layout Standard
+Conclusions:
+\end_layout
+
+\begin_layout Standard
+There is no such thing as non-fiction; all writing is fundamentally fictional
+ at it's root.
+ The only way to be non-fictional is to be quarks and space-time, the universe
+ itself.
+\end_layout
+
+\begin_layout Standard
+The above is a fancy way of saying that analytic philosophy is blarney,
+ and that the quest for symbolic AI is doomed.
+ One cannot unambiguously assign speech-act labels to text, or symbols to
+ meaning.
+ The problem lies beyond mere 
+\begin_inset Quotes eld
+\end_inset
+
+fuzziness
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+probability
+\begin_inset Quotes erd
+\end_inset
+
+, Bayesian or otherwise.
+\end_layout
+
+\begin_layout Standard
+Yet, despite these problems, there is a way forward in relationships, without
+ insisting on cause and effect, premise and inference, (Bayesian) prior
+ and deduction.
+ Directionality can be useful, but it is an infelicity, a trap with yawning
+ abysses of foundational problems, not the least of which is the concept
+ of 
+\begin_inset Quotes eld
+\end_inset
+
+well-foundedness
+\begin_inset Quotes erd
+\end_inset
+
+ itself.
+ Restricted compositionality is more powerful and more general.
+\end_layout
+
+\begin_layout Subsubsection*
+Inductive logic programming
+\end_layout
+
+\begin_layout Standard
+See, for example, the Wikipedia article on this.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+See 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://en.wikipedia.org/wiki/Inductive_logic_programming
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+ The learning of sheaf structure is a generalization of 
+\begin_inset Quotes eld
+\end_inset
+
+inductive logic programming
+\begin_inset Quotes erd
+\end_inset
+
+, where the specific axioms of logic have been abstracted away.
+ More precisely, logic has an explicit directionality to all of it's rules
+ and axioms; sheaves can not only capture this directional, but they also
+ provide a non-directional generalization.
+ XXX TODO: this entire paragraph needs to be extended to a full-sized paper.
+\end_layout
+
+\begin_layout Section*
+AtomSpace
+\end_layout
+
+\begin_layout Standard
+The AtomSpace is a graph database intended to provide generic support for
+ knowledge representation, logical inference, and symbolic AI reasoning.
+ It provides a large variety of operators for constructing terms and defining
+ relations, as well as a fairly comprehensive type system for assigning
+ types to variables and working with signatures of functions and terms.
+ In this sense, it incorporates many features that are commonly accepted
+ in quotidian computer science.
+ There is some question about how the existing AtomSpace implementation
+ should inter-operate with the idea of connectors and bonds.
+ The goal of this section is to review the existing type system, and how
+ it can interface with a connector-and-bond system.
+\end_layout
+
+\begin_layout Subsection*
+The Atomese Type System
+\end_layout
+
+\begin_layout Standard
+The existing Atomese type system is an extensible system of types usually
+ defined at compile time.
+ Although new types can be added at run-time, it is usually useful to have
+ a corresponding object-oriented class definition for each type, so that
+ the types can 
+\begin_inset Quotes eld
+\end_inset
+
+do things
+\begin_inset Quotes erd
+\end_inset
+
+ (be evaluatable, perform numeric operations, perform i/o operations, etc.)
+ As a result, the type hierarchy is somewhat limited and fairly rigid.
+ Although there are more than 100 different types in use in the current
+ system, only a handful of these are relevant to the current discussion.
+ A quick sketch of these is given below.
+\end_layout
+
+\begin_layout Standard
+The core concept underlying Atomese is the 
+\noun on
+Atom
+\noun default
+: a globally-unique immutable structure which can be referenced and can
+ be used as an anchor for mutable, varying 
+\noun on
+Value
+\noun default
+s.
+ All 
+\noun on
+Atom
+\noun default
+s derive from two basic types: the 
+\noun on
+Node
+\noun default
+ and the 
+\noun on
+Link
+\noun default
+.
+ The 
+\noun on
+Node
+\noun default
+ is simply a (UTF-8) string.
+ All 
+\noun on
+Node
+\noun default
+s having the same string name are in fact the same 
+\noun on
+Node
+\noun default
+.
+ Very crudely, one can think of 
+\noun on
+Node
+\noun default
+s as named vertexes of a graph.
+ The 
+\noun on
+Link
+\noun default
+ corresponds to a hyper-edge: a 
+\noun on
+Link
+\noun default
+ can contain zero, one, two or more 
+\noun on
+Atom
+\noun default
+s; it is a possibly-empty list of 
+\noun on
+Atom
+\noun default
+s.
+ 
+\noun on
+Link
+\noun default
+s to not have any other properties; in particular, they have no string name.
+ Thus, crudely, one may think of a 
+\noun on
+Link
+\noun default
+ containing exactly two 
+\noun on
+Node
+\noun default
+s as an ordinary graph edge.
+ Like 
+\noun on
+Node
+\noun default
+s, 
+\noun on
+Link
+\noun default
+s are globally unique: there can only ever be one 
+\noun on
+Link
+\noun default
+ containing a given list of 
+\noun on
+Atom
+\noun default
+s.
+ It is very convenient to think of a 
+\noun on
+Link
+\noun default
+ as a vertex internal to a tree; the 
+\noun on
+Node
+\noun default
+s are the leafs of the tree.
+ The trees are necessarily acyclic, and finite; it is not possible to construct
+ a 
+\noun on
+Link
+\noun default
+ that contains itself.
+\end_layout
+
+\begin_layout Standard
+The AtomSpace is a container for 
+\noun on
+Atom
+\noun default
+s.
+ As each 
+\noun on
+Atom
+\noun default
+ is effectively a tree, one can think of it as a forest-of-trees.
+ However, since each 
+\noun on
+Atom
+\noun default
+ is globally unique (within an AtomSpace), a more accurate conceptual visualizat
+ion is that of a rhizome or woolen felt, as different trees typically share
+ the same branches.
+ In the following, s-expressions will be used to write down trees.
+\end_layout
+
+\begin_layout Subsubsection*
+VariableNode
+\end_layout
+
+\begin_layout Standard
+Declares the name of a variable.
+ For example, 
+\family typewriter
+(VariableNode 
+\begin_inset Quotes eld
+\end_inset
+
+x
+\begin_inset Quotes erd
+\end_inset
+
+)
+\family default
+.
+\end_layout
+
+\begin_layout Subsubsection*
+TypedVariableLink
+\end_layout
+
+\begin_layout Standard
+Associates a type declaration with a variable.
+ For example, 
+\family typewriter
+(TypedVariable (Variable 
+\begin_inset Quotes eld
+\end_inset
+
+x
+\begin_inset Quotes erd
+\end_inset
+
+) (Type 
+\begin_inset Quotes eld
+\end_inset
+
+ConceptNode
+\begin_inset Quotes erd
+\end_inset
+
+))
+\family default
+.
+ This states that the the variable is necessarily of type 
+\begin_inset Quotes eld
+\end_inset
+
+
+\noun on
+Concept
+\noun default
+
+\begin_inset Quotes erd
+\end_inset
+
+, with 
+\noun on
+ConceptNode
+\noun default
+ being one of the many predefined types in the system.
+ The 
+\noun on
+TypeNode
+\noun default
+ is just a 
+\noun on
+Node
+\noun default
+ whose string name must be the string representation of a simple type.
+\end_layout
+
+\begin_layout Subsubsection*
+SignatureLink
+\end_layout
+
+\begin_layout Standard
+A mechanism to declare or construct a compound or complex type.
+ For example, 
+\family typewriter
+(Signature (EvaluationLink (PredicateNode 
+\begin_inset Quotes eld
+\end_inset
+
+foo
+\begin_inset Quotes erd
+\end_inset
+
+) (ListLink (Type 
+\begin_inset Quotes eld
+\end_inset
+
+Concept
+\begin_inset Quotes erd
+\end_inset
+
+) (Type 
+\begin_inset Quotes eld
+\end_inset
+
+Concept
+\begin_inset Quotes erd
+\end_inset
+
+))))
+\family default
+ constructs a type consisting of two 
+\noun on
+Concept
+\noun default
+s, and given a fixed label of 
+\begin_inset Quotes eld
+\end_inset
+
+foo
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The specific meaning of 
+\noun on
+EvaluationLink
+\noun default
+, 
+\noun on
+ListLink
+\noun default
+ and 
+\noun on
+PredicateNode
+\noun default
+ are of no particular concern here, they're merely examples of some of the
+ predefined types in the Atomese system.
+\end_layout
+
+\begin_layout Subsubsection*
+Other type constructors
+\end_layout
+
+\begin_layout Standard
+The system contains several other type constructors, including those for
+ type union and type intersection.
+\end_layout
+
+\begin_layout Section*
+Bibliography
+\end_layout
+
+\begin_layout Itemize
+Marius Buliga (2003).
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Artificial chemistry experiments with chemlambda, lambda calculus, interaction
+ combinators.
+\begin_inset Quotes erd
+\end_inset
+
+ https://arxiv.org/abs/2003.14332
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+btprint "btPrintCited"
+bibfiles "lang"
+options "tufte"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

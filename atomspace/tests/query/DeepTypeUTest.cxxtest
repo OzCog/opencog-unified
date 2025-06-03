@@ -1,0 +1,583 @@
+/*
+ * tests/query/DeepTypeUTest.cxxtest
+ *
+ * Copyright (C) 2015 Linas Vepstas
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <opencog/util/Logger.h>
+#include <opencog/guile/SchemeEval.h>
+#include <opencog/atomspace/AtomSpace.h>
+#include <cxxtest/TestSuite.h>
+
+using namespace opencog;
+
+class DeepTypeUTest: public CxxTest::TestSuite
+{
+private:
+	AtomSpacePtr as;
+	SchemeEval* eval;
+
+public:
+	DeepTypeUTest(void)
+	{
+		// logger().setLevel(Logger::FINE);
+		logger().set_level(Logger::DEBUG);
+		logger().set_print_to_stdout_flag(true);
+		logger().set_timestamp_flag(false);
+		logger().set_sync_flag(true);
+
+		as = createAtomSpace();
+		eval = new SchemeEval(as);
+		eval->eval("(use-modules (opencog exec) (opencog type-utils))");
+		eval->eval("(add-to-load-path \"" PROJECT_SOURCE_DIR "\")");
+	}
+
+	~DeepTypeUTest()
+	{
+		// Erase the log file if no assertions failed.
+		if (!CxxTest::TestTracker::tracker().suiteFailed())
+				std::remove(logger().get_filename().c_str());
+	}
+
+	void setUp(void);
+	void tearDown(void);
+
+	void test_is_type(void);
+	void test_type_match(void);
+	void test_match_signature(void);
+	void test_match_arrow(void);
+	void test_get_signature(void);
+	void test_unbundle_defined_type_node(void);
+	void test_aybe_sea(void);
+	void test_deep_disconnect(void);
+};
+
+void DeepTypeUTest::tearDown(void)
+{
+}
+
+void DeepTypeUTest::setUp(void)
+{
+	as->clear();
+}
+
+/*
+ * Basic deep-type unit test.
+ */
+void DeepTypeUTest::test_is_type(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	as->clear();
+	eval->eval("(load-from-path \"tests/query/deep-types.scm\")");
+
+	std::string rv = eval->eval(
+		"(cog-value-is-type? "
+		"	(Signature (Inheritance (Concept \"foo\") (Type \"ConceptNode\")))"
+		"	(Inheritance (Concept \"foo\") (ConceptNode \"bar\")))");
+
+	printf("expect true, got %s", rv.c_str());
+	TSM_ASSERT("Expected true", rv == "#t\n");
+
+	rv = eval->eval(
+		"(cog-value-is-type? "
+		"	(Signature (Inheritance (Concept \"foo\") (Type \"ConceptNode\")))"
+		"	(Inheritance (Concept \"failure-mode\") (ConceptNode \"bar\")))");
+
+	printf("expect false, got %s", rv.c_str());
+	TSM_ASSERT("Expected false", rv == "#f\n");
+
+	rv = eval->eval(
+		"(cog-value-is-type? "
+		"	(DefinedType \"My foo type\")"
+		"	(Inheritance (Concept \"foo\") (ConceptNode \"bar\")))");
+
+	printf("expect true, got %s", rv.c_str());
+	TSM_ASSERT("Expected true", rv == "#t\n");
+
+	rv = eval->eval(
+		"(cog-value-is-type? "
+		"	(DefinedType \"My foo type\")"
+		"	(Inheritance (Concept \"failure-mode\") (ConceptNode \"bar\")))");
+
+	printf("expect false, got %s", rv.c_str());
+	TSM_ASSERT("Expected false", rv == "#f\n");
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Basic deep-type unit test.
+ */
+void DeepTypeUTest::test_type_match(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	std::string rv;
+	as->clear();
+
+	// ----------------------
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(Concept \"aaa\")"
+		"	(Concept \"aaa\"))");
+
+	printf("expect true, got %s", rv.c_str());
+	TSM_ASSERT("Expected true", rv == "#t\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(Concept \"aaa\")"
+		"	(Concept \"bar\"))");
+
+	printf("expect false, got %s", rv.c_str());
+	TSM_ASSERT("Expected false", rv == "#f\n");
+
+	// ----------------------
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(Type \"ConceptNode\")"
+		"	(Concept \"bar\"))");
+
+	printf("expect true, got %s", rv.c_str());
+	TSM_ASSERT("Expected true", rv == "#t\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(Concept \"bar\")"
+		"	(Type \"ConceptNode\"))");
+
+	printf("expect false, got %s", rv.c_str());
+	TSM_ASSERT("Expected false", rv == "#f\n");
+
+	// ----------------------
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(Type \"ConceptNode\")"
+		"	(Type \"ConceptNode\"))");
+
+	printf("expect true, got %s", rv.c_str());
+	TSM_ASSERT("Expected true", rv == "#t\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(TypeChoice (Type \"ConceptNode\") (Type \"NumberNode\"))"
+		"	(Type \"ConceptNode\"))");
+
+	printf("expect true, got %s", rv.c_str());
+	TSM_ASSERT("Expected true", rv == "#t\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(Type \"ConceptNode\")"
+		"	(TypeChoice (Type \"ConceptNode\") (Type \"NumberNode\")))");
+
+	printf("expect false, got %s", rv.c_str());
+	TSM_ASSERT("Expected false", rv == "#f\n");
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Signature unit test.
+ */
+void DeepTypeUTest::test_match_signature(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	std::string rv;
+	as->clear();
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(SignatureLink (EvaluationLink "
+		"		(Type \"PredicateNode\")"
+		"		(ListLink (Type \"ConceptNode\") (Type \"NumberNode\"))))"
+		"	(SignatureLink (EvaluationLink "
+		"		(Type \"PredicateNode\")"
+		"		(ListLink (Type \"ConceptNode\") (Type \"NumberNode\")))))");
+
+	printf("(seq) expect true, got %s", rv.c_str());
+	TSM_ASSERT("Expected true", rv == "#t\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(SignatureLink (EvaluationLink "
+		"		(Type \"PredicateNode\")"
+		"		(ListLink (Type \"ConceptNode\") (Type \"NumberNode\"))))"
+		"	(SignatureLink (EvaluationLink "
+		"		(Type \"PredicateNode\")"
+		"		(ListLink (Type \"NumberNode\") (Type \"NumberNode\")))))");
+
+	printf("(nn) expect false, got %s", rv.c_str());
+	TSM_ASSERT("Expected false", rv == "#f\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(SignatureLink (EvaluationLink "
+		"		(Type \"PredicateNode\")"
+		"		(ListLink (Type \"ConceptNode\") (Type \"NumberNode\"))))"
+		"	(SignatureLink (EvaluationLink "
+		"		(PredicateNode \"foo\")"
+		"		(ListLink (Type \"ConceptNode\") (NumberNode 42)))))");
+
+	printf("(cpred) expect true, got %s", rv.c_str());
+	TSM_ASSERT("Expected true", rv == "#t\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(SignatureLink (EvaluationLink "
+		"		(Type \"PredicateNode\")"
+		"		(ListLink (Type \"ConceptNode\") (Type \"NumberNode\"))))"
+		"	(EvaluationLink "
+		"		(PredicateNode \"foo\")"
+		"		(ListLink (ConceptNode \"bar\") (NumberNode 42))))");
+
+	printf("(concr) expect true, got %s", rv.c_str());
+	TSM_ASSERT("Expected true", rv == "#t\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(SignatureLink (EvaluationLink "
+		"		(Type \"PredicateNode\")"
+		"		(ListLink (Type \"ConceptNode\") (Type \"NumberNode\"))))"
+		"	(EvaluationLink "
+		"		(PredicateNode \"foo\")"
+		"		(ListLink (NumberNode 13) (NumberNode 42))))");
+
+	printf("(badnum) expect false, got %s", rv.c_str());
+	TSM_ASSERT("Expected false", rv == "#f\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(SignatureLink (EvaluationLink "
+		"		(PredicateNode \"foo\")"
+		"		(ListLink (Type \"ConceptNode\") (Type \"NumberNode\"))))"
+		"	(EvaluationLink "
+		"		(PredicateNode \"foo\")"
+		"		(ListLink (ConceptNode \"bar\") (NumberNode 42))))");
+
+	printf("(foo-concr) expect true, got %s", rv.c_str());
+	TSM_ASSERT("Expected true", rv == "#t\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(SignatureLink (EvaluationLink "
+		"		(PredicateNode \"foo\")"
+		"		(ListLink (Type \"ConceptNode\") (Type \"NumberNode\"))))"
+		"	(EvaluationLink "
+		"		(PredicateNode \"bar\")"
+		"		(ListLink (ConceptNode \"bar\") (NumberNode 42))))");
+
+	printf("(foobar) expect false, got %s", rv.c_str());
+	TSM_ASSERT("Expected false", rv == "#f\n");
+
+	// ----------------------
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Arrow unit test.
+ * Mostly a cut-n-paste of above signature test, but with arrows, instead.
+ */
+void DeepTypeUTest::test_match_arrow(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	std::string rv;
+	as->clear();
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(Arrow "
+		"		(EvaluationLink "
+		"			(Type \"PredicateNode\")"
+		"			(ListLink (Type \"ConceptNode\") (Type \"NumberNode\")))"
+		"		(Type \"SetLink\"))"
+		"	(SignatureLink (EvaluationLink "
+		"		(Type \"PredicateNode\")"
+		"		(ListLink (Type \"ConceptNode\") (Type \"NumberNode\")))))");
+
+	printf("(aro seq) expect true, got %s", rv.c_str());
+	TSM_ASSERT("Expected true", rv == "#t\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(Arrow "
+		"		(EvaluationLink "
+		"			(Type \"PredicateNode\")"
+		"			(ListLink (Type \"ConceptNode\") (Type \"NumberNode\")))"
+		"		(Type \"SetLink\"))"
+		"	(SignatureLink (EvaluationLink "
+		"		(Type \"PredicateNode\")"
+		"		(ListLink (Type \"NumberNode\") (Type \"NumberNode\")))))");
+
+	printf("(aro nn) expect false, got %s", rv.c_str());
+	TSM_ASSERT("Expected false", rv == "#f\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(Arrow "
+		"		(EvaluationLink "
+		"			(Type \"PredicateNode\")"
+		"			(ListLink (Type \"ConceptNode\") (Type \"NumberNode\")))"
+		"		(Type \"SetLink\"))"
+		"	(Arrow "
+		"		(Type \"MemberLink\")"
+		"		(EvaluationLink "
+		"			(Type \"PredicateNode\")"
+		"			(ListLink (Type \"ConceptNode\") (NumberNode 42)))))");
+
+	printf("(aro cpred) expect true, got %s", rv.c_str());
+	TSM_ASSERT("Expected true", rv == "#t\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(Arrow "
+		"		(EvaluationLink "
+		"			(Type \"PredicateNode\")"
+		"			(ListLink (Type \"ConceptNode\") (Type \"NumberNode\")))"
+		"		(Type \"SetLink\"))"
+		"	(Arrow "
+		"		(Type \"MemberLink\")"
+		"		(EvaluationLink "
+		"			(PredicateNode \"foo\")"
+		"			(ListLink (ConceptNode \"bar\") (NumberNode 42)))))");
+
+	printf("(aro concr) expect true, got %s", rv.c_str());
+	TSM_ASSERT("Expected true", rv == "#t\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(Arrow "
+		"		(EvaluationLink "
+		"			(Type \"PredicateNode\")"
+		"			(ListLink (Type \"ConceptNode\") (Type \"NumberNode\")))"
+		"		(Type \"SetLink\"))"
+		"	(Arrow "
+		"		(Type \"MemberLink\")"
+		"		(EvaluationLink "
+		"			(PredicateNode \"foo\")"
+		"			(ListLink (NumberNode 13) (NumberNode 42)))))");
+
+	printf("(aro badnum) expect false, got %s", rv.c_str());
+	TSM_ASSERT("Expected false", rv == "#f\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(Arrow "
+		"		(EvaluationLink "
+		"			(TypeChoice "
+		"				(Type \"PredicateNode\")"
+		"				(Type \"GroundedPredicateNode\"))"
+		"			(ListLink (Type \"ConceptNode\") (Type \"NumberNode\")))"
+		"		(Type \"SetLink\"))"
+		"	(Arrow "
+		"		(Type \"MemberLink\")"
+		"		(EvaluationLink "
+		"			(PredicateNode \"foo\")"
+		"			(ListLink (ConceptNode \"bar\") (NumberNode 42)))))");
+
+	printf("(aro choice) expect true, got %s", rv.c_str());
+	TSM_ASSERT("Expected true", rv == "#t\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(Arrow "
+		"		(EvaluationLink "
+		"			(TypeChoice "
+		"				(PredicateNode \"foo\")"
+		"				(PredicateNode \"bar\")"
+		"				(Type \"GroundedPredicateNode\"))"
+		"			(ListLink (Type \"ConceptNode\") (Type \"NumberNode\")))"
+		"		(Type \"SetLink\"))"
+		"	(Arrow "
+		"		(Type \"MemberLink\")"
+		"		(EvaluationLink "
+		"			(PredicateNode \"foo\")"
+		"			(ListLink (ConceptNode \"bar\") (NumberNode 42)))))");
+
+	printf("(aro choice concr) expect true, got %s", rv.c_str());
+	TSM_ASSERT("Expected true", rv == "#t\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(Arrow "
+		"		(EvaluationLink "
+		"			(TypeChoice "
+		"				(PredicateNode \"bar\")"
+		"				(Type \"GroundedPredicateNode\"))"
+		"			(ListLink (Type \"ConceptNode\") (Type \"NumberNode\")))"
+		"		(Type \"SetLink\"))"
+		"	(Arrow "
+		"		(Type \"MemberLink\")"
+		"		(EvaluationLink "
+		"			(PredicateNode \"foo\")"
+		"			(ListLink (ConceptNode \"bar\") (NumberNode 42)))))");
+
+	printf("(aro choice foobar) expect false, got %s", rv.c_str());
+	TSM_ASSERT("Expected false", rv == "#f\n");
+
+	rv = eval->eval(
+		"(cog-type-match? "
+		"	(Arrow "
+		"		(EvaluationLink "
+		"			(TypeChoice "
+		"				(PredicateNode \"foo\")"
+		"				(PredicateNode \"bar\")"
+		"				(PredicateNode \"baz\")"
+		"				(Type \"GroundedPredicateNode\"))"
+		"			(ListLink (Type \"ConceptNode\") (Type \"NumberNode\")))"
+		"		(Type \"SetLink\"))"
+		"	(Arrow "
+		"		(Type \"MemberLink\")"
+		"		(EvaluationLink "
+		"			(TypeChoice "
+		"				(PredicateNode \"foo\")"
+		"				(GroundedPredicateNode \"scm: stuff huff\"))"
+		"			(ListLink (ConceptNode \"bar\") (NumberNode 42)))))");
+
+	printf("(aro choice subset) expect true, got %s", rv.c_str());
+	TSM_ASSERT("Expected true", rv == "#t\n");
+
+	// ----------------------
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Basic deep-type unit test.
+ */
+void DeepTypeUTest::test_get_signature(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	as->clear();
+	eval->eval("(load-from-path \"tests/query/deep-types.scm\")");
+
+	Handle hgnd = eval->eval_h("(cog-execute! get-foo)");
+	Handle hans = eval->eval_h(
+		"(SetLink "
+		"    (InheritanceLink "
+		"        (ConceptNode \"foo\") (ConceptNode \"bingo\")))");
+
+	printf("Expected this: %s\n", hans->to_string().c_str());
+	printf("Found this answer: %s\n", hgnd->to_string().c_str());
+
+	TSM_ASSERT("Didn't get the expected grounding", hans == hgnd);
+
+	// --------------------------------------------------------
+	hgnd = eval->eval_h("(cog-execute! get-foobar)");
+	hans = eval->eval_h(
+		"(SetLink "
+		"    (InheritanceLink "
+		"        (ConceptNode \"foo\") (ConceptNode \"bingo\"))"
+		"    (InheritanceLink "
+		"        (ConceptNode \"bar\") (ConceptNode \"bingo\")))");
+
+	printf("Expected this: %s\n", hans->to_string().c_str());
+	printf("Found this answer: %s\n", hgnd->to_string().c_str());
+
+	TSM_ASSERT("Didn't get the expected grounding", hans == hgnd);
+
+	// --------------------------------------------------------
+	hgnd = eval->eval_h("(cog-execute! predicate-search)");
+	hans = eval->eval_h(
+		"(SetLink "
+		"   (EvaluationLink"
+		"      (PredicateNode \"foo\")"
+		"      (ListLink"
+		"         (ConceptNode \"bingo\")"
+		"         (ConceptNode \"yes!\")))"
+		"   (EvaluationLink"
+		"      (AnchorNode \"bar\")"
+		"      (ListLink"
+		"         (ConceptNode \"hurrah\")"
+		"         (ConceptNode \"yay!\"))))");
+
+	printf("Expected this: %s\n", hans->to_string().c_str());
+	printf("Found this answer: %s\n", hgnd->to_string().c_str());
+
+	TSM_ASSERT("Didn't get the expected grounding", hans == hgnd);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test to make sure that the unbundling of DefinedType in
+ * TypedVariableLink is taking place.
+ */
+void DeepTypeUTest::test_unbundle_defined_type_node(void)
+{
+	logger().info("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/deep-types.scm\")");
+
+	Handle result = eval->eval_h("(cog-execute! predicate-search-typed)");
+	Handle result_expected = eval->eval_h(
+		"(SetLink "
+		"   (EvaluationLink"
+		"      (PredicateNode \"foo\")"
+		"      (ListLink"
+		"         (ConceptNode \"bingo\")"
+		"         (ConceptNode \"yes!\")))"
+		"   (EvaluationLink"
+		"      (AnchorNode \"bar\")"
+		"      (ListLink"
+		"         (ConceptNode \"hurrah\")"
+		"         (ConceptNode \"yay!\"))))");
+
+	TSM_ASSERT("Didn't get expected result", result == result_expected);
+	logger().info("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test trivial constant types.
+ */
+void DeepTypeUTest::test_aybe_sea(void)
+{
+	logger().info("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/deep-types.scm\")");
+
+	Handle result = eval->eval_h("(cog-execute! constant-a)");
+	Handle expected = eval->eval_h("(SetLink (Concept \"A\"))");
+	TSM_ASSERT_EQUALS("Bad simple constant", result, expected);
+
+	result = eval->eval_h("(cog-execute! constant-zappa)");
+	TSM_ASSERT_EQUALS("Bad constant abc", result, expected);
+
+	logger().info("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test disconnected deep components
+ */
+void DeepTypeUTest::test_deep_disconnect(void)
+{
+	logger().info("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/deep-types.scm\")");
+
+	Handle result = eval->eval_h("(cog-execute! deep-disconnect)");
+	Handle expected = eval->eval_h(
+		"(SetLink (List (Concept \"A\") (Concept \"B\")))");
+	TSM_ASSERT_EQUALS("Bad disconnect", result, expected);
+
+	logger().info("END TEST: %s", __FUNCTION__);
+}

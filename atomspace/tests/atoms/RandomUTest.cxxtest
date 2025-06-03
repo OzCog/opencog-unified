@@ -1,0 +1,145 @@
+/*
+ * tests/atoms/RandomUTest.cxxtest
+ *
+ * Copyright (C) 2015 Linas Vepstas
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <opencog/guile/SchemeEval.h>
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/util/Logger.h>
+
+using namespace opencog;
+
+class RandomUTest: public CxxTest::TestSuite
+{
+private:
+    AtomSpacePtr as;
+    SchemeEval* eval;
+
+public:
+    RandomUTest(void)
+    {
+        logger().set_level(Logger::DEBUG);
+        logger().set_print_to_stdout_flag(true);
+
+        as = createAtomSpace();
+        eval = new SchemeEval(as);
+        eval->eval("(add-to-load-path \"" PROJECT_SOURCE_DIR "\")");
+    }
+
+    ~RandomUTest()
+    {
+        delete eval;
+        // Erase the log file if no assertions failed.
+        if (!CxxTest::TestTracker::tracker().suiteFailed())
+            std::remove(logger().get_filename().c_str());
+    }
+
+    void setUp(void);
+    void tearDown(void);
+
+    void test_weights(void);
+    void test_pairs(void);
+};
+
+void RandomUTest::tearDown(void)
+{
+    as->clear();
+}
+
+void RandomUTest::setUp(void)
+{
+    as->clear();
+}
+
+/*
+ * RandomChoiceLink unit test.
+ */
+void RandomUTest::test_weights(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/atoms/random-choice.scm\")");
+
+    eval->eval_tv("(cog-evaluate! (DefinedPredicate \"loop a lot of times\"))");
+
+    Handle countA = eval->eval_h(
+        "(cog-execute! (Get (State (Anchor \"sum-A\") (Variable \"$x\"))))");
+    printf("A-count = %s\n", countA->to_string().c_str());
+
+    Handle countB = eval->eval_h(
+        "(cog-execute! (Get (State (Anchor \"sum-B\") (Variable \"$x\"))))");
+    printf("B-count = %s\n", countB->to_string().c_str());
+
+    Handle ratio = eval->eval_h(
+        "(cog-execute! (DefinedSchema \"ratio\"))");
+    printf("ratio = %s\n", ratio->to_string().c_str());
+
+    TruthValuePtr tv = eval->eval_tv("(cog-evaluate! (DefinedPredicate \"test\"))");
+    TS_ASSERT_LESS_THAN(0.5, tv->get_mean());
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * RandomChoiceLink unit test.
+ */
+void RandomUTest::test_pairs(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    // Define a simple list of pairs
+    eval->eval_h(
+        "(DefineLink (DefinedSchema \"pairs\") "
+        "(RandomChoice "
+        "   (SetLink "
+        "      (ListLink (NumberNode 1) (Concept \"AAA\"))"
+        "      (ListLink (NumberNode 1) (Concept \"BBB\"))"
+        "      (ListLink (NumberNode 0.1) (Concept \"CCC\")) )))"
+    );
+
+    Handle A = eval->eval_h("(Concept \"AAA\")");
+    Handle B = eval->eval_h("(Concept \"BBB\")");
+    Handle C = eval->eval_h("(Concept \"CCC\")");
+
+    int cntA=0, cntB=0, cntC=0;
+    for (int i=0; i<1000; i++)
+    {
+        Handle pick = eval->eval_h(
+            "(cog-execute! (DefinedSchema \"pairs\"))");
+
+        if (pick == A) cntA++;
+        if (pick == B) cntB++;
+        if (pick == C) cntC++;
+    }
+
+    printf("Got counts A=%d B=%d C=%d\n", cntA, cntB, cntC);
+
+    // Loose bounds. My rand gen always gives the same answer:
+    // Got counts A=488 B=468 C=44
+    TS_ASSERT_LESS_THAN(450, cntA);
+    TS_ASSERT_LESS_THAN(450, cntB);
+    TS_ASSERT_LESS_THAN(35, cntC);
+
+    TS_ASSERT_LESS_THAN(cntA, 500);
+    TS_ASSERT_LESS_THAN(cntB, 500);
+    TS_ASSERT_LESS_THAN(cntC, 60);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}

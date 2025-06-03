@@ -1,0 +1,58 @@
+/** algorithmUTest.cxxtest ---
+ *
+ * Copyright (C) 2010 OpenCog Foundation
+ *
+ * Author: Nil Geisweiller <nilg@laptop>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <opencog/util/algorithm.h>
+
+using namespace opencog;
+using namespace std;
+
+class algorithmUTest : public CxxTest::TestSuite
+{
+public:
+	void test_powerset() {
+		set<int> s = {1, 3, 5};
+		set<set<int> > ps = powerset(s);
+		set<set<int> > expect_set = { {}, {1}, {3}, {5},
+		                              {1, 3}, {1, 5}, {3, 5},
+		                              {1, 3, 5} };
+        
+		TS_ASSERT_EQUALS(ps, expect_set);
+	}
+
+	void test_powerset_exact() {
+		set<int> s = {1, 3, 5};
+		set<set<int> > ps = powerset(s, 2, true);
+		set<set<int> > expect_set = { {1, 3}, {1, 5}, {3, 5} };
+
+		TS_ASSERT_EQUALS(ps, expect_set);
+	}
+
+	void test_cartesian_product() {
+		set<int> c = {1, 2, 3};
+		set<vector<int>> result = cartesian_product(c, 2);
+		set<vector<int>> expect = { {1, 1}, {1, 2}, {1, 3},
+		                            {2, 1}, {2, 2}, {2, 3},
+		                            {3, 1}, {3, 2}, {3, 3} };
+
+		TS_ASSERT_EQUALS(result, expect);
+	}
+};

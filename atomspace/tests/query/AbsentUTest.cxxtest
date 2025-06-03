@@ -1,0 +1,317 @@
+/*
+ * tests/query/AbsentUTest.cxxtest
+ *
+ * Copyright (C) 2015 Linas Vepstas
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/guile/SchemeEval.h>
+#include <opencog/util/Logger.h>
+
+using namespace opencog;
+
+class AbsentUTest: public CxxTest::TestSuite
+{
+private:
+		AtomSpacePtr as;
+		SchemeEval* eval;
+
+public:
+	AbsentUTest(void)
+	{
+		logger().set_level(Logger::DEBUG);
+		logger().set_print_to_stdout_flag(true);
+
+		as = createAtomSpace();
+		eval = new SchemeEval(as);
+		eval->eval("(add-to-load-path \"" PROJECT_SOURCE_DIR "\")");
+
+		eval->eval("(use-modules (opencog exec))");
+	}
+
+	~AbsentUTest()
+	{
+		delete eval;
+		// Erase the log file if no assertions failed.
+		if (!CxxTest::TestTracker::tracker().suiteFailed())
+				std::remove(logger().get_filename().c_str());
+	}
+
+	void setUp(void);
+	void tearDown(void);
+
+	void test_single(void);
+	void test_double(void);
+	void test_connect_exist(void);
+	void test_connect_not_exist(void);
+	void test_discon_exist(void);
+	void test_discon_not_exist(void);
+	void test_bridges(void);
+};
+
+void AbsentUTest::tearDown(void)
+{
+	as->clear();
+}
+
+void AbsentUTest::setUp(void)
+{
+	as->clear();
+	eval->eval("(load-from-path \"tests/query/test_types.scm\")");
+}
+
+#define getarity(hand) hand->get_arity()
+
+/*
+ * Single AbsentLink used to trigger an action that takes
+ * place only when the atomspace is completely lacking something!
+ */
+void AbsentUTest::test_single(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/absent.scm\")");
+
+	Handle empty = eval->eval_h("(ConceptNode \"room empty\")");
+	Handle full = eval->eval_h("(ConceptNode \"room nonempty\")");
+
+	// Verify the initial state, room should be empty
+	Handle state = eval->eval_h("(show-room-state)");
+	printf("Expecting: %s\n", empty->to_string().c_str());
+	printf("Got: %s\n\n", state->to_string().c_str());
+	TS_ASSERT_EQUALS(state, empty);
+
+	// Make the golem come alive
+	eval->eval_h("(cog-execute! create)");
+	eval->eval_h("(cog-execute! is-visible)");
+	eval->eval_h("(cog-execute! is-invisible)");
+
+	state = eval->eval_h("(show-room-state)");
+	printf("Expecting: %s\n", full->to_string().c_str());
+	printf("Got: %s\n\n", state->to_string().c_str());
+	TS_ASSERT_EQUALS(state, full);
+
+	// Kill the golem
+	eval->eval_h("(cog-execute! destroy)");
+	eval->eval_h("(cog-execute! is-visible)");
+	eval->eval_h("(cog-execute! is-invisible)");
+
+	state = eval->eval_h("(show-room-state)");
+	TS_ASSERT_EQUALS(state, empty);
+
+	// Once more, for good luck.
+	eval->eval_h("(cog-execute! create)");
+	eval->eval_h("(cog-execute! is-visible)");
+	eval->eval_h("(cog-execute! is-invisible)");
+
+	state = eval->eval_h("(show-room-state)");
+	printf("Expecting: %s\n", full->to_string().c_str());
+	printf("Got: %s\n\n", state->to_string().c_str());
+	TS_ASSERT_EQUALS(state, full);
+
+	eval->eval_h("(cog-execute! destroy)");
+	eval->eval_h("(cog-execute! is-visible)");
+	eval->eval_h("(cog-execute! is-invisible)");
+
+	state = eval->eval_h("(show-room-state)");
+	TS_ASSERT_EQUALS(state, empty);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void AbsentUTest::test_double(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/absent-multi.scm\")");
+
+	Handle denied = eval->eval_h("(get-denied)");
+	Handle exists = eval->eval_h("(get-exists)");
+	Handle proven = eval->eval_h("(get-proven)");
+
+	// Verify the initial state, UFO should exist
+	Handle state = eval->eval_h("(show-ufo-state)");
+	TS_ASSERT_EQUALS(state, exists);
+
+	// Mulder and Scully not around; UFO should be.
+	eval->eval_h("(cog-execute! is-visible)");
+	eval->eval_h("(cog-execute! is-invisible)");
+	eval->eval_h("(cog-execute! is-proven)");
+
+	state = eval->eval_h("(show-ufo-state)");
+	TS_ASSERT_EQUALS(state, exists);
+
+	// Get Mulder on the scene
+	eval->eval_h("(cog-execute! call-mulder)");
+	eval->eval_h("(cog-execute! is-visible)");
+	eval->eval_h("(cog-execute! is-invisible)");
+	eval->eval_h("(cog-execute! is-proven)");
+
+	state = eval->eval_h("(show-ufo-state)");
+	TS_ASSERT_EQUALS(state, denied);
+
+	// Discredit Mulder
+	eval->eval_h("(cog-execute! discredit-mulder)");
+	eval->eval_h("(cog-execute! is-visible)");
+	eval->eval_h("(cog-execute! is-invisible)");
+	eval->eval_h("(cog-execute! is-proven)");
+
+	state = eval->eval_h("(show-ufo-state)");
+	TS_ASSERT_EQUALS(state, exists);
+
+	// Get Scully on the scene
+	eval->eval_h("(cog-execute! call-scully)");
+	eval->eval_h("(cog-execute! is-visible)");
+	eval->eval_h("(cog-execute! is-invisible)");
+	eval->eval_h("(cog-execute! is-proven)");
+
+	state = eval->eval_h("(show-ufo-state)");
+	TS_ASSERT_EQUALS(state, denied);
+
+	// Discredit Scully
+	eval->eval_h("(cog-execute! discredit-scully)");
+	eval->eval_h("(cog-execute! is-visible)");
+	eval->eval_h("(cog-execute! is-invisible)");
+	eval->eval_h("(cog-execute! is-proven)");
+
+	state = eval->eval_h("(show-ufo-state)");
+	TS_ASSERT_EQUALS(state, exists);
+
+	// Get both Mulder and Scully on the job
+	eval->eval_h("(cog-execute! call-mulder)");
+	eval->eval_h("(cog-execute! call-scully)");
+	eval->eval_h("(cog-execute! is-visible)");
+	eval->eval_h("(cog-execute! is-invisible)");
+	eval->eval_h("(cog-execute! is-proven)");
+
+	state = eval->eval_h("(show-ufo-state)");
+	TS_ASSERT_EQUALS(state, proven);
+
+	// Discredit Scully
+	eval->eval_h("(cog-execute! discredit-scully)");
+	eval->eval_h("(cog-execute! is-visible)");
+	eval->eval_h("(cog-execute! is-invisible)");
+	eval->eval_h("(cog-execute! is-proven)");
+
+	state = eval->eval_h("(show-ufo-state)");
+	TS_ASSERT_EQUALS(state, denied);
+
+	// Discredit Mulder too
+	eval->eval_h("(cog-execute! discredit-mulder)");
+	eval->eval_h("(cog-execute! is-visible)");
+	eval->eval_h("(cog-execute! is-invisible)");
+	eval->eval_h("(cog-execute! is-proven)");
+
+	state = eval->eval_h("(show-ufo-state)");
+	TS_ASSERT_EQUALS(state, exists);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void AbsentUTest::test_connect_exist(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/absent-conn1.scm\")");
+
+	Handle rtn = eval->eval_h("(cog-execute! test-absent)");
+
+	Handle soln = eval->eval_h("soln");
+
+	TSM_ASSERT_EQUALS("Wrong number of solutions", getarity(rtn), 0);
+	TS_ASSERT_EQUALS(rtn, soln);
+
+	Handle npr = eval->eval_h("(cog-execute! test-not-present)");
+
+	TSM_ASSERT_EQUALS("Wrong number of solutions", getarity(npr), 0);
+	TS_ASSERT_EQUALS(npr, soln);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void AbsentUTest::test_connect_not_exist(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/absent-conn2.scm\")");
+
+	Handle rtn = eval->eval_h("(cog-execute! test-absent)");
+
+	Handle soln = eval->eval_h("soln");
+
+	TSM_ASSERT_EQUALS("Wrong number of solutions", getarity(rtn), 1);
+	TS_ASSERT_EQUALS(rtn, soln);
+
+	Handle npr = eval->eval_h("(cog-execute! test-not-present)");
+
+	TSM_ASSERT_EQUALS("Wrong number of solutions", getarity(npr), 1);
+	TS_ASSERT_EQUALS(npr, soln);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void AbsentUTest::test_discon_exist(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/absent-disconn1.scm\")");
+
+	Handle rtn = eval->eval_h("(cog-execute! test)");
+
+	Handle soln = eval->eval_h("soln");
+
+	TSM_ASSERT_EQUALS("Wrong number of solutions", getarity(rtn), 0);
+	TS_ASSERT_EQUALS(rtn, soln);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void AbsentUTest::test_discon_not_exist(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/absent-disconn2.scm\")");
+
+	Handle rtn = eval->eval_h("(cog-execute! test)");
+
+	Handle soln = eval->eval_h("soln");
+
+	TSM_ASSERT_EQUALS("Wrong number of solutions", getarity(rtn), 1);
+	TS_ASSERT_EQUALS(rtn, soln);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+// Test absent links that beidge across disconnected components.
+// This is for bug #1596
+void AbsentUTest::test_bridges(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/absent-pets.scm\")");
+
+	Handle rtn = eval->eval_h("(cog-execute! pet-keepers)");
+
+	Handle soln = eval->eval_h("expected-result");
+
+	TSM_ASSERT_EQUALS("Wrong number of solutions", getarity(rtn), 3);
+	TS_ASSERT_EQUALS(rtn, soln);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}

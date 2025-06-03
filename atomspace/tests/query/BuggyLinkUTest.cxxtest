@@ -1,0 +1,94 @@
+/*
+ * tests/query/BuggyLinkUTest.cxxtest
+ *
+ * Copyright (C) 2014 Linas Vepstas
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/guile/SchemeEval.h>
+#include <opencog/util/Logger.h>
+#include "imply.h"
+
+
+using namespace opencog;
+
+class BuggyLinkUTest: public CxxTest::TestSuite
+{
+private:
+        AtomSpacePtr as;
+        SchemeEval* eval;
+
+public:
+    BuggyLinkUTest(void)
+    {
+        logger().set_level(Logger::DEBUG);
+        logger().set_print_to_stdout_flag(true);
+
+        as = createAtomSpace();
+        eval = new SchemeEval(as);
+        eval->eval("(add-to-load-path \"" PROJECT_SOURCE_DIR "\")");
+
+    }
+
+    ~BuggyLinkUTest()
+    {
+        // Erase the log file if no assertions failed.
+        if (!CxxTest::TestTracker::tracker().suiteFailed())
+                std::remove(logger().get_filename().c_str());
+    }
+
+    void setUp(void);
+    void tearDown(void);
+
+    void test_link(void);
+};
+
+void BuggyLinkUTest::tearDown(void)
+{
+    as->clear();
+}
+
+void BuggyLinkUTest::setUp(void)
+{
+    as->clear();
+}
+
+#define getarity(hand) hand->get_arity()
+
+/*
+ * BuggyLink unit test.  Test binding to unquoted links.
+ * This test explicitly tests the bug described in
+ * https://github.com/opencog/opencog/issues/1025
+ * The old pattern matcher would crash with a null-pointer deref.
+ * The current one works great.
+ */
+void BuggyLinkUTest::test_link(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/query/buggy-link.scm\")");
+
+    Handle bindy = eval->eval_h("bindy");
+    TSM_ASSERT("Failed to load test data", Handle::UNDEFINED != bindy);
+
+    Handle lily = bindlink(as, bindy);
+    logger().debug() << "Result is this:\n" << lily->to_string();
+
+    TS_ASSERT_EQUALS(1, getarity(lily));
+}

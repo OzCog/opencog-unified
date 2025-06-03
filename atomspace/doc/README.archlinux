@@ -1,0 +1,11 @@
+##############################################################################
+Installation and dependency resolution for ArchLinux users
+###############################################################################
+
+Opencog depends on the following packages.
+
+   g++ cmake guile cxxtest
+
+Optionally, install python and cython
+
+----------------------------------------------------------

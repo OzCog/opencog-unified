@@ -1,0 +1,126 @@
+/*
+ * tests/query/DefineLinkUTest.cxxtest
+ *
+ * Copyright (C) 2015 Linas Vepstas
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <opencog/atoms/base/Link.h>
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/guile/SchemeEval.h>
+#include <opencog/util/Logger.h>
+
+using namespace opencog;
+
+class DefineLinkUTest: public CxxTest::TestSuite
+{
+private:
+	AtomSpacePtr as;
+	SchemeEval* eval;
+
+public:
+	DefineLinkUTest(void)
+	{
+		logger().set_level(Logger::DEBUG);
+		logger().set_print_to_stdout_flag(true);
+
+		as = createAtomSpace();
+		eval = new SchemeEval(as);
+		eval->eval("(add-to-load-path \"" PROJECT_SOURCE_DIR "\")");
+
+		eval->eval("(use-modules (opencog exec))");
+	}
+
+	~DefineLinkUTest()
+	{
+		delete eval;
+		// Erase the log file if no assertions failed.
+		if (!CxxTest::TestTracker::tracker().suiteFailed())
+				std::remove(logger().get_filename().c_str());
+	}
+
+	void setUp(void);
+	void tearDown(void);
+
+	void test_basic(void);
+	void test_schema(void);
+};
+
+void DefineLinkUTest::tearDown(void)
+{
+	as->clear();
+}
+
+void DefineLinkUTest::setUp(void)
+{
+	as->clear();
+}
+
+#define getarity(hand) hand->get_arity()
+
+/*
+ * DefineLink most basic unit test.
+ */
+void DefineLinkUTest::test_basic(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/define.scm\")");
+
+	Handle items = eval->eval_h("(cog-execute! get-elect)");
+	TS_ASSERT_EQUALS(2, getarity(items));
+
+	items = eval->eval_h("(cog-execute! get-elect-bound)");
+	TS_ASSERT_EQUALS(2, getarity(items));
+
+	items = eval->eval_h("(cog-execute! get-parts)");
+	TS_ASSERT_EQUALS(2, getarity(items));
+}
+
+/*
+ * DefineLink DefinedSchemaNode
+ * Should be able to execute defined schemas.
+ */
+void DefineLinkUTest::test_schema(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/define-schema.scm\")");
+
+	Handle timestamp = eval->eval_h(
+		"(cog-execute! (DefinedSchemaNode \"set timestamp\"))");
+	TS_ASSERT_EQUALS(2, getarity(timestamp));
+
+	// Executing the above should return something like this:
+	// (EvaluationLink
+	//	 (PredicateNode "start-interaction-timestamp")
+	//	 (ListLink
+	//		 (NumberNode "1442342173.000000")))
+	// We need to check explicitly for the NumberNode, as a bogus
+	// return would provide a VariableNode instead, and that would
+	// be wrong.
+
+	Handle pred = timestamp->getOutgoingAtom(0);
+	TS_ASSERT_EQUALS(PREDICATE_NODE, pred->get_type());
+
+	Handle list = timestamp->getOutgoingAtom(1);
+	TS_ASSERT_EQUALS(LIST_LINK, list->get_type());
+
+	Handle num = list->getOutgoingAtom(0);
+	TS_ASSERT_EQUALS(NUMBER_NODE, num->get_type());
+}

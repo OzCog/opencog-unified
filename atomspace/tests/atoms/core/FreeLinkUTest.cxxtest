@@ -1,0 +1,219 @@
+/*
+ * tests/atoms/core/FreeLinkUTest.cxxtest
+ *
+ * Copyright (C) 2015 Linas Vepstas
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <opencog/guile/SchemeEval.h>
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/atoms/core/FreeLink.h>
+#include <opencog/atoms/core/VariableList.h>
+#include <opencog/util/Logger.h>
+
+using namespace opencog;
+
+class FreeLinkUTest: public CxxTest::TestSuite
+{
+private:
+	AtomSpacePtr as;
+	SchemeEval* eval;
+
+public:
+	FreeLinkUTest(void)
+	{
+		logger().set_level(Logger::DEBUG);
+		logger().set_print_to_stdout_flag(true);
+
+		as = createAtomSpace();
+		eval = new SchemeEval(as);
+	}
+
+	~FreeLinkUTest()
+	{
+		delete eval;
+		// Erase the log file if no assertions failed.
+		if (!CxxTest::TestTracker::tracker().suiteFailed())
+			std::remove(logger().get_filename().c_str());
+	}
+
+	void setUp(void);
+	void tearDown(void);
+
+	void test_unquote(void);
+	void test_deunquote(void);
+	void test_binding(void);
+	void test_getlink(void);
+};
+
+void FreeLinkUTest::tearDown(void)
+{
+	as->clear();
+}
+
+void FreeLinkUTest::setUp(void)
+{
+	as->clear();
+}
+
+/*
+ * FreeLink free-variable extraction test.  Test UnquoteLink.
+ */
+void FreeLinkUTest::test_unquote(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	// ---------
+	Handle vx = eval->eval_h("(VariableNode \"$x\")");
+	Handle vz = eval->eval_h("(VariableNode \"$z\")");
+	Handle unq = eval->eval_h(
+		"(OrderedLink (VariableNode \"$x\")"
+		"	(QuoteLink (ListLink (VariableNode \"$y\")"
+		"		(UnquoteLink (VariableNode \"$z\")))))"
+	);
+
+	FreeVariables fv;
+	fv.find_variables(unq);
+	HandleSeq vars = fv.varseq;
+
+	printf("expecting Variable $x: %s\n", vars[0]->to_short_string().c_str());
+	printf("expecting Variable $z: %s\n", vars[1]->to_short_string().c_str());
+
+	// Expecting only two variables $x and $z, because $y is quoted.
+	// Expecting the order to be preserved: i.e. $x before $z
+	TS_ASSERT_EQUALS(vars.size(), 2);
+	TS_ASSERT_EQUALS(vars[0], vx);
+	TS_ASSERT_EQUALS(vars[1], vz);
+
+	// ---------
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * FreeLink free-variable extraction test.  Test multiple,
+ * recursive UnquoteLinks.
+ */
+void FreeLinkUTest::test_deunquote(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	// ---------
+	Handle vx = eval->eval_h("(VariableNode \"$x\")");
+	Handle vz = eval->eval_h("(VariableNode \"$z\")");
+	Handle vu = eval->eval_h("(VariableNode \"$u\")");
+	Handle unq = eval->eval_h(
+		"(OrderedLink (VariableNode \"$x\")"
+		"	(QuoteLink (ListLink (VariableNode \"$y\")"
+		"		(UnquoteLink (VariableNode \"$z\"))"
+		"		(VariableNode \"$w\")"
+		"		(UnquoteLink (VariableNode \"$u\"))"
+		"		(VariableNode \"$t\"))))"
+	);
+
+	FreeVariables fv;
+	fv.find_variables(unq);
+	HandleSeq vars = fv.varseq;
+
+	printf("expect Var $x: %s\n", vars[0]->to_short_string().c_str());
+	printf("expect Var $z: %s\n", vars[1]->to_short_string().c_str());
+	printf("expect Var $u: %s\n", vars[2]->to_short_string().c_str());
+
+	// Expecting only three variables $x, $z, $u because all the
+	// others are quoted.  Expecting the order to be preserved:
+	// i.e. $x then $z then $u.
+	TS_ASSERT_EQUALS(vars.size(), 3);
+	TS_ASSERT_EQUALS(vars[0], vx);
+	TS_ASSERT_EQUALS(vars[1], vz);
+	TS_ASSERT_EQUALS(vars[2], vu);
+
+	// ---------
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * FreeLink free-variable extraction test.  Test bound variables.
+ */
+void FreeLinkUTest::test_binding(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	// ---------
+	Handle vx = eval->eval_h("(VariableNode \"$x\")");
+	Handle vz = eval->eval_h("(VariableNode \"$z\")");
+	Handle unq = eval->eval_h(
+		"(OrderedLink (VariableNode \"$x\")"
+		"	(LambdaLink (VariableList (VariableNode \"$y\"))"
+		"		(ListLink (VariableNode \"$z\"))))"
+	);
+
+	FreeVariables fv;
+	fv.find_variables(unq);
+	HandleSeq vars = fv.varseq;
+
+	printf("expecting free $x: %s\n", vars[0]->to_short_string().c_str());
+	printf("expecting free $z: %s\n", vars[1]->to_short_string().c_str());
+
+	// Expecting only two variables $x and $z, because $y is quoted.
+	// Expecting the order to be preserved: i.e. $x before $z
+	TS_ASSERT_EQUALS(vars.size(), 2);
+	TS_ASSERT_EQUALS(vars[0], vx);
+	TS_ASSERT_EQUALS(vars[1], vz);
+
+	// ---------
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * FreeLink free-variable extraction test.  Test GetLink.
+ */
+void FreeLinkUTest::test_getlink(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	// ---------
+	Handle vx = eval->eval_h("(VariableNode \"$x\")");
+	Handle vz = eval->eval_h("(VariableNode \"$z\")");
+	Handle unq = eval->eval_h(
+		"(OrderedLink (VariableNode \"$x\")"
+		"	(GetLink (VariableList (VariableNode \"$ya\")"
+		"			(VariableNode \"$yb\")"
+		"			(VariableNode \"$yc\")"
+		"			(VariableNode \"$yd\"))"
+		"		(ListLink (VariableNode \"$ya\")"
+		"			(VariableNode \"$yb\")"
+		"			(VariableNode \"$z\")"
+		"			(VariableNode \"$yc\")"
+		"			(VariableNode \"$yd\"))))"
+	);
+
+	FreeVariables fv;
+	fv.find_variables(unq);
+	HandleSeq vars = fv.varseq;
+
+	printf("expecting get $x: %s\n", vars[0]->to_short_string().c_str());
+	printf("expecting get $z: %s\n", vars[1]->to_short_string().c_str());
+
+	// Expecting only two variables $x and $z, because $y is quoted.
+	// Expecting the order to be preserved: i.e. $x before $z
+	TS_ASSERT_EQUALS(vars.size(), 2);
+	TS_ASSERT_EQUALS(vars[0], vx);
+	TS_ASSERT_EQUALS(vars[1], vz);
+
+	// ---------
+	logger().debug("END TEST: %s", __FUNCTION__);
+}

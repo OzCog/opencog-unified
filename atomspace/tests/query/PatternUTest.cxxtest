@@ -1,0 +1,477 @@
+/*
+ * tests/query/PatternUTest.cxxtest
+ *
+ * Copyright (C) 2009,2011 Linas Vepstas <linasvepstas@gmail.com>
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <cxxtest/TestSuite.h>
+
+#include <opencog/atoms/base/Node.h>
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/query/TermMatchMixin.h>
+#include <opencog/query/InitiateSearchMixin.h>
+#include <opencog/query/SatisfyMixin.h>
+#include <opencog/atoms/pattern/PatternLink.h>
+#include <opencog/util/Logger.h>
+
+#include "imply.h"
+#include "test-types.h"
+
+using namespace opencog;
+
+#define al as->add_link
+#define an as->add_node
+
+// This implements the most basic, simplest test of the pattern matcher.
+class PatternUTest: public CxxTest::TestSuite
+{
+	private:
+		AtomSpacePtr as;
+
+		// These handles are documented below.
+		Handle hconst_1;
+		Handle hconst_2;
+		Handle hconst_3;
+		Handle hsoln_a;
+		Handle hsoln_b;
+		Handle hsoln_c;
+
+		Handle hpred_1a;
+		Handle hpred_1b;
+		Handle hpred_1c;
+
+		Handle hpred_2a;
+		Handle hpred_2b;
+		Handle hpred_2c;
+
+		Handle hitem_1;
+		Handle hitem_2;
+		Handle hitem_3;
+		Handle hlist;
+		Handle hprnode;
+		Handle hoc;
+
+		Handle hshort_list;
+		Handle hshort_prnode;
+		Handle hshort_oc;
+
+		Handle heval;
+		Handle hshort_eval;
+
+	public:
+
+		PatternUTest(void)
+		{
+			logger().set_level(Logger::DEBUG);
+			logger().set_print_to_stdout_flag(true);
+#include "test-types.cc"
+			as = createAtomSpace();
+		}
+
+		~PatternUTest()
+		{
+			// Erase the log file if no assertions failed.
+			if (!CxxTest::TestTracker::tracker().suiteFailed())
+				std::remove(logger().get_filename().c_str());
+		}
+
+		void setUp(void);
+		void tearDown(void);
+
+		void test_simple_link(void);
+		void test_two_links(void);
+		void test_eval(void);
+		void test_implication(void);
+};
+
+class PMCB :
+	public InitiateSearchMixin,
+	public TermMatchMixin,
+	public SatisfyMixin
+{
+	public:
+		PMCB(AtomSpace* as) :
+			InitiateSearchMixin(as), TermMatchMixin(as), found(0) {}
+
+		virtual void set_pattern(const Variables& vars,
+		                         const Pattern& pat)
+		{
+			InitiateSearchMixin::set_pattern(vars, pat);
+			TermMatchMixin::set_pattern(vars, pat);
+		}
+
+		virtual bool node_match(Node *, Node *);
+		virtual bool propose_grounding(const HandleMap &var_soln,
+		                               const HandleMap &pred_soln);
+
+		int found;
+		HandleMap preds;
+		HandleMap vars;
+};
+
+bool PMCB::node_match(Node *npat, Node *nsoln)
+{
+	Type pattype = npat->get_type();
+	Type soltype = nsoln->get_type();
+
+	// Reject obvioius mismatches
+	if (pattype != soltype) return false;
+
+	Handle ha = npat->get_handle();
+	Handle hb = nsoln->get_handle();
+	logger().debug("Compare (%zu) %s ==== (%zu) %s",
+		ha.value(), npat->get_name().c_str(),
+		hb.value(), nsoln->get_name().c_str());
+
+	return npat == nsoln;
+}
+
+bool PMCB::propose_grounding(const HandleMap &var_soln,
+                             const HandleMap &pred_soln)
+{
+	found ++;
+	preds = pred_soln;
+	vars = var_soln;
+	return false;
+}
+
+#define getlink(hand,pos) hand->getOutgoingAtom(pos)
+
+/*
+ * This function sets up the following structures:
+ *
+ *    ConceptNode "some const concept node 1"       ;; hconst_1
+ *    ConceptNode "some const concept node 2"       ;; hconst_2
+ *    ConceptNode "some const concept node 3"       ;; hconst_3
+ *    ConceptNode "desired solution concept node a" ;; hsoln_a
+ *    ConceptNode "desired solution concept node b" ;; hsoln_b
+ *    ConceptNode "desired solution concept node c" ;; hsoln_c
+ *    ConceptNode "incorrect solution concept node"
+ *
+ *    InheritanceLink   ;; hpred_1a
+ *       ConceptNode "some const concept node 1"
+ *       ConceptNode "desired solution concept node a"
+ *
+ *    ListLink     ;; hpred_1b
+ *       ConceptNode "some const concept node 1"
+ *       ConceptNode "desired solution concept node b"
+ *
+ *    ListLink     ;; hpred_1c
+ *       ConceptNode "some const concept node 1"
+ *       ConceptNode "desired solution concept node c"
+ *
+ *    AssociativeLink
+ *       ConceptNode "some const concept node"
+ *       ConceptNode "incorrect solution concept node"
+ *
+ *    EvaluationLink                                ;; hoc
+ *       PredicateNode "relationship blaupunkt"     ;; hprnode
+ *       ListLink                                   ;; hlist
+ *          ConceptNode "concept kanjiru 1"         ;; hitem_1
+ *          ConceptNode "concept kangaeru 2"        ;; hitem_2
+ *          ConceptNode "concept nihongo 3"         ;; hitem_3
+ *
+ *    EvaluationLink                                ;; hshort_oc
+ *       PredicateNode "relationship weltanshaung"  ;; hshort_prnode
+ *       ListLink                                   ;; hshort_list
+ *          ConceptNode "concept kanjiru 1"         ;; hitem_1
+ *          ConceptNode "concept kangaeru 2"        ;; hitem_2
+ */
+void PatternUTest::tearDown(void)
+{
+}
+void PatternUTest::setUp(void)
+{
+	// create a gnarly graph
+	hconst_1 = an(CONCEPT_NODE, "some const concept node 1");
+	hconst_2 = an(CONCEPT_NODE, "some const concept node 2");
+	hconst_3 = an(CONCEPT_NODE, "some const concept node 3");
+	hsoln_a = an(CONCEPT_NODE, "desired solution concept node a");
+	hsoln_b = an(CONCEPT_NODE, "desired solution concept node b");
+	hsoln_c = an(CONCEPT_NODE, "desired solution concept node c");
+
+	hpred_1a = al(INHERITANCE_LINK, hconst_1, hsoln_a);
+	hpred_1b = al(LIST_LINK, hconst_1, hsoln_b);
+	hpred_1c = al(LIST_LINK, hconst_1, hsoln_c);
+
+	hpred_2a = al(INHERITANCE_LINK, hconst_2, hsoln_a);
+	hpred_2b = al(LIST_LINK, hconst_2, hsoln_b);
+	hpred_2c = al(LIST_LINK, hconst_2, hsoln_c);
+
+	// create a confounding link, like above, but different
+	Handle hwrong = an(CONCEPT_NODE, "incorrect solution concept node");
+
+	al(SIMILARITY_LINK, hconst_1, hwrong);
+
+	// Create a standard-format opencog predicate
+	hitem_1 = an(CONCEPT_NODE, "concept kanjiru 1");
+	hitem_2 = an(CONCEPT_NODE, "concept kangaeru 2");
+	hitem_3 = an(CONCEPT_NODE, "concept nihongo 3");
+
+	hlist = al(LIST_LINK, hitem_1, hitem_2, hitem_3);
+
+	hprnode = an(PREDICATE_NODE, "relationship blaupunkt");
+
+	hoc = al(EVALUATION_LINK, hprnode, hlist);
+
+	// Same as above, but with only two items in the list.
+	hshort_list = al(LIST_LINK, hitem_1, hitem_2);
+
+	hshort_prnode = an(PREDICATE_NODE, "relationship weltanshaung");
+
+	hshort_oc = al(EVALUATION_LINK, hshort_prnode, hshort_list);
+}
+
+void PatternUTest::test_simple_link(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	// Define the pattern to match against.
+	Handle hvar = an(VARIABLE_NODE, "variable node");
+	Handle he = al(INHERITANCE_LINK, hconst_1, hvar);
+
+	HandleSet vars;
+	vars.insert(hvar);
+
+	HandleSeq preds;
+	preds.push_back(he);
+
+	PMCB pmcb(as.get());
+	match(pmcb, vars, preds);
+
+	// Should find only one solution.
+	TSM_ASSERT_EQUALS("wrong number of solutions", pmcb.found, 1);
+	TSM_ASSERT("incorrect solution", hsoln_a == pmcb.vars[hvar]);
+	TSM_ASSERT("incorrect predicate", hpred_1a == pmcb.preds[he]);
+
+	// Remove garbage, just in case ...
+	as->extract_atom(he);
+	as->extract_atom(hvar);
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * This test creates the following pattern, for matching:
+ *
+ *    AndList
+ *       ListLink
+ *          ConceptNode "some const concept node 1"
+ *          VariableNode "variable node x"
+ *       ListLink
+ *          ConceptNode "some const concept node 2"
+ *          VariableNode "variable node x"
+ *
+ *    ListLink
+ *       VariableNode "variable node x"
+ *
+ * This is used to try to match hypergraphs in the atomspace, defined
+ * above. Two answers are expected, since "desired solution concept
+ * node b" and "c" can be paired to "x".
+ */
+
+void PatternUTest::test_two_links(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	// Define the pattern to match against.
+	Handle hx = an(VARIABLE_NODE, "variable node x");
+
+	Handle hl1 = al(LIST_LINK, hconst_1, hx);
+	Handle hl2 = al(LIST_LINK, hconst_2, hx);
+
+	Handle han = al(AND_LINK, hl1, hl2);
+
+	Handle hv = al(VARIABLE_LIST, hx);
+
+	HandleSet vars;
+	vars.insert(hx);
+
+	HandleSeq preds;
+	preds.push_back(hl1);
+	preds.push_back(hl2);
+
+	PMCB pmcb(as.get());
+	match(pmcb, vars, preds);
+
+	// Should find two solutions:
+	// var_x = soln_b
+	// var_x = soln_c
+	TSM_ASSERT_EQUALS("wrong number of solutions", pmcb.found, 2);
+	// TSM_ASSERT("incorrect solution", hsoln_b == pmcb.vars[hx]);
+	// TSM_ASSERT("incorrect predicate", hpred_b == pmcb.preds[hlx]);
+
+	// Test the non-std::vector interface also.
+	pmcb.found = 0;
+	PatternLinkPtr sl(createPatternLink(hv, han));
+	pmcb.satisfy(sl);
+	TSM_ASSERT_EQUALS("wrong number of solutions", pmcb.found, 2);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * This test case creates the following pattern-matching and variable
+ * structures:
+ *
+ *    EvaluationLink                                ;; heval
+ *       VariableNode "3-tuple relationship variable"
+ *       ListLink
+ *          ConceptNode "concept kanjiru 1"         ;; hitem_1
+ *          VariableNode "concept variable"
+ *          ConceptNode "concept nihongo 3"         ;; hitem_3
+ *
+ *    EvaluationLink                                ;; hshort_eval
+ *       VariableNode "2-tuple relationship variable"
+ *       ListLink
+ *          ConceptNode "concept kanjiru 1"         ;; hitem_1
+ *          VariableNode "concept variable"
+ *
+ */
+void PatternUTest::test_eval(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	// Create a standard-format opencog predicate
+	Handle h1 = an(CONCEPT_NODE, "concept kanjiru 1");
+	Handle h2 = an(VARIABLE_NODE, "concept variable");
+	Handle h3 = an(CONCEPT_NODE, "concept nihongo 3");
+
+	Handle hl = al(LIST_LINK, h1, h2, h3);
+
+	Handle hprn = an(VARIABLE_NODE, "3-tuple relationship variable");
+
+	heval = al(EVALUATION_LINK, hprn, hl);
+
+	HandleSet vars;
+	vars.insert(hprn);
+	vars.insert(h2);
+
+	HandleSeq preds;
+	preds.push_back(heval);
+
+	PMCB pmcb(as.get());
+	match(pmcb, vars, preds);
+
+	// Should find one solution
+	TSM_ASSERT_EQUALS("wrong number of solutions", pmcb.found, 1);
+	TSM_ASSERT("incorrect solution", hitem_2 == pmcb.vars[h2]);
+	TSM_ASSERT("incorrect pr-node", hprnode == pmcb.vars[hprn]);
+	TSM_ASSERT("incorrect predicate", hoc == pmcb.preds[heval]);
+
+	// ----------------------------------------
+	logger().debug("BEGIN second subtest: %s", __FUNCTION__);
+	// Do it again, but with a truncated list
+	Handle hls = al(LIST_LINK, h1, h2);
+
+	Handle hprns = an(VARIABLE_NODE, "2-tuple relationship variable");
+
+	hshort_eval = al(EVALUATION_LINK, hprns, hls);
+
+	HandleSet svars;
+	svars.insert(hprns);
+	svars.insert(h2);
+
+	HandleSeq spreds;
+	spreds.push_back(hshort_eval);
+
+	pmcb.found = 0; // reset the counter !!
+	match(pmcb, svars, spreds);
+
+	// Should find one solution
+	TSM_ASSERT_EQUALS("wrong number of solutions", pmcb.found, 1);
+	TSM_ASSERT("incorrect solution", hitem_2 == pmcb.vars[h2]);
+	TSM_ASSERT("incorrect pr-node", hshort_prnode == pmcb.vars[hprns]);
+	TSM_ASSERT("incorrect predicate", hshort_oc == pmcb.preds[hshort_eval]);
+
+	// ----------------------------------------------
+	logger().debug("BEGIN third subtest: %s", __FUNCTION__);
+	// And do it again, now matching two clauses
+	// The first clause was set up above; tack on the second one.
+	preds.push_back(hshort_eval);
+	vars.insert(hprns);
+	pmcb.found = 0; // reset the counter !!
+	match(pmcb, vars, preds);
+	TSM_ASSERT_EQUALS("wrong number of solutions", pmcb.found, 1);
+	TSM_ASSERT("incorrect solution", hitem_2 == pmcb.vars[h2]);
+	TSM_ASSERT("incorrect pr-node", hprnode == pmcb.vars[hprn]);
+	TSM_ASSERT("incorrect pr-node", hshort_prnode == pmcb.vars[hprns]);
+	TSM_ASSERT("incorrect predicate", hoc == pmcb.preds[heval]);
+	TSM_ASSERT("incorrect predicate", hshort_oc == pmcb.preds[hshort_eval]);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * This creates the following implication structure
+ *
+ *    ImplicationLink
+ *       AndLink
+ *           EvaluationLink  ;; heval, as given above ...
+ *           EvaluationLink  ;; hshorteval, as given above ...
+ *       ParseLink
+ *           VariableNode "concept variable"
+ *
+ * After evaluation, it is expected that the atom-space will
+ * contain the following:
+ *
+ *    ParseLink
+ *       ConceptNode "concept kangaeru 2"        ;; hitem_2
+ *
+ * Since that is what the variable is expected to bind to.
+ */
+void PatternUTest::test_implication(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	Handle han = al(AND_LINK, heval, hshort_eval);
+
+	Handle h2 = an(VARIABLE_NODE, "concept variable");
+
+	Handle hpa = al(PARSE_LINK, h2);
+
+	imply(as.get(), han, hpa);
+
+	// Remove the parse link, so that the other one is easier to find.
+	as->extract_atom(hpa);
+
+	// At this point, the AtomSpace should contain a structure
+	// that looks like the below. Look for it.
+	//
+	//   ParseLink
+	//      ConceptNode "concept kangaeru 2"        ;; hitem_2
+	//
+	// Be sure to explicitly check that we got hitem_2 as the result
+
+	HandleSeq ret;
+	as->get_handles_by_type(ret, PARSE_LINK);
+
+	TSM_ASSERT_EQUALS("incorrect implication", ret.size(), 1);
+	if (0 < ret.size())
+	{
+		TSM_ASSERT("null pointer", as->is_valid_handle(ret[0]));
+
+		Handle solution = getlink(ret[0],0);
+		TSM_ASSERT("incorrect solution", hitem_2 == solution);
+	}
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+#undef al
+#undef an

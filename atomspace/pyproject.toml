@@ -1,0 +1,158 @@
+# OpenCog AtomSpace pyproject.toml
+# Meant for use in pip python virtual envs.
+#
+# IMPORTANT PREREQUISITES:
+# First, install System dependencies (before building cogutil and atomspace):
+# Ubuntu/Debian: apt install libboost-all-dev cmake guile-3.0-dev pkg-config cxxtest
+# CentOS/RHEL:   yum install boost-devel cmake3 guile30-devel pkgconfig cxxtest
+#
+# Next, before building AtomSpace, you MUST first build and install cogutil:
+#
+# 1. Clone cogutil:
+#    git clone https://github.com/opencog/cogutil.git
+#    cd cogutil
+#
+# 2. Build and install cogutil:
+#    mkdir build && cd build
+#    cmake ..
+#    make -j
+#    sudo make install
+#    sudo ldconfig  # Update library cache
+#
+# 3. Verify cogutil installation:
+#    pkg-config --exists cogutil && echo "cogutil found" || echo "cogutil NOT found"
+#
+# 4. Then proceed with the AtomSpace build in the python venv:
+#    python3 -m venv as-test-venv
+#    source as-test-venv/bin/activate
+#    pip install . -v
+#
+
+[build-system]
+requires = [
+    "py-build-cmake~=0.1.8",
+    "pybind11",
+    "cython>=0.23",
+    "cmake>=3.0.2",
+    "wheel",
+]
+build-backend = "py_build_cmake.build"
+
+[project]
+name = "atomspace"
+version = "5.0.5"
+description = "The AtomSpace Hypergraph Database"
+readme = "README.md"
+license = "AGPL-3.0-or-later"
+license-files = ["LICEN[CS]E*"]
+authors = [
+  { name="OpenCog Development", email="opencog@googlegroups.com" },
+]
+maintainers = [
+  { name="OpenCog Development", email="opencog@googlegroups.com" },
+]
+
+keywords = [
+    "knowledge-representation",
+    "graph-database",
+    "hypergraph",
+    "metagraph",
+    "pattern-matching",
+    "symbolic-ai",
+]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+requires-python = ">=3.8"
+
+dependencies = [
+    "nose3",  # For testing
+]
+
+[project.optional-dependencies]
+dev = [
+    "cxxtest",
+    "nose3",
+    "build",
+]
+
+[project.urls]
+Homepage = "https://github.com/opencog/atomspace"
+Issues = "https://github.com/opencog/atomspace/issues"
+Documentation = "https://wiki.opencog.org/w/AtomSpace"
+Repository = "https://github.com/opencog/atomspace"
+
+[tool.py-build-cmake.module]
+name = "opencog"
+
+[tool.py-build-cmake.sdist]
+include = [
+    "CMakeLists.txt",
+    "cmake/**/*",
+    "opencog/**/*",
+    "tests/**/*",
+    "examples/**/*",
+    "lib/**/*",
+    "*.md",
+    "LICENSE",
+]
+exclude = [
+    "build/**/*",
+    "**/__pycache__/**/*",
+    "**/*.pyc",
+    "**/.git/**/*",
+]
+
+[tool.py-build-cmake.cmake]
+minimum_version = "3.12"
+build_type = "Release"
+source_path = "."
+build_path = "build"
+build_tool_args = ["-j"]
+
+# The pip venv cannot find the cython executable. I don't know why.
+# So hack around this by force-setting it.
+# Failure to set ${CMAKE_INSTALL_PREFIX} results in assorted
+# `Permission denied.` errors.
+# Ditto for ${GUILE_SITE_DIR}
+args = [
+    "-DCYTHON_EXECUTABLE=/usr/bin/cython",
+    "-DCMAKE_INSTALL_PREFIX=${VIRTUAL_ENV}",
+    "-DGUILE_SITE_DIR=${VIRTUAL_ENV}/share/guile/site/3.0/",
+]
+
+# Need to install everything, and not just the python bindings.
+install_components = ["Unspecified"]
+# install_components = ["PythonBindings"]
+
+# Build only for Linux
+[tool.cibuildwheel]
+build = "cp3*-linux_x86_64"
+skip = "cp35-* pp*"  # Skip Python 3.5 and PyPy
+
+# Install system dependencies for AtomSpace
+before-all = [
+    # Ubuntu/Debian dependencies
+    "apt-get update && apt-get install -y libboost-all-dev cmake guile-3.0-dev || true",
+    # CentOS/RHEL dependencies
+    "yum install -y boost-devel cmake3 guile30-devel || true",
+]
+
+# Test the wheel
+test-requires = ["nose3"]
+test-command = "python -c 'import opencog.atomspace; print(\"AtomSpace import successful\")'"

@@ -1,0 +1,89 @@
+/*
+ * tests/query/BuggySelfGroundUTest.cxxtest
+ *
+ * Copyright (C) 2015 OpenCog Foundation
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * Created by Jacek Świergocki <jswiergo@gmail.com> August 2015
+ */
+
+#include <opencog/guile/SchemeEval.h>
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/util/Logger.h>
+#include "imply.h"
+
+using namespace opencog;
+
+class BuggySelfGroundUTest: public CxxTest::TestSuite
+{
+private:
+    AtomSpacePtr as;
+    SchemeEval* eval;
+
+public:
+    BuggySelfGroundUTest(void)
+    {
+        logger().set_level(Logger::DEBUG);
+        logger().set_print_to_stdout_flag(true);
+
+        as = createAtomSpace();
+        eval = new SchemeEval(as);
+        eval->eval("(add-to-load-path \"" PROJECT_SOURCE_DIR "\")");
+
+    }
+
+    ~BuggySelfGroundUTest()
+    {
+        delete eval;
+        // Erase the log file if no assertions failed.
+        if (!CxxTest::TestTracker::tracker().suiteFailed())
+            std::remove(logger().get_filename().c_str());
+    }
+
+    void setUp(void);
+    void tearDown(void);
+
+    void test_crash(void);
+};
+
+void BuggySelfGroundUTest::tearDown(void)
+{
+    as->clear();
+}
+
+void BuggySelfGroundUTest::setUp(void)
+{
+    as->clear();
+}
+
+#define getarity(hand) hand->get_arity()
+
+void BuggySelfGroundUTest::test_crash(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/query/buggy-selfgnd.scm\")");
+
+    Handle hbnd = eval->eval_h("bnd");
+    TSM_ASSERT("Failed to load test data", Handle::UNDEFINED != hbnd);
+
+    Handle items = bindlink(as, hbnd);
+    TS_ASSERT_EQUALS(1, getarity(items));
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}

@@ -1,0 +1,226 @@
+/*
+ * tests/atomspace/AtomTableUTest.cxtest
+ *
+ * Copyright (C) 2002-2007 Novamente LLC
+ * Copyright (C) 2008 by OpenCog Foundation
+ * Copyright (C) 2015 Linas Vepstas
+ * All Rights Reserved
+ *
+ * Written by Welter Silva <welter@vettalabs.com>
+ *            Gustavo Gama <gama@vettalabs.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <iostream>
+#include <fstream>
+
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/atoms/atom_types/NameServer.h>
+#include <opencog/atoms/value/FloatValue.h>
+#include <opencog/atoms/base/Link.h>
+#include <opencog/atoms/base/Node.h>
+#include <opencog/atoms/truthvalue/SimpleTruthValue.h>
+#include <opencog/guile/SchemeEval.h>
+#include <opencog/util/Logger.h>
+#include <opencog/util/platform.h>
+#include <opencog/util/mt19937ar.h>
+#include "../query/test-types.h"
+
+using namespace opencog;
+using namespace std;
+
+const char* gpnNames[] = {"GPN1", "GPN2", "GPN3", "GPN4", "GNP5", "GNP6"};
+int numberOfExpectedMatches[] = {26, 26, 26, 1, 1, 1};
+
+class AtomTableUTest : public CxxTest::TestSuite
+{
+
+private:
+
+    AtomSpacePtr table;
+    AtomSpacePtr atomSpace;
+
+public:
+
+    AtomTableUTest() {
+        // Uncomment to enable logging
+        //logger().setLevel(Logger::DEBUG);
+        //logger().setPrintToStdoutFlag(true);
+
+#include "../query/test-types.cc"
+        atomSpace = createAtomSpace();
+        table = atomSpace;
+    }
+    ~AtomTableUTest() {
+    }
+
+    void setUp()
+    {
+        atomSpace->clear();
+    }
+
+    void tearDown() {
+        atomSpace->clear();
+    }
+
+    void testSimple()
+    {
+        Handle time = table->add_atom(createNode(TIME_NODE, "1"));
+        Handle word = table->add_atom(createNode(NUMBER_NODE, "1"));
+        Handle sense = table->add_atom(createNode(CONCEPT_NODE, "28675194"));
+        HandleSeq os;
+        os.push_back(time);
+        os.push_back(word);
+        os.push_back(sense);
+        table->add_atom(createLink(std::move(os), INHERITANCE_LINK));
+        table->barrier();
+    }
+
+    void testHolds()
+    {
+        Handle h(createNode(NUMBER_NODE, "1"));
+        Handle word = table->add_atom(h);
+        TS_ASSERT(word->getAtomSpace() == table.get());
+    }
+
+    void testIsCleared()
+    {
+        atomSpace->clear();
+        TS_ASSERT(0 == table->get_size());
+        Handle word = table->add_atom(createNode(NUMBER_NODE, "1"));
+        TS_ASSERT(1 == table->get_size());
+    }
+
+    void doRecursiveAdd(Type list_type)
+    {
+        Handle hn1(createNode(NUMBER_NODE, "1"));
+        Handle hn2(createNode(NUMBER_NODE, "2"));
+        Handle hn3(createNode(NUMBER_NODE, "3"));
+        Handle hn4(createNode(NUMBER_NODE, "4"));
+        Handle hnp(createNode(PREDICATE_NODE, "diequalized"));
+
+        // The unordered link will get tested second,
+        // and will get a scrambled set of UUID's.
+        Handle hll;
+        if (list_type == LIST_LINK)
+            hll = createLink(list_type, hn1, hn2, hn3, hn4);
+        else if (list_type == SET_LINK)
+            hll = createLink(list_type, hn4, hn1, hn2, hn3);
+        else
+            hll = createLink(list_type, hn4, hn2, hn3, hn1);
+        Handle hle(createLink(EVALUATION_LINK, hnp, hll));
+
+        // Add the link.  All the outgoing atoms should get added too.
+        Handle hlet = table->add_atom(hle);
+        const HandleSeq& hs = hlet->getOutgoingSet();
+
+        const HandleSeq& hsl = hs[1]->getOutgoingSet();
+
+        // Now test resolution.  Given the version of the atom that is
+        // not yet in the atomspace, we should be able to find the one
+        // that is in the atomspace.
+        Handle hle_resolved(table->get_atom(hle));
+        TS_ASSERT(*((AtomPtr)hlet) == *((AtomPtr)hle_resolved));
+
+        Handle hnp_resolved(table->get_atom(hnp));
+        TS_ASSERT(*((AtomPtr)hs[0]) == *((AtomPtr)hnp_resolved));
+
+        Handle hll_resolved(table->get_atom(hll));
+        TS_ASSERT(*((AtomPtr)hs[1]) == *((AtomPtr)hll_resolved));
+
+        // The remainder of the test assumes an ordered link,
+        // so that atoms get stored in known locations. Can't
+        // run this part if its unordered.
+        if (not nameserver().isA(list_type, ORDERED_LINK))
+            return;
+
+        Handle hn1_resolved(table->get_atom(hn1));
+        TS_ASSERT(*((AtomPtr)hsl[0]) == *((AtomPtr)hn1_resolved));
+
+        Handle hn2_resolved(table->get_atom(hn2));
+        TS_ASSERT(*((AtomPtr)hsl[1]) == *((AtomPtr)hn2_resolved));
+
+        Handle hn3_resolved(table->get_atom(hn3));
+        TS_ASSERT(*((AtomPtr)hsl[2]) == *((AtomPtr)hn3_resolved));
+
+        Handle hn4_resolved(table->get_atom(hn4));
+        TS_ASSERT(*((AtomPtr)hsl[3]) == *((AtomPtr)hn4_resolved));
+    }
+
+    void testRecursiveAdd()
+    {
+        // Once for an ordered link type, and again for an unordered
+        // type.   Unordered links get special handling.
+        doRecursiveAdd(LIST_LINK);
+        doRecursiveAdd(SET_LINK);
+        doRecursiveAdd(SIMILARITY_LINK);
+        doRecursiveAdd(LIST_LINK);
+    }
+
+    /* test the fix for the bug triggered whenever we had a link
+     * pointing to the same atom twice (or more). */
+    void testDoubleLink()
+    {
+        Handle n1(createNode(NUMBER_NODE, "1"));
+        Handle n2(createNode(NUMBER_NODE, "2"));
+        Handle hn1 = table->add_atom(n1);
+        Handle hn2 = table->add_atom(n2);
+
+        HandleSeq os;
+        os.push_back(hn1); os.push_back(hn1); os.push_back(hn2);
+        Handle l1(createLink(std::move(os), LIST_LINK));
+        Handle hl1 = table->add_atom(l1);
+
+        // Now, remove hn1 from the table ...
+        table->extract_atom(hn1, true);
+
+        // Number nodes are handled differently, in the atomspace. Try
+        // again, with concept nodes.
+        Handle h3(createNode(CONCEPT_NODE, "3"));
+        os.clear();
+        os.push_back(h3);
+        os.push_back(h3);
+
+        Handle l33 = table->add_atom(createLink(std::move(os), LIST_LINK));
+        HandleSeq hs = l33->getOutgoingSet();
+        printf("hs1 & hs2 ptr's: %p %p\n", hs[0].operator->(), hs[1].operator->());
+        TS_ASSERT_EQUALS(hs[0], hs[1]);
+    }
+
+    void testSimpleWithCustomAtomTypes()
+    {
+        nameserver().beginTypeDecls("custom types");
+        Type MY_NUMBER_NODE = nameserver().declType(NUMBER_NODE, "MyNumberNode");
+        Type MY_CONCEPT_NODE = nameserver().declType(CONCEPT_NODE, "MyConceptNode");
+        Type MY_INHERITANCE_LINK = nameserver().declType(INHERITANCE_LINK, "MyInheritanceLink");
+        nameserver().endTypeDecls();
+        logger().debug("MY_NUMBER_NODE = %u, MY_CONCEPT_NODE = %u, MY_INHERITANCE_LINK = %u\n", MY_NUMBER_NODE, MY_CONCEPT_NODE, MY_INHERITANCE_LINK);
+        Handle wp = createNode(MY_NUMBER_NODE, "1");
+        Handle word = table->add_atom(wp);
+        Handle sp = createNode(MY_CONCEPT_NODE, "28675194");
+        Handle sense = table->add_atom(sp);
+        Handle lp = createLink(MY_INHERITANCE_LINK, word, sense);
+        Handle lh = table->add_atom(lp);
+
+        TS_ASSERT(table->get_node(MY_NUMBER_NODE, "1") != Handle::UNDEFINED);
+        TS_ASSERT(table->get_node(MY_CONCEPT_NODE, "28675194") != Handle::UNDEFINED);
+        HandleSeq os;
+        os.push_back(word);
+        os.push_back(sense);
+        TS_ASSERT(table->get_link(MY_INHERITANCE_LINK, std::move(os)) != Handle::UNDEFINED);
+    }
+};

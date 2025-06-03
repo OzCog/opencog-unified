@@ -1,0 +1,288 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\begin_preamble
+\usepackage{url} 
+\usepackage{slashed}
+\usepackage[all]{xy}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding utf8
+\fontencoding global
+\font_roman "times" "default"
+\font_sans "helvet" "default"
+\font_typewriter "cmtt" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures false
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry false
+\use_package amsmath 2
+\use_package amssymb 2
+\use_package cancel 1
+\use_package esint 0
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 0
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset space \hspace{}
+\length 70text%
+\end_inset
+
+Linas Vepstas
+\end_layout
+
+\begin_layout Standard
+\begin_inset space \hspace{}
+\length 70text%
+\end_inset
+
+linasvepstas@gmail.com
+\end_layout
+
+\begin_layout Standard
+\begin_inset space \hspace{}
+\length 70text%
+\end_inset
+
+28 February 2024
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To: ACM Transactions on Database Systems
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+Dear Editors:
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Please consider the attached manuscript for publication in ACM TODS.
+ I beleive it meets your publication standards.
+ Below are statements responding to your author guidelines.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Thank you,
+\end_layout
+
+\begin_layout Standard
+Linas
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Authors:
+\end_layout
+
+\begin_layout Standard
+Sole author: Linas Vepstas.
+ E-mail: linasvepstas@gmail.com.
+ Affiliation: OpenCog Foundation.
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "ORCID: 0000-0002-2557-740X"
+target "https://orcid.org/0000-0002-2557-740X"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Acknowledgements:
+\end_layout
+
+\begin_layout Standard
+The following acknowledgments paragraph was removed from the submission
+ text:
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+The second revision of this text has benefited from the (witting or unwitting)
+ helpful input of Amirouche Boubekki, Kino Coursey, John Cowan, Marc Nieper-Wißk
+irchen, Adam Vandervorst and Steven Wiley.
+ Absolutely none of this would have been possible without a decade's worth
+ of gracious support and tutelage of Ben Goertzel.
+\end_layout
+
+\begin_layout Paragraph
+Anonymous citations:
+\end_layout
+
+\begin_layout Standard
+There are no anonymous citations in this text.
+\end_layout
+
+\begin_layout Paragraph
+Conflicts of Interest:
+\end_layout
+
+\begin_layout Standard
+I am not aware of any potential conflicts of interest with any potential
+ reviewer; my work is sufficiently removed from the mainstream, that it
+ is unlikely that I will have had prior contact with potential reviewers.
+ Exceptions would be employees of Singularity.AI, associates of the OpenCog
+ Foundation and users of and contributors to the OpenCog system.
+ Among these are various grad students and professors; to the best of my
+ knowledge, knowing their fields of expertise and interest, it is very unlikely
+ that they would be chosen as reviewers.
+ They are not database geeks.
+\end_layout
+
+\begin_layout Paragraph
+Well-known or Unique Systems:
+\end_layout
+
+\begin_layout Standard
+The OpenCog system is well-known.
+ It is an open source project, with hundreds of contributors.
+ I am one of the more prominent and active contributors; some quality time
+ with a search engine, together with some basic sleuthing common-sense,
+ would quickly narrow things down to my being the likely author.
+\end_layout
+
+\begin_layout Paragraph
+Prior Publication:
+\end_layout
+
+\begin_layout Standard
+This work has been disseminated to a small number of people; primarily,
+ the employees at Singularity.AI and associates of the OpenCog Foundation.
+ In it's original form, it was meant to be a limited techical report; but
+ there have been repeated suggestions that it should be published in a prominent
+ journal.
+ The techical report can be found on github, as a part of project documentation.
+\end_layout
+
+\begin_layout Paragraph
+Novelty:
+\end_layout
+
+\begin_layout Standard
+None of the contents, nor paraphrasings or variations thereof, have appeared
+ in any journal before.
+\end_layout
+
+\begin_layout Paragraph
+Disclosure:
+\end_layout
+
+\begin_layout Standard
+None of the contents, nor paraphrasings or variations thereof, have been
+ submitted to any other journal or conference for publication.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "30col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

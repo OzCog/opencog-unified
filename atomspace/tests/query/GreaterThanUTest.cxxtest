@@ -1,0 +1,124 @@
+/*
+ * tests/query/GreaterThanUTest.cxxtest
+ *
+ * Copyright (C) 2014 Linas Vepstas
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <opencog/guile/SchemeEval.h>
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/util/Logger.h>
+#include "imply.h"
+
+using namespace opencog;
+
+class GreaterThanUTest: public CxxTest::TestSuite
+{
+private:
+	AtomSpacePtr as;
+	SchemeEval* eval;
+
+public:
+	GreaterThanUTest(void)
+	{
+		logger().set_level(Logger::DEBUG);
+		logger().set_print_to_stdout_flag(true);
+
+		as = createAtomSpace();
+		eval = new SchemeEval(as);
+		eval->eval("(add-to-load-path \"" PROJECT_SOURCE_DIR "\")");
+	}
+
+	~GreaterThanUTest()
+	{
+		// Erase the log file if no assertions failed.
+		if (!CxxTest::TestTracker::tracker().suiteFailed())
+			std::remove(logger().get_filename().c_str());
+	}
+
+	void setUp(void);
+	void tearDown(void);
+
+	void test_scm_greater(void);
+	void test_builtin_greater(void);
+};
+
+void GreaterThanUTest::tearDown(void)
+{
+}
+
+void GreaterThanUTest::setUp(void)
+{
+}
+
+#define getarity(hand) hand->get_arity()
+
+/*
+ * Basic GreaterThanLink unit test. Defines several relationships
+ * involving NumberNodes, and then verifies that the GreaterThanLink
+ * is actually performing the numeric comparison correctly.
+ */
+// Uses a scheme func for the compares
+void GreaterThanUTest::test_scm_greater(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/greater_than.scm\")");
+
+	Handle richer_than_george = eval->eval_h("(scm-than-george)");
+	Handle richer_than_susan = eval->eval_h("(scm-than-susan)");
+	Handle richer_than_obama = eval->eval_h("(scm-than-obama)");
+	Handle richer_than_gates = eval->eval_h("(scm-than-gates)");
+
+	Handle people_richer_than_george = bindlink(as, richer_than_george);
+	Handle people_richer_than_susan = bindlink(as, richer_than_susan);
+	Handle people_richer_than_obama = bindlink(as, richer_than_obama);
+	Handle people_richer_than_gates = bindlink(as, richer_than_gates);
+
+	TS_ASSERT_EQUALS(0, getarity(people_richer_than_gates));
+	TS_ASSERT_EQUALS(1, getarity(people_richer_than_obama));
+	TS_ASSERT_EQUALS(2, getarity(people_richer_than_george));
+	TS_ASSERT_EQUALS(3, getarity(people_richer_than_susan));
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+// Same test as above, but using the built-in GreaterThanLink
+void GreaterThanUTest::test_builtin_greater(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/greater_than.scm\")");
+
+	Handle richer_than_george = eval->eval_h("(builtin-than-george)");
+	Handle richer_than_susan = eval->eval_h("(builtin-than-susan)");
+	Handle richer_than_obama = eval->eval_h("(builtin-than-obama)");
+	Handle richer_than_gates = eval->eval_h("(builtin-than-gates)");
+
+	Handle people_richer_than_george = bindlink(as, richer_than_george);
+	Handle people_richer_than_susan = bindlink(as, richer_than_susan);
+	Handle people_richer_than_obama = bindlink(as, richer_than_obama);
+	Handle people_richer_than_gates = bindlink(as, richer_than_gates);
+
+	TS_ASSERT_EQUALS(0, getarity(people_richer_than_gates));
+	TS_ASSERT_EQUALS(1, getarity(people_richer_than_obama));
+	TS_ASSERT_EQUALS(2, getarity(people_richer_than_george));
+	TS_ASSERT_EQUALS(3, getarity(people_richer_than_susan));
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}

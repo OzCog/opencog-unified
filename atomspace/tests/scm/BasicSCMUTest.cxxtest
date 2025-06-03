@@ -1,0 +1,683 @@
+/*
+ * tests/scm/BasicSCMUTest.cxxtest
+ *
+ * Most basic, simplest sniff test, verifies that atoms can be created.
+ * Copyright (C) 2009 Linas Vepstas <linasvepstas@gmail.com>
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <math.h>
+
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/atoms/base/Atom.h>
+#include <opencog/atoms/atom_types/NameServer.h>
+#include <opencog/atoms/base/Link.h>
+#include <opencog/atoms/base/Node.h>
+#include <opencog/atoms/truthvalue/TruthValue.h>
+#include <opencog/atoms/truthvalue/SimpleTruthValue.h>
+
+#include <opencog/guile/SchemeEval.h>
+
+#include "../query/test-types.h"
+
+#include <opencog/util/Logger.h>
+
+using namespace opencog;
+using namespace std;
+
+class BasicSCMUTest :  public CxxTest::TestSuite
+{
+	private:
+		AtomSpacePtr as;
+		SchemeEval *eval;
+
+	public:
+
+	BasicSCMUTest(void)
+	{
+		logger().set_level(Logger::DEBUG);
+		logger().set_print_to_stdout_flag(true);
+#include "../query/test-types.cc"
+	}
+
+	~BasicSCMUTest()
+	{
+		// erase the log file if no assertions failed
+		if (!CxxTest::TestTracker::tracker().suiteFailed())
+			std::remove(logger().get_filename().c_str());
+	}
+
+	void setUp(void);
+
+	void tearDown(void);
+
+	// First, check the basics, before doing more advanced stuff!
+	void test_utf8(void);
+	void test_single_atom(void);
+	void test_extract(void);
+	void test_clear(void);
+	void test_extract_hypergraph(void);
+
+	void check_tv(const Handle&, double, double);
+
+	// Nodes
+	void check_node(const char *, const char *, double, double);
+
+	// Links
+	void check_link(const char *, Type, const char *, const char *,
+	                const char *, const char *, double, double);
+	void test_link_tv_setting(void);
+	void test_reference_link(void);
+	void test_word_instance_link(void);
+	void test_inheritance_link(void);
+	// TODO
+	//void test_evaluation_link(void);
+
+	// Values
+	void test_values(void);
+	void test_value_list(void);
+
+	// TVs
+	void check_truth_value(const TruthValuePtr& tv);
+	void test_truth_value(void);
+
+	// Relex links
+	void check_parse_link(const char *, Type, const char *, const char *, const char *, const char *, double, double);
+	void test_parse_link(void);
+	void test_lemma_link(void);
+	void test_part_of_speech_link(void);
+};
+
+/*
+ * This is called once before each test, for each test (!!)
+ */
+void BasicSCMUTest::setUp(void)
+{
+	as = createAtomSpace();
+	eval = new SchemeEval(as);
+
+	// Proper UTF-8 behaviour requires the right locale.
+	// Do not use LC_ALL, as otherwise the printing of the numeric
+	// quantities (immediately below) get commas, not decimal points,
+	// in the majority of European locales. Unfortunately, guile number
+	// parsing is not locale dependent...
+	// eval->eval("(setlocale LC_ALL \"\")");
+	eval->eval("(setlocale LC_CTYPE \"\")");
+	eval->clear_pending();
+}
+
+void BasicSCMUTest::tearDown(void)
+{
+	delete eval;
+	eval = NULL;
+}
+
+// ============================================================
+
+void BasicSCMUTest::test_utf8(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(+ 2 2)");
+	bool eval_err = eval->eval_error();
+	eval->clear_pending();
+	TSM_ASSERT("Failed to find functional scheme interpreter", !eval_err);
+
+	eval->eval("Evaluating this will cause an error to be thrown!");
+	eval_err = eval->eval_error();
+	eval->clear_pending();
+	TSM_ASSERT("Scheme interpreter fails to throw errors", eval_err);
+
+	eval->eval("(display \"Ćićolina\")");
+	eval_err = eval->eval_error();
+	eval->clear_pending();
+	TSM_ASSERT("Failed to eval a UTF-8 string", !eval_err);
+
+	eval->eval("(display \"Lietuvos žydų kilmės žurnalistas\")");
+	eval_err = eval->eval_error();
+	eval->clear_pending();
+	TSM_ASSERT("Failed to eval a UTF-8 string", !eval_err);
+}
+
+// ============================================================
+
+void BasicSCMUTest::check_tv(const Handle& h, double mean, double conf)
+{
+	TruthValuePtr tv = h->getTruthValue();
+	double m = tv->get_mean();
+	double c = tv->get_confidence();
+
+	TS_ASSERT_LESS_THAN_EQUALS(fabs(m-mean), 1.0e-6);
+	TS_ASSERT_LESS_THAN_EQUALS(fabs(c-conf), 1.0e-6);
+}
+
+void BasicSCMUTest::check_node(const char * tipo, const char * nodename, double truth, double conf)
+{
+	printf("check_node(%s,%s,%f,%f)\n", tipo, nodename, truth, conf);
+	char buff[500];
+	snprintf(buff, 500, "(%s \"%s\" (stv %f %f))", tipo, nodename, truth, conf);
+	eval->eval(buff);
+	bool eval_err = eval->eval_error();
+	eval->clear_pending();
+	printf("check node %s\n", buff);
+	TSM_ASSERT("Failed to create a node", !eval_err);
+
+	Type t = nameserver().getType(tipo);
+	Handle h = as->xget_handle(t, nodename);
+	TSM_ASSERT("Failed to find handle", h != nullptr);
+
+	NodePtr n = NodeCast(h);
+	TSM_ASSERT("Failed to find node", n != nullptr);
+
+	if (n) check_tv(h, truth, conf);
+}
+
+void BasicSCMUTest::test_single_atom(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	// Check basic guile-atomspace integration.
+	eval->eval("(cog-new-node 'Node \"My First Node\")");
+	bool eval_err = eval->eval_error();
+	eval->clear_pending();
+	TSM_ASSERT("Failed to create the first atom!", !eval_err);
+
+	Type t = nameserver().getType("Node");
+	Handle h = as->xget_handle(t, "My First Node");
+	TSM_ASSERT("Failed to find handle for first atom", h != nullptr);
+
+	// Load the utility definitions
+	eval->eval("(add-to-load-path \"" PROJECT_SOURCE_DIR "\")");
+	eval->eval("(add-to-load-path \"../..\")");
+
+	std::string rs = eval->eval("(load-from-path \"tests/scm/typedefs.scm\")");
+	eval_err = eval->eval_error();
+	if (eval_err)
+		printf("Ohh noooo! %s\n", rs.c_str());
+	eval->clear_pending();
+	TSM_ASSERT_EQUALS("Failed to load type definitions", false, eval_err);
+	printf("typedefs now loaded!\n");
+
+	// We should add many more nodes, but I'm feeling lazy ...
+	check_node("Node", "ola amigos", 0.2, 0.3);
+	check_node("SentenceNode", "Watashi mo sou ooimasu", 0.52, 0.5433);
+	check_node("DocumentNode", "Blamoo yadda", 0.852, 0.95433);
+	check_node("WordNode", "The Bird is the Word", 0.7652, 0.1154);
+	check_node("LemmaNode", "When life gives you lemmas, make conjugations", 0.4765, 0.61154);
+	check_node("PartOfSpeechNode", "はにがうりだそうであってるのかはちょっと不安ですが翻訳ソフトでやくし てみました。", 0.34765, 0.33611);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+// ============================================================
+
+void BasicSCMUTest::test_extract(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	// Check atom extraction.
+	eval->eval("(define x (Concept \"AAA\"))");
+	bool eval_err = eval->eval_error();
+	eval->clear_pending();
+	TSM_ASSERT("Failed to create AAA!", !eval_err);
+
+	eval->eval("(define y (Concept \"BBB\"))");
+	eval_err = eval->eval_error();
+	eval->clear_pending();
+	TSM_ASSERT("Failed to create BBB!", !eval_err);
+
+	eval->eval("(define l (ListLink x y))");
+	eval_err = eval->eval_error();
+	eval->clear_pending();
+	TSM_ASSERT("Failed to create (Link AAA BBB)!", !eval_err);
+
+	eval->eval("(cog-extract-recursive! x)");
+	eval_err = eval->eval_error();
+	eval->clear_pending();
+	TSM_ASSERT("Failed to extract atom AAA!", !eval_err);
+
+	eval->eval("(cog-atom? l)");
+	eval_err = eval->eval_error();
+	eval->clear_pending();
+	TSM_ASSERT("Failed to evaluate scheme predicate!", !eval_err);
+
+	Handle li = eval->eval_h("(cog-atom l)");
+	eval_err = eval->eval_error();
+	eval->clear_pending();
+	TSM_ASSERT("Failed to get handle!", !eval_err);
+
+	TSM_ASSERT("Handle is not null!", nullptr == li);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+// ============================================================
+
+void BasicSCMUTest::test_clear(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	// Number of neasted Lists and Sets
+	int n = 10;
+	Handle lists_sets = as->add_link(LIST_LINK, as->add_link(SET_LINK));
+	for (int i = 0; i < n; ++i)
+		lists_sets = as->add_link(LIST_LINK, as->add_link(SET_LINK, lists_sets));
+
+	std::string rs = eval->eval("(clear)");
+	std::cout << "rs = " << rs << std::endl;
+
+	// Check that there are no error
+	TSM_ASSERT("Failed to clear the atomspace", rs == "#t\n");
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+// ============================================================
+
+void BasicSCMUTest::test_extract_hypergraph(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	// Number of neasted Lists and Sets
+	std::string rs =
+		eval->eval("(define x (ListLink (Concept \"A\") (Concept \"A\")))");
+	rs = eval->eval("(extract-hypergraph x)");
+	std::cout << "rs = " << rs << std::endl;
+
+	// Check that there are no error
+	TSM_ASSERT("Failed to clear the atomspace", rs == "\n");
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+// ============================================================
+
+void BasicSCMUTest::check_truth_value(const TruthValuePtr& tv)
+{
+	// logger().debug() << "check_node_truth_value(" << tv << ")";
+
+	// added check_truth_value_node in the atomspace
+	string node_str = "check_truth_value_node";
+	string add_node_str = string("(cog-new-node 'Node \"") + node_str + "\") ";
+
+	Handle hadd = eval->eval_h(add_node_str);
+	bool eval_err = eval->eval_error();
+	eval->clear_pending();
+	TSM_ASSERT("Failed to create atom!", !eval_err);
+
+	// set its truth value
+	stringstream ss;
+	ss << "(cog-set-tv! " << add_node_str << "(";
+	Type tvt = tv->get_type();
+	if (tvt == SIMPLE_TRUTH_VALUE)
+		ss << "cog-new-stv " << tv->get_mean() << " " << tv->get_confidence();
+	else if (tvt == COUNT_TRUTH_VALUE)
+		ss << "cog-new-stv " << tv->get_mean() << " " << tv->get_confidence()
+		   << " " << tv->get_count();
+	else {
+		ss << "Wrong Truth Value Type (" << tvt << ")";
+		TSM_ASSERT(ss.str().c_str(), false);
+	}
+	ss << "))";
+
+	// eval
+	eval->eval(ss.str());
+	eval_err = eval->eval_error();
+	eval->clear_pending();
+	TSM_ASSERT("Failed to eval", !eval_err);
+
+	// Check that the atom has the right TV
+	Handle h = as->xget_handle(NODE, node_str);
+	TSM_ASSERT("Failed to get the handle", h != Handle::UNDEFINED);
+	TSM_ASSERT("Failed to get the correct handle", h == hadd);
+	// hack to avoid floating error
+	bool tv_eq = tv->to_string() == h->getTruthValue()->to_string();
+	TSM_ASSERT("TVs are different", tv_eq);
+
+	// Check the fast-path API, too
+	string strmfast = "(cog-mean " + add_node_str + ")";
+	double mfast = atof(eval->eval(strmfast.c_str()).c_str());
+	string strcfast = "(cog-confidence " + add_node_str + ")";
+	double cfast = atof(eval->eval(strcfast.c_str()).c_str());
+	check_tv(h, mfast, cfast);
+
+	// Check the slow-path API, too
+	string strmslow = "(cog-tv-mean (cog-tv " + add_node_str + "))";
+	double mslow = atof(eval->eval(strmslow.c_str()).c_str());
+	string strcslow = "(cog-tv-confidence (cog-tv " + add_node_str + "))";
+	double cslow = atof(eval->eval(strcslow.c_str()).c_str());
+	check_tv(h, mslow, cslow);
+
+	// remove Node so we can redo the test
+	as->extract_atom(h);
+}
+
+void BasicSCMUTest::test_truth_value(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+	check_truth_value(SimpleTruthValue::createTV(0.5, 0.5));
+	check_truth_value(SimpleTruthValue::createTV(0.2, 0.7));
+	// @todo : add more
+}
+
+// ============================================================
+
+void BasicSCMUTest::test_values(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(define h (Concept \"foo\"))");
+	TSM_ASSERT("Failed to create atom", not eval->eval_error());
+	eval->eval("(define k (Predicate \"key\"))");
+	TSM_ASSERT("Failed to create key", not eval->eval_error());
+	eval->eval("(define f (FloatValue 0.1 0.2 0.3))");
+	TSM_ASSERT("Failed to create float", not eval->eval_error());
+	eval->eval("(define s (StringValue \"a\" \"bb\" \"ccc\"))");
+	TSM_ASSERT("Failed to create string", not eval->eval_error());
+	eval->eval("(define ss (StringValue \"ddd\" \"eee\" \"fff\"))");
+	TSM_ASSERT("Failed to create string", not eval->eval_error());
+	eval->eval("(define t (stv 0.5 0.8))");
+	TSM_ASSERT("Failed to create TV", not eval->eval_error());
+	eval->eval("(define l (LinkValue f h s k t))");
+	TSM_ASSERT("Failed to create string", not eval->eval_error());
+
+	Handle h = eval->eval_h("h");
+	Handle k = eval->eval_h("k");
+	ValuePtr f = eval->eval_v("f");
+	ValuePtr s = eval->eval_v("s");
+	ValuePtr ss = eval->eval_v("ss");
+	ValuePtr l = eval->eval_v("l");
+
+	eval->eval("(cog-set-value! h k l)");
+	TSM_ASSERT("Failed to set value", not eval->eval_error());
+
+	ValuePtr lv = eval->eval_v("(cog-value h k)");
+	TSM_ASSERT("Failed to get value", not eval->eval_error());
+	TSM_ASSERT("Failed to get correct value", l == lv);
+
+	ValuePtr alv = h->getValue(k);
+	TSM_ASSERT("Failed to get correct value", l == alv);
+
+	// -------
+	eval->eval("(cog-set-value! h k '(0.1 0.2 0.3))");
+	TSM_ASSERT("Failed to set float", not eval->eval_error());
+
+	ValuePtr fv = h->getValue(k);
+	TSM_ASSERT("Failed to get correct value", *f == *fv);
+
+	const std::vector<double>& vv(FloatValueCast(fv)->value());
+	TS_ASSERT_LESS_THAN_EQUALS(fabs(vv[0] - 0.1), 1.0e-6);
+	TS_ASSERT_LESS_THAN_EQUALS(fabs(vv[1] - 0.2), 1.0e-6);
+	TS_ASSERT_LESS_THAN_EQUALS(fabs(vv[2] - 0.3), 1.0e-6);
+
+	ValuePtr fv2 = eval->eval_v("(cog-value h k)");
+	TSM_ASSERT("Failed to get value", not eval->eval_error());
+	TSM_ASSERT("Failed to get correct value", *f == *fv2);
+
+	// -------
+	eval->eval("(cog-set-value! h k (list f h s k t))");
+	TSM_ASSERT("Failed to set value", not eval->eval_error());
+
+	ValuePtr lv2 = eval->eval_v("(cog-value h k)");
+	TSM_ASSERT("Failed to get value", not eval->eval_error());
+	TSM_ASSERT("Failed to get correct value", *l == *lv2);
+
+	// -------
+	eval->eval("(cog-set-value! h k '(\"a\" \"bb\" \"ccc\"))");
+	TSM_ASSERT("Failed to set value", not eval->eval_error());
+
+	ValuePtr sv = eval->eval_v("(cog-value h k)");
+	TSM_ASSERT("Failed to get value", not eval->eval_error());
+	TSM_ASSERT("Failed to get correct value", *s == *sv);
+	TSM_ASSERT("Failed to test inequality", *ss != *sv);
+
+	// -------
+	// This is a kind-of funky, not entirely Kosher syntax,
+	// but we support it anyway... 
+	eval->eval("(cog-set-value! h k '(f h s k t))");
+	TSM_ASSERT("Failed to set value", not eval->eval_error());
+
+	ValuePtr lv3 = eval->eval_v("(cog-value h k)");
+	TSM_ASSERT("Failed to get value", not eval->eval_error());
+	TSM_ASSERT("Failed to get correct value", *l == *lv3);
+}
+
+// ============================================================
+
+void BasicSCMUTest::test_value_list(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(define h (Concept \"foo\"))");
+	TSM_ASSERT("Failed to create atom", not eval->eval_error());
+	eval->eval("(define k (Predicate \"key\"))");
+	TSM_ASSERT("Failed to create key", not eval->eval_error());
+	eval->eval("(define ll (ListLink h k h))");
+	TSM_ASSERT("Failed to create key", not eval->eval_error());
+	eval->eval("(define f (FloatValue 0.1 0.2 0.3))");
+	TSM_ASSERT("Failed to create float", not eval->eval_error());
+	eval->eval("(define s (StringValue \"a\" \"bb\" \"ccc\"))");
+	TSM_ASSERT("Failed to create string", not eval->eval_error());
+	eval->eval("(define ss (StringValue \"ddd\" \"eee\" \"fff\"))");
+	TSM_ASSERT("Failed to create string", not eval->eval_error());
+	eval->eval("(define t (stv 0.5 0.8))");
+	TSM_ASSERT("Failed to create TV", not eval->eval_error());
+	eval->eval("(define l (LinkValue f h s k t))");
+	TSM_ASSERT("Failed to create string", not eval->eval_error());
+
+	// -------
+	std::string boo = eval->eval("(equal? (cog-value->list f) '(0.1 0.2 0.3))");
+	TSM_ASSERT("Failed float list equality", boo == "#t\n");
+
+	boo = eval->eval("(equal? (cog-value->list s) '(\"a\" \"bb\" \"ccc\"))");
+	TSM_ASSERT("Failed string list equality", boo == "#t\n");
+
+	boo = eval->eval("(equal? (cog-value->list l) (list f h s k t))");
+	TSM_ASSERT("Failed value list equality", boo == "#t\n");
+
+	boo = eval->eval("(equal? (cog-value->list ll) (list h k h))");
+	TSM_ASSERT("Failed ListLink equality", boo == "#t\n");
+
+	boo = eval->eval("(equal? (cog-value->list ll) (cog-outgoing-set ll))");
+	TSM_ASSERT("Failed outgoing set equality", boo == "#t\n");
+
+	boo = eval->eval("(equal? (cog-value->list h) '(\"foo\"))");
+	TSM_ASSERT("Failed name list equality", boo == "#t\n");
+
+	boo = eval->eval("(equal? (cog-value->list k) '(\"key\"))");
+	TSM_ASSERT("Failed key name equality", boo == "#t\n");
+}
+
+// ============================================================
+
+void BasicSCMUTest::check_link(const char * tipo, Type type,
+                               const char * nodename1, const char * nodename2,
+                               const char * value1, const char * value2,
+                               double truth, double conf)
+{
+	printf("check_link(%s,%s,%s,%f,%f)\n",
+	        tipo, nodename1, nodename2, truth, conf);
+	char buff[500];
+	snprintf(buff, 500, "(%s (stv %f %f) (%s \"%s\") (%s \"%s\") )",
+	         tipo, truth, conf, nodename1, value1, nodename2, value2);
+	eval->eval(buff);
+	bool eval_err = eval->eval_error();
+	eval->clear_pending();
+	printf("check_link %s\n", buff);
+	TSM_ASSERT("Failed to create a link", !eval_err);
+
+	HandleSeq links;
+	as->get_handles_by_type(links, type, true);
+	//printf("Number of links found: %d\n",links.size());
+	for (const Handle& h: links)
+		check_tv(h, truth, conf);
+
+	Type t1 = nameserver().getType(nodename1);
+	Handle h1 = as->xget_handle(t1, value1);
+	TSM_ASSERT("Failed to find handle", h1 != nullptr);
+
+	NodePtr n1 = NodeCast(h1);
+	TSM_ASSERT("Failed to find node", n1 != nullptr);
+
+	Type t2 = nameserver().getType(nodename2);
+	Handle h2 = as->xget_handle(t2, value2);
+	TSM_ASSERT("Failed to find handle", h2 != nullptr);
+
+	NodePtr n2 = NodeCast(h2);
+	TSM_ASSERT("Failed to find node", n2 != nullptr);
+}
+
+// ============================================================
+
+void BasicSCMUTest::test_word_instance_link(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	check_link("WordInstanceLink", WORD_INSTANCE_LINK,
+	           "WordInstanceNode", "ParseNode",
+	           "the@401c28c2-9de3-453f-b6d8-1b56061d127e",
+	           "sentence@8c13ec38-0295-4632-9205-e095035e4364_parse_0",
+	           1.0, 1.0);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void BasicSCMUTest::test_reference_link(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	check_link("ReferenceLink", REFERENCE_LINK, "WordInstanceNode", "WordNode",
+	           "the@401c28c2-9de3-453f-b6d8-1b56061d127e",
+	           "the", 0.65, 0.45);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void BasicSCMUTest::test_inheritance_link(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	check_link("InheritanceLink", INHERITANCE_LINK,
+	           "WordInstanceNode", "DefinedLinguisticConceptNode",
+	           "blue@6fdd848e-a69c-4b6c-a9a2-376e09789096",
+	           "hyp", 1.0, 1.0);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void BasicSCMUTest::test_part_of_speech_link(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	check_link("PartOfSpeechLink", PART_OF_SPEECH_LINK,
+	           "WordInstanceNode", "DefinedLinguisticConceptNode",
+	           "blue@6fdd848e-a69c-4b6c-a9a2-376e09789096", "adj",
+	            1.0, 1.0);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void BasicSCMUTest::test_parse_link()
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	check_parse_link("ParseLink", PARSE_LINK, "ParseNode", "SentenceNode",
+	                 "sentence@8c13ec38-0295-4632-9205-e095035e4364_parse_0",
+	                 "sentence@8c13ec38-0295-4632-9205-e095035e4364", 1.0, 1.0);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+// ============================================================
+
+void BasicSCMUTest::test_link_tv_setting(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	// Create initially with one set of truth values
+	Handle inh = eval->eval_h("(ListLink (stv 0.75 0.25) (ConceptNode \"Linas\") (ConceptNode \"human\"))");
+	bool eval_err = eval->eval_error();
+	eval->clear_pending();
+	TSM_ASSERT("Failed to create a link", !eval_err);
+
+	check_tv(inh, 0.75, 0.25);
+
+	// Add it again, but with stronger confidence.
+	// Make sure the new values grab hold
+	inh = eval->eval_h("(ListLink (stv 0.6 0.42) (ConceptNode \"Linas\") (ConceptNode \"human\"))");
+	eval_err = eval->eval_error();
+	eval->clear_pending();
+	TSM_ASSERT("Failed to update a link", !eval_err);
+
+	check_tv(inh, 0.6, 0.42);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+// ============================================================
+
+void BasicSCMUTest::check_parse_link(const char * tipo, Type type,
+                               const char * nodename1, const char * nodename2,
+                               const char * value1, const char * value2,
+                               double truth, double conf)
+{
+	printf("check_parse_link(%s,%s,%s,%f,%f)\n",
+	       tipo, nodename1, nodename2, truth, conf);
+	char buff[500];
+	snprintf(buff, 500, "(%s  (%s \"%s\"(stv %f %f)) (%s \"%s\"))",
+	         tipo, nodename1, value1, truth, conf, nodename2, value2);
+	eval->eval(buff);
+	bool eval_err = eval->eval_error();
+	eval->clear_pending();
+	TSM_ASSERT("Failed to create parse link", !eval_err);
+
+	HandleSeq links;
+	as->get_handles_by_type(links, type, true);
+	//printf("Number of links found: %d\n",links.size());
+	for (const Handle& h: links)
+		check_tv(h, 1.0, 0.0); // DEFAULT_TV is true with no confidence
+
+	Type t1 = nameserver().getType(nodename1);
+	Handle h1 = as->xget_handle(t1, value1);
+	TSM_ASSERT("Failed to find handle", h1 != nullptr);
+
+	NodePtr n1 = NodeCast(h1);
+	TSM_ASSERT("Failed to find node", n1 != nullptr);
+
+	if (n1)
+		check_tv(h1, truth, conf);
+
+	Type t2 = nameserver().getType(nodename2);
+	Handle h2 = as->xget_handle(t2, value2);
+	TSM_ASSERT("Failed to find handle", h2 != nullptr);
+
+	NodePtr n2 = NodeCast(h2);
+	TSM_ASSERT("Failed to find node", n2 != nullptr);
+}
+
+void BasicSCMUTest::test_lemma_link()
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	check_parse_link("LemmaLink", LEMMA_LINK, "WordInstanceNode", "WordNode",
+	                 "blue@6fdd848e-a69c-4b6c-a9a2-376e09789096",
+	                 "blue", 1.0, 1.0);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/* ============================= END OF FILE ================= */

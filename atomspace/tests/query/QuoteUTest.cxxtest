@@ -1,0 +1,400 @@
+/*
+ * tests/query/QuoteUTest.cxxtest
+ *
+ * Copyright (C) 2014 Linas Vepstas
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <opencog/atoms/base/Link.h>
+#include <opencog/atoms/base/Node.h>
+#include <opencog/atoms/value/LinkValue.h>
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/guile/SchemeEval.h>
+#include <opencog/util/Logger.h>
+#include <cxxtest/TestSuite.h>
+#include "imply.h"
+
+
+using namespace opencog;
+
+class QuoteUTest: public CxxTest::TestSuite
+{
+private:
+    AtomSpacePtr as;
+    SchemeEval* eval;
+
+public:
+    QuoteUTest(void)
+    {
+        logger().set_level(Logger::DEBUG);
+        logger().set_print_to_stdout_flag(true);
+        logger().set_timestamp_flag(false);
+
+        as = createAtomSpace();
+        eval = new SchemeEval(as);
+        eval->eval("(add-to-load-path \"" PROJECT_SOURCE_DIR "\")");
+
+    }
+
+    ~QuoteUTest()
+    {
+        delete eval;
+        // Erase the log file if no assertions failed.
+        if (!CxxTest::TestTracker::tracker().suiteFailed())
+                std::remove(logger().get_filename().c_str());
+    }
+
+    void setUp(void);
+    void tearDown(void);
+
+    void test_quoted_variable(void);
+    void test_nest(void);
+    void test_throw(void);
+    void test_gpn_bindy(void);
+    void test_gpn_get_times_link(void);
+    void test_double_quote(void);
+    void test_impossible(void);
+    void test_numeric_greater(void);
+    void test_crash(void);
+    void test_exec_getlink(void);
+    void test_quote_self(void);
+    void test_quote_glob(void);
+    void test_quote_scope(void);
+};
+
+void QuoteUTest::tearDown(void)
+{
+    as->clear();
+}
+
+void QuoteUTest::setUp(void)
+{
+    as->clear();
+}
+
+#define getarity(hand) hand->get_arity()
+#define getlink(hand,pos) hand->getOutgoingAtom(pos)
+#define getname(hand) hand->get_name()
+
+/*
+ * QuoteLink unit test.  Test quoted variables.
+ */
+void QuoteUTest::test_quoted_variable(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/query/quote-var.scm\")");
+
+    Handle bindy = eval->eval_h("bindy");
+
+    Handle banana = bindlink(as, bindy);
+    TS_ASSERT_EQUALS(1, getarity(banana));
+
+    banana = getlink(banana, 0);
+    TS_ASSERT_EQUALS(CONCEPT_NODE, banana->get_type());
+    TS_ASSERT_EQUALS(0, strcmp("banana", getname(banana).c_str()));
+
+    // ----------------------------------------------
+    logger().debug("BEGIN subtest bother: %s", __FUNCTION__);
+    bindy = eval->eval_h("bother");
+
+    banana = bindlink(as, bindy);
+    TS_ASSERT_EQUALS(1, getarity(banana));
+
+    banana = getlink(banana, 0);
+    TS_ASSERT_EQUALS(CONCEPT_NODE, banana->get_type());
+    TS_ASSERT_EQUALS(0, strcmp("banana", getname(banana).c_str()));
+
+    // ----------------------------------------------
+    logger().debug("BEGIN subtest bunbound: %s", __FUNCTION__);
+    bindy = eval->eval_h("bunbound");
+
+    banana = bindlink(as, bindy);
+    TS_ASSERT_EQUALS(1, getarity(banana));
+
+    banana = getlink(banana, 0);
+    TS_ASSERT_EQUALS(CONCEPT_NODE, banana->get_type());
+    TS_ASSERT_EQUALS(0, strcmp("banana", getname(banana).c_str()));
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * QuoteLink unit test.  Test nested quoted variables.
+ */
+void QuoteUTest::test_nest(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/query/quote-nest.scm\")");
+
+    Handle bindy = eval->eval_h("bindy");
+
+    Handle allstar = bindlink(as, bindy);
+    TS_ASSERT_EQUALS(1, getarity(allstar));
+
+    allstar = getlink(allstar, 0);
+    TS_ASSERT_EQUALS(PREDICATE_NODE, allstar->get_type());
+    TS_ASSERT_EQUALS(std::string("all-var"), getname(allstar));
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void QuoteUTest::test_throw(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    bool did_throw = false;
+    try
+    {
+#define al as->add_link
+#define an as->add_node
+        Handle var_a = an(VARIABLE_NODE, "$var-a");
+        Handle var_b = an(VARIABLE_NODE, "$var-b");
+        Handle bindy = al(BIND_LINK,
+                          var_a,
+                          al(EVALUATION_LINK,
+                             var_a,
+                             al(QUOTE_LINK, var_a, var_b)),
+                          var_a);
+#undef al
+#undef an
+    }
+    catch (const InvalidParamException& e)
+    {
+        did_throw = true;
+    }
+
+    TS_ASSERT_EQUALS(true, did_throw);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * QuoteLink unit test.  Test proper search scope
+ */
+void QuoteUTest::test_gpn_bindy(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/query/quote-gpn.scm\")");
+
+    Handle bindy = eval->eval_h("bindy");
+
+    Handle allstar = bindlink(as, bindy);
+    TS_ASSERT_EQUALS(1, getarity(allstar));
+
+    allstar = getlink(allstar, 0);
+    TS_ASSERT_EQUALS(LIST_LINK, allstar->get_type());
+    TS_ASSERT_EQUALS(2, getarity(allstar));
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test matching quoted TimesLink
+ */
+void QuoteUTest::test_gpn_get_times_link(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/query/quote-gpn.scm\")");
+
+    Handle get_times_link = eval->eval_h("get-times-link");
+
+    Handle result = satisfying_set(as, get_times_link);
+    TS_ASSERT_EQUALS(1, getarity(result));
+
+    Handle times_link = getlink(result, 0);
+    TS_ASSERT_EQUALS(LIST_LINK, times_link->get_type());
+    TS_ASSERT_EQUALS(2, getarity(times_link));
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * QuoteLink unit test.  Test double-quotes.
+ */
+void QuoteUTest::test_double_quote(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/query/quote-quote.scm\")");
+
+    Handle bindy = eval->eval_h("bindy");
+
+    Handle banana = bindlink(as, bindy);
+    TS_ASSERT_EQUALS(1, getarity(banana));
+
+    banana = getlink(banana, 0);
+    TS_ASSERT_EQUALS(CONCEPT_NODE, banana->get_type());
+    TS_ASSERT_EQUALS(0, strcmp("banana", getname(banana).c_str()));
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+// Test bug #1531
+void QuoteUTest::test_impossible(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/query/quote-impossible.scm\")");
+
+    Handle imp = eval->eval_h("imp");
+
+    TruthValuePtr tv = imp->evaluate(as.get());
+
+    // Mostly we expect the above to not throw or assert.
+    // Getting back false tv (no groundings at all) is a bonus.
+    TS_ASSERT_EQUALS(TruthValue::FALSE_TV(), tv);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * QuoteLink unit test.  Derivative of the GreaterThanUTest,
+ * this one differs by explicitly quoting the GroundedSchemaNode,
+ * so that it is explicitly matched, instead of being treated as
+ * a virtual.
+ */
+void QuoteUTest::test_numeric_greater(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/query/quote-greater.scm\")");
+
+    Handle richer_than_george = eval->eval_h("(richer-than-george)");
+    Handle richer_than_susan = eval->eval_h("(richer-than-susan)");
+    Handle richer_than_obama = eval->eval_h("(richer-than-obama)");
+    Handle richer_than_gates = eval->eval_h("(richer-than-gates)");
+
+    Handle people_richer_than_george = bindlink(as, richer_than_george);
+    Handle people_richer_than_susan = bindlink(as, richer_than_susan);
+    Handle people_richer_than_obama = bindlink(as, richer_than_obama);
+    Handle people_richer_than_gates = bindlink(as, richer_than_gates);
+
+    TS_ASSERT_EQUALS(0, getarity(people_richer_than_gates));
+    TS_ASSERT_EQUALS(0, getarity(people_richer_than_obama));
+    TS_ASSERT_EQUALS(1, getarity(people_richer_than_george));
+    TS_ASSERT_EQUALS(2, getarity(people_richer_than_susan));
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void QuoteUTest::test_crash(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/query/quote-crash.scm\")");
+
+    // If we can execute this without crashing, the test is successful.
+    Handle cr = eval->eval_h("(cog-execute! crasher)");
+    TS_ASSERT_EQUALS(1, getarity(cr));
+
+    // This blows out the stack in an infinite loop, if the pattern
+    // matcher doesn't prevent it.
+    Handle infloop = eval->eval_h("infloop");
+    bool did_throw = false;
+    try {
+        Handle inf = bindlink(as, infloop);
+        printf("infloop is %s\n", inf->to_short_string().c_str());
+    }
+    catch (const RuntimeException&)
+    {
+        did_throw = true;
+    }
+
+    // Huh. As of now, this is no longer an inf loop. It's also
+    // Not throwing. So, just ignore, for now. Is anything actually
+    // broken?
+    printf("did_throw: %d\n", did_throw);
+    // TS_ASSERT(did_throw);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+// Test for bug #646. QuoteLink placed below GetLink should not
+// be discarded by Instantiator before beginning of pattern matching.
+void QuoteUTest::test_exec_getlink(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/query/quote-exec-getlink.scm\")");
+
+    Handle exe = eval->eval_h("(cog-execute! z-get)");
+    TS_ASSERT_EQUALS(1, getarity(exe));
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+// Test for bug #2583
+void QuoteUTest::test_quote_self(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/query/quote-self.scm\")");
+
+    ValuePtr vp = eval->eval_v("(cog-execute! self-ground)");
+    TS_ASSERT(nameserver().isA(vp->get_type(), LINK_VALUE));
+
+    HandleSeq hs(LinkValueCast(vp)->to_handle_seq());
+    TS_ASSERT_EQUALS(1, hs.size());
+
+    Handle ex = eval->eval_h("expect");
+    TS_ASSERT_EQUALS(ex, hs[0]);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+// Test for bug #2583 (simpler version of above)
+void QuoteUTest::test_quote_glob(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/query/quote-glob.scm\")");
+
+    ValuePtr vp = eval->eval_v("(cog-execute! quote-glob)");
+    TS_ASSERT(nameserver().isA(vp->get_type(), LINK_VALUE));
+
+    HandleSeq hs(LinkValueCast(vp)->to_handle_seq());
+    TS_ASSERT_EQUALS(1, hs.size());
+
+    Handle ex = eval->eval_h("expect");
+    TS_ASSERT_EQUALS(ex, hs[0]);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+// URE meta-pattern
+void QuoteUTest::test_quote_scope(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/query/quote-scope.scm\")");
+
+    ValuePtr vp = eval->eval_v("(cog-execute! quote-scope)");
+    TS_ASSERT(nameserver().isA(vp->get_type(), LINK_VALUE));
+
+    HandleSeq hs(LinkValueCast(vp)->to_handle_seq());
+    TS_ASSERT_EQUALS(1, hs.size());
+
+    Handle ex = eval->eval_h("expect");
+    TS_ASSERT_EQUALS(ex, as->add_atom(hs[0]));
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}

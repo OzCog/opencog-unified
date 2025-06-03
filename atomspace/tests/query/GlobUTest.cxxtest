@@ -1,0 +1,822 @@
+/*
+ * tests/query/GlobUTest.cxxtest
+ *
+ * Copyright (C) 2015, 2016 Linas Vepstas
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <opencog/guile/SchemeEval.h>
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/util/Logger.h>
+
+using namespace opencog;
+
+class GlobUTest: public CxxTest::TestSuite
+{
+private:
+	AtomSpacePtr as;
+	SchemeEval* eval;
+
+public:
+	GlobUTest(void)
+	{
+		logger().set_level(Logger::DEBUG);
+		logger().set_print_to_stdout_flag(true);
+
+		as = createAtomSpace();
+		eval = new SchemeEval(as);
+		eval->eval("(add-to-load-path \"" PROJECT_SOURCE_DIR "\")");
+
+		eval->eval("(load-from-path \"opencog/scm/opencog.scm\")");
+		eval->eval("(use-modules (opencog exec))");
+	}
+
+	~GlobUTest()
+	{
+		delete eval;
+		// Erase the log file if no assertions failed.
+		if (!CxxTest::TestTracker::tracker().suiteFailed())
+			std::remove(logger().get_filename().c_str());
+	}
+
+	void setUp(void);
+	void tearDown(void);
+
+	void test_glob_middle(void);
+	void test_glob_final(void);
+	void test_glob_type(void);
+	void test_glob_interval(void);
+	void test_glob_empty_intersection(void);
+	void test_glob_empty_union(void);
+	void test_glob_typeset(void);
+	void test_glob_three_globs(void);
+	void test_glob_two_in_a_row(void);
+	void test_glob_exact(void);
+	void test_glob_greedy(void);
+	void test_glob_unorder(void);
+	void test_glob_backtrack(void);
+	void test_glob_backtoo(void);
+	void test_glob_backmore(void);
+	void test_glob_multiple(void);
+	void test_nest(void);
+	void test_gnest(void);
+	void test_partition(void);
+	void test_pivot(void);
+	void test_multi_pivot(void);
+	void test_number(void);
+};
+
+void GlobUTest::tearDown(void)
+{
+	as->clear();
+}
+
+void GlobUTest::setUp(void)
+{
+	as->clear();
+	eval->eval("(load-from-path \"tests/query/test_types.scm\")");
+}
+
+/*
+ * Test a glob in the middle of a list.
+ */
+void GlobUTest::test_glob_middle(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-basic.scm\")");
+
+	Handle love = eval->eval_h("(cog-execute! glob-you)");
+	printf("glob-you %s\n", love->to_string().c_str());
+	TS_ASSERT_EQUALS(2, love->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"  (ListLink"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"love\")"
+		"    (ConceptNode \"you\")"
+		"    (ConceptNode \"too\"))"
+		"  (ListLink"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"really\")"
+		"    (ConceptNode \"totally\")"
+		"    (ConceptNode \"need\")"
+		"    (ConceptNode \"you\")"
+		"    (ConceptNode \"too\")))"
+	);
+	TS_ASSERT_EQUALS(love, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test a glob at the end of a list.
+ */
+void GlobUTest::test_glob_final(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-basic.scm\")");
+
+	Handle love = eval->eval_h("(cog-execute! love-glob)");
+	printf("love-glob %s\n", love->to_string().c_str());
+	TS_ASSERT_EQUALS(3, love->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"  (ListLink"
+		"    (ConceptNode \"Hey!\")"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"like\")"
+		"    (NumberNode  42)"
+		"    (ConceptNode \"also\"))"
+		"  (ListLink"
+		"    (ConceptNode \"Hey!\")"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"like\")"
+		"    (ConceptNode \"you\")"
+		"    (ConceptNode \"also\"))"
+		"  (ListLink"
+		"    (ConceptNode \"Hey!\")"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"like\")"
+		"    (ConceptNode \"teddy\")"
+		"    (ConceptNode \"bears\")"
+		"    (ConceptNode \"a\")"
+		"    (ConceptNode \"lot\")"
+		"    (ConceptNode \"also\")))"
+	);
+	TS_ASSERT_EQUALS(love, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test a glob with type restrictions
+ */
+void GlobUTest::test_glob_type(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-basic.scm\")");
+
+	Handle love = eval->eval_h("(cog-execute! love-type-glob)");
+	printf("love-type-glob %s\n", love->to_string().c_str());
+	TS_ASSERT_EQUALS(1, love->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"  (ListLink"
+		"    (ConceptNode \"Hey!\")"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"like\")"
+		"    (NumberNode  42)"
+		"    (ConceptNode \"also\")))"
+	);
+	TS_ASSERT_EQUALS(love, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test a glob with interval restrictions
+ */
+void GlobUTest::test_glob_interval(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-basic.scm\")");
+
+	Handle love = eval->eval_h("(cog-execute! love-interval-glob)");
+	printf("love-interval-glob %s\n", love->to_string().c_str());
+	TS_ASSERT_EQUALS(2, love->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"  (ListLink"
+		"    (ConceptNode \"Hey!\")"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"like\")"
+		"    (NumberNode  42)"
+		"    (ConceptNode \"also\"))"
+		"  (ListLink"
+		"    (ConceptNode \"Hey!\")"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"like\")"
+		"    (Concept \"you\")"
+		"    (ConceptNode \"also\")))"
+	);
+	TS_ASSERT_EQUALS(love, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test a glob with both type and interval restrictions
+ */
+void GlobUTest::test_glob_typeset(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-basic.scm\")");
+
+	Handle love = eval->eval_h("(cog-execute! love-typeset-glob)");
+	printf("love-typeset-glob %s\n", love->to_string().c_str());
+	TS_ASSERT_EQUALS(2, love->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"  (ListLink"
+		"    (ConceptNode \"Hey!\")"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"like\")"
+		"    (ConceptNode \"teddy\")"
+		"    (ConceptNode \"bears\")"
+		"    (ConceptNode \"a\")"
+		"    (ConceptNode \"lot\")"
+		"    (ConceptNode \"also\"))"
+		"  (ListLink"
+		"    (ConceptNode \"Hey!\")"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"like\")"
+		"    (Concept \"you\")"
+		"    (ConceptNode \"also\")))"
+	);
+	TS_ASSERT_EQUALS(love, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test a glob with empty interval intersection
+ */
+void GlobUTest::test_glob_empty_intersection(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-basic.scm\")");
+
+	Handle love = eval->eval_h("(cog-execute! love-interval-glob-empty-intersection)");
+	printf("love-interval-glob-empty-intersection %s\n", love->to_string().c_str());
+	TS_ASSERT_EQUALS(0, love->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink)"
+	);
+	TS_ASSERT_EQUALS(love, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test a glob with empty interval union
+ */
+void GlobUTest::test_glob_empty_union(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-basic.scm\")");
+
+	Handle love = eval->eval_h("(cog-execute! love-interval-glob-empty-union)");
+	printf("love-interval-glob-empty-union %s\n", love->to_string().c_str());
+	TS_ASSERT_EQUALS(2, love->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"  (ListLink"
+		"    (ConceptNode \"Hey!\")"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"like\")"
+		"    (NumberNode  42)"
+		"    (ConceptNode \"also\"))"
+		"  (ListLink"
+		"    (ConceptNode \"Hey!\")"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"like\")"
+		"    (Concept \"you\")"
+		"    (ConceptNode \"also\")))"
+	);
+	TS_ASSERT_EQUALS(love, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * A slightly more complicated case
+ */
+void GlobUTest::test_glob_three_globs(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-basic.scm\")");
+
+	Handle love = eval->eval_h("(cog-execute! love-three-globs)");
+	printf("love-three-globs %s\n", love->to_string().c_str());
+	TS_ASSERT_EQUALS(3, love->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"  (ListLink"
+		"    (ConceptNode \"Hey!\")"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"hate\")"
+		"    (Concept \"you\")"
+		"    (ConceptNode \"also\"))"
+		"  (ListLink"
+		"    (ConceptNode \"Hey!\")"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"need\")"
+		"    (Concept \"you\")"
+		"    (ConceptNode \"also\"))"
+		"  (ListLink"
+		"    (ConceptNode \"Hey!\")"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"love\")"
+		"    (Concept \"you\")"
+		"    (ConceptNode \"also\")))"
+	);
+	TS_ASSERT_EQUALS(love, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void GlobUTest::test_glob_two_in_a_row(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-basic.scm\")");
+
+	Handle greet = eval->eval_h("(cog-execute! greet)");
+	printf("greet %s\n", greet->to_string().c_str());
+	TS_ASSERT_EQUALS(1, greet->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"  (ListLink"
+		"    (ConceptNode \"hi\")"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"am\")"
+		"    (ConceptNode \"Sophia\")))"
+	);
+	TS_ASSERT_EQUALS(greet, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void GlobUTest::test_glob_exact(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-basic.scm\")");
+
+	Handle exact = eval->eval_h("(cog-execute! exact)");
+	printf("exact %s\n", exact->to_string().c_str());
+	TS_ASSERT_EQUALS(1, exact->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"  (ListLink"
+		"    (ConceptNode \"I\")"
+		"    (ConceptNode \"really\")"
+		"    (ConceptNode \"want\")"
+		"    (ConceptNode \"it\")"
+		"    (ConceptNode \"too\")))"
+	);
+	TS_ASSERT_EQUALS(exact, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void GlobUTest::test_glob_greedy(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-basic.scm\")");
+
+	Handle greedy = eval->eval_h("(cog-execute! greedy)");
+	printf("greedy %s\n", greedy->to_string().c_str());
+	TS_ASSERT_EQUALS(1, greedy->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"  (ListLink"
+		"    (ConceptNode \"the\")"
+		"    (ConceptNode \"man\")"
+		"    (ConceptNode \"we\")"
+		"    (ConceptNode \"saw\")"
+		"    (ConceptNode \"saw\")"
+		"    (ConceptNode \"a\")"
+		"    (ConceptNode \"cat\")"
+		"    (ConceptNode \"too\")))"
+	);
+	TS_ASSERT_EQUALS(greedy, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void GlobUTest::test_glob_unorder(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-basic.scm\")");
+
+	Handle unorder = eval->eval_h("(cog-execute! unorder)");
+	printf("unorder %s\n", unorder->to_string().c_str());
+	TS_ASSERT_EQUALS(1, unorder->get_arity());
+
+	// 32-bit and 64-bit hashes differ because std::hash() returns
+	// size_t As a result, the order is randomly reversed. Hack
+	// around this inconsistency. Also, changing the type hierarchy
+	// can also affect the hash value.  So try both permutations.
+	Handle response1 = eval->eval_h(
+		"(SetLink"
+		"  (ListLink"
+		"    (ConceptNode \"honeydew\")"
+		"    (ConceptNode \"lime\")))"
+	);
+	Handle response2 = eval->eval_h(
+		"(SetLink"
+		"  (ListLink"
+		"    (ConceptNode \"lime\")"
+		"    (ConceptNode \"honeydew\")))"
+	);
+	TS_ASSERT((unorder == response1) or (unorder == response2));
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void GlobUTest::test_glob_backtrack(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-basic.scm\")");
+
+	Handle backtrack = eval->eval_h("(cog-execute! backtrack)");
+	printf("backtrack %s\n", backtrack->to_string().c_str());
+	TS_ASSERT_EQUALS(1, backtrack->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"  (ListLink"
+		"    (ListLink"
+		"      (ConceptNode \"A\")"
+		"      (ConceptNode \"B\"))"
+		"    (ListLink"
+		"      (ConceptNode \"C\"))"
+		"    (ListLink"
+		"      (ConceptNode \"D\")"
+		"      (ConceptNode \"E\")"
+		"      (ConceptNode \"F\")"
+		"      (ConceptNode \"G\")"
+		"      (ConceptNode \"H\")"
+		"      (ConceptNode \"I\"))))"
+	);
+	TS_ASSERT_EQUALS(backtrack, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void GlobUTest::test_glob_backtoo(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-basic.scm\")");
+
+	Handle backtoo = eval->eval_h("(cog-execute! backtoo)");
+	printf("backtoo %s\n", backtoo->to_string().c_str());
+	TS_ASSERT_EQUALS(1, backtoo->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"  (ListLink"
+		"    (ListLink"
+		"      (ConceptNode \"A\")"
+		"      (ConceptNode \"B\")"
+		"      (ConceptNode \"C\"))"
+		"    (ListLink"
+		"      (ConceptNode \"D\")"
+		"      (ConceptNode \"E\")"
+		"      (ConceptNode \"F\"))"
+		"    (ListLink"
+		"      (ConceptNode \"G\")"
+		"      (ConceptNode \"H\")"
+		"      (ConceptNode \"I\"))))"
+	);
+	TS_ASSERT_EQUALS(backtoo, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void GlobUTest::test_glob_backmore(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-basic.scm\")");
+
+	Handle backmore = eval->eval_h("(cog-execute! backmore)");
+	printf("backmore %s\n", backmore->to_string().c_str());
+	TS_ASSERT_EQUALS(1, backmore->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"  (ListLink"
+		"    (ListLink"
+		"      (ConceptNode \"A\")"
+		"      (ConceptNode \"B\")"
+		"      (ConceptNode \"C\"))"
+		"    (ListLink"
+		"      (ConceptNode \"D\")"
+		"      (ConceptNode \"E\")"
+		"      (ConceptNode \"F\"))"
+		"    (ListLink"
+		"      (ConceptNode \"G\")"
+		"      (ConceptNode \"H\")"
+		"      (ConceptNode \"I\"))))"
+	);
+	TS_ASSERT_EQUALS(backmore, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void GlobUTest::test_glob_multiple(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-basic.scm\")");
+
+	Handle ma = eval->eval_h("(cog-execute! get-ma)");
+	printf("ma %s\n", ma->to_string().c_str());
+	TS_ASSERT_EQUALS(1, ma->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"  (ListLink"
+		"    (ConceptNode \"FOO\")))"
+	);
+	TS_ASSERT_EQUALS(ma, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test nested expressions.
+ */
+void GlobUTest::test_nest(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-nest.scm\")");
+
+	Handle five = eval->eval_h("(cog-execute! get-five)");
+	printf("nested %s\n", five->to_string().c_str());
+	TS_ASSERT_EQUALS(5, five->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink one two three four five)"
+	);
+	TS_ASSERT_EQUALS(five, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test nested expressions.
+ */
+void GlobUTest::test_gnest(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-nest.scm\")");
+
+	Handle four = eval->eval_h("(cog-execute! get-four)");
+	printf("g-nested got %s\n", four->to_string().c_str());
+	TS_ASSERT_EQUALS(4, four->get_arity());
+
+	// "two" should not be found.
+	Handle response = eval->eval_h(
+		"(SetLink one three four five)"
+	);
+	TS_ASSERT_EQUALS(four, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test partitioning of list of like items.
+ * Issue #1825
+ */
+void GlobUTest::test_partition(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-partition.scm\")");
+
+	Handle parts = eval->eval_h("(cog-execute! partition)");
+	printf("party got %s\n", parts->to_string().c_str());
+	TS_ASSERT_EQUALS(4, parts->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"	(OrderedLink"
+		"		(ConceptNode \"begin\")"
+		"		(ConceptNode \"foo\")"
+		"		(ConceptNode \"foo\")"
+		"		(ConceptNode \"foo\")"
+		"		(ConceptNode \"end\"))"
+		"	(OrderedLink"
+		"		(ConceptNode \"begin\")"
+		"		(ConceptNode \"foo\")"
+		"		(ConceptNode \"foo\")"
+		"		(ConceptNode \"end\")"
+		"		(ConceptNode \"foo\"))"
+		"	(OrderedLink"
+		"		(ConceptNode \"begin\")"
+		"		(ConceptNode \"foo\")"
+		"		(ConceptNode \"end\")"
+		"		(ConceptNode \"foo\")"
+		"		(ConceptNode \"foo\"))"
+		"	(OrderedLink"
+		"		(ConceptNode \"begin\")"
+		"		(ConceptNode \"end\")"
+		"		(ConceptNode \"foo\")"
+		"		(ConceptNode \"foo\")"
+		"		(ConceptNode \"foo\")))"
+	);
+	TS_ASSERT_EQUALS(parts, response);
+
+	// -----------
+	parts = eval->eval_h("(cog-execute! part-deeper)");
+	printf("party got %s\n", parts->to_string().c_str());
+	TS_ASSERT_EQUALS(4, parts->get_arity());
+
+	response = eval->eval_h(
+		"(SetLink"
+		"	(OrderedLink"
+		"		(ConceptNode \"begin\")"
+		"		(ConceptNode \"bar\")"
+		"		(ConceptNode \"bar\")"
+		"		(ConceptNode \"bar\")"
+		"		(ConceptNode \"end\"))"
+		"	(OrderedLink"
+		"		(ConceptNode \"begin\")"
+		"		(ConceptNode \"bar\")"
+		"		(ConceptNode \"bar\")"
+		"		(ConceptNode \"end\")"
+		"		(ConceptNode \"bar\"))"
+		"	(OrderedLink"
+		"		(ConceptNode \"begin\")"
+		"		(ConceptNode \"bar\")"
+		"		(ConceptNode \"end\")"
+		"		(ConceptNode \"bar\")"
+		"		(ConceptNode \"bar\"))"
+		"	(OrderedLink"
+		"		(ConceptNode \"begin\")"
+		"		(ConceptNode \"end\")"
+		"		(ConceptNode \"bar\")"
+		"		(ConceptNode \"bar\")"
+		"		(ConceptNode \"bar\")))"
+	);
+	TS_ASSERT_EQUALS(parts, response);
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test pivoting around a common GlobNode.
+ * Tests Issue #2167
+ */
+void GlobUTest::test_pivot(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-pivot.scm\")");
+
+	Handle pivot = eval->eval_h("(cog-execute! glob-pivot)");
+	printf("pivot got %s\n", pivot->to_string().c_str());
+	TS_ASSERT_EQUALS(1, pivot->get_arity());
+
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"	(ListLink"
+		"		(ConceptNode \"blah\")))"
+	);
+	TS_ASSERT_EQUALS(pivot, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test pivoting around multiple common GlobNodes.
+ * Same as above, but trickier.
+ */
+void GlobUTest::test_multi_pivot(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-multi-pivot.scm\")");
+	Handle response = eval->eval_h(
+		"(SetLink"
+		"	(ListLink"
+		"		(ConceptNode \"blah\")))"
+	);
+
+	Handle chesponse = eval->eval_h(
+		"(SetLink"
+		"	(ListLink"
+		"		(ConceptNode \"class-3\")"
+		"		(ListLink"
+		"			(ConceptNode \"blah\"))))"
+	);
+
+	Handle plain = eval->eval_h("(cog-execute! glob-unify-plain)");
+	printf("unify-plain got %s\n", plain->to_string().c_str());
+	TS_ASSERT_EQUALS(1, plain->get_arity());
+	TS_ASSERT_EQUALS(plain, response);
+
+	Handle tall = eval->eval_h("(cog-execute! glob-unify-tall)");
+	printf("unify-tall got %s\n", tall->to_string().c_str());
+	TS_ASSERT_EQUALS(1, tall->get_arity());
+	TS_ASSERT_EQUALS(tall, response);
+
+	Handle pivot = eval->eval_h("(cog-execute! glob-multi-pivot)");
+	printf("multi-pivot got %s\n", pivot->to_string().c_str());
+	TS_ASSERT_EQUALS(1, pivot->get_arity());
+	TS_ASSERT_EQUALS(pivot, response);
+
+	Handle chase = eval->eval_h("(cog-execute! glob-chase-pivot)");
+	printf("chase-pivot got %s\n", chase->to_string().c_str());
+	TS_ASSERT_EQUALS(1, chase->get_arity());
+	TS_ASSERT_EQUALS(chase, chesponse);
+
+	Handle mhase = eval->eval_h("(cog-execute! glob-chase-multi-pivot)");
+	printf("multi-chase got %s\n", mhase->to_string().c_str());
+	TS_ASSERT_EQUALS(1, mhase->get_arity());
+	TS_ASSERT_EQUALS(mhase, chesponse);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test arithmetic links with Globs in them.
+ * Tests Issue #2528
+ */
+void GlobUTest::test_number(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/glob-number.scm\")");
+
+	Handle fifteen = eval->eval_h("(cog-execute! glob-for-plus)");
+	printf("Number expect 15: %s\n", fifteen->to_string().c_str());
+	TS_ASSERT_EQUALS(1, fifteen->get_arity());
+
+	Handle response = eval->eval_h("(SetLink (Number 15))");
+	TS_ASSERT_EQUALS(fifteen, response);
+
+	// ----
+	Handle big = eval->eval_h("(cog-execute! glob-for-ten)");
+	printf("Number expect 390: %s\n", big->to_string().c_str());
+	TS_ASSERT_EQUALS(1, big->get_arity());
+
+	response = eval->eval_h("(SetLink (Number 390))");
+	TS_ASSERT_EQUALS(big, response);
+
+	// ----
+	logger().debug("END TEST: %s", __FUNCTION__);
+}

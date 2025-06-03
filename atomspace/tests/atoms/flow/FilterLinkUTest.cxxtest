@@ -1,0 +1,442 @@
+/*
+ * tests/atoms/flow/FilterLinkUTest.cxxtest
+ *
+ * Copyright (C) 2016 Linas Vepstas
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <opencog/guile/SchemeEval.h>
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/atoms/execution/Instantiator.h>
+#include <opencog/util/Logger.h>
+
+using namespace opencog;
+
+class FilterLinkUTest: public CxxTest::TestSuite
+{
+private:
+    AtomSpacePtr as;
+    SchemeEval* eval;
+
+public:
+    FilterLinkUTest(void)
+    {
+        logger().set_level(Logger::DEBUG);
+        logger().set_print_to_stdout_flag(true);
+
+        as = createAtomSpace();
+        eval = new SchemeEval(as);
+        eval->eval("(add-to-load-path \"" PROJECT_SOURCE_DIR "\")");
+        eval->eval("(use-modules (opencog exec))");
+    }
+
+    ~FilterLinkUTest()
+    {
+        delete eval;
+        // Erase the log file if no assertions failed.
+        if (!CxxTest::TestTracker::tracker().suiteFailed())
+            std::remove(logger().get_filename().c_str());
+    }
+
+    void setUp(void);
+    void tearDown(void);
+
+    void test_singleton(void);
+    void test_signature(void);
+    void test_double_set(void);
+    void test_implication(void);
+    void test_glob(void);
+    void test_implication_nodecl(void);
+    void test_local_quote_map(void);
+    void xtest_quote_arg_map(void);
+    void test_dont_exec(void);
+    void test_naked_signature(void);
+    void test_defined_schema(void);
+    void test_rule_link(void);
+    void test_sign_node(void);
+};
+
+void FilterLinkUTest::tearDown(void)
+{
+    as->clear();
+}
+
+void FilterLinkUTest::setUp(void)
+{
+    as->clear();
+}
+
+/*
+ * FilterLink unit test.
+ */
+void FilterLinkUTest::test_singleton(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/atoms/flow/filter-link.scm\")");
+
+    Handle result = eval->eval_h("(cog-execute! single)");
+
+    Handle baz = eval->eval_h("(Concept \"baz\")");
+    printf("got %s", result->to_string().c_str());
+    printf("expected %s\n", baz->to_string().c_str());
+
+    TS_ASSERT(result == baz);
+
+    // -------------------------------------------------
+    result = eval->eval_h("(cog-execute! single-set)");
+
+    Handle set = eval->eval_h(
+		"(SetLink "
+		"	(Concept \"ah one\") (Concept \"ah two\") (Number 3))");
+    printf("got %s", result->to_string().c_str());
+    printf("expected %s\n", set->to_string().c_str());
+
+    TS_ASSERT(result == set);
+
+    // -------------------------------------------------
+    // Uses same expected result as above.
+    result = eval->eval_h("(cog-execute! single-set-noscope)");
+
+    printf("got %s", result->to_string().c_str());
+    printf("expected %s\n", set->to_string().c_str());
+
+    TS_ASSERT(result == set);
+
+    // -------------------------------------------------
+    result = eval->eval_h("(cog-execute! single-set-filter)");
+
+    set = eval->eval_h(
+		"(SetLink "
+		"	(Concept \"ah one\") (Number 3))");
+    printf("got %s", result->to_string().c_str());
+    printf("expected %s\n", set->to_string().c_str());
+
+    TS_ASSERT(result == set);
+
+    // -------------------------------------------------
+    // Uses same expected result as above.
+    result = eval->eval_h("(cog-execute! single-set-filter-noscope)");
+
+    printf("got %s", result->to_string().c_str());
+    printf("expected %s\n", set->to_string().c_str());
+
+    TS_ASSERT(result == set);
+
+    // -------------------------------------------------
+    result = eval->eval_h("(cog-execute! single-list)");
+
+    Handle list = eval->eval_h(
+		"(ListLink "
+		"	(Concept \"ah one\") (Concept \"ah two\") (Number 3))");
+    printf("got %s", result->to_string().c_str());
+    printf("expected %s\n", list->to_string().c_str());
+
+    TS_ASSERT(result == list);
+
+    // -------------------------------------------------
+    result = eval->eval_h("(cog-execute! single-type)");
+
+    set = eval->eval_h(
+		"(SetLink "
+		"	(Concept \"ah one\") (Concept \"ah two\"))");
+    printf("got %s", result->to_string().c_str());
+    printf("expected %s\n", set->to_string().c_str());
+
+    TS_ASSERT(result == set);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void FilterLinkUTest::test_signature(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/atoms/flow/filter-link.scm\")");
+
+    Handle result = eval->eval_h("(cog-execute! single-signature)");
+
+    Handle sete = eval->eval_h("sig-expect");
+    printf("got %s", result->to_string().c_str());
+    printf("expected %s\n", sete->to_string().c_str());
+
+    TS_ASSERT(result == sete);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void FilterLinkUTest::test_double_set(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/atoms/flow/filter-link.scm\")");
+
+    Handle result = eval->eval_h("(cog-execute! double-num-set)");
+
+    Handle sete = eval->eval_h(
+        "(SetLink (ListLink (Concept \"bar\") (Number 3)))");
+    printf("got %s", result->to_string().c_str());
+    printf("expected %s\n", sete->to_string().c_str());
+
+    TS_ASSERT(result == sete);
+
+    // ---------------------------------------------------
+    result = eval->eval_h("(cog-execute! double-con-set)");
+
+    sete = eval->eval_h(
+        "(SetLink "
+        "    (ListLink (Concept \"bar\") (Concept \"ah one\"))"
+        "    (ListLink (Concept \"bar\") (Concept \"ah two\")))");
+    printf("got %s", result->to_string().c_str());
+    printf("expected %s\n", sete->to_string().c_str());
+
+    TS_ASSERT(result == sete);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void FilterLinkUTest::test_implication(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/atoms/flow/filter-link.scm\")");
+
+    Handle result = eval->eval_h("(cog-execute! imply-map)");
+
+    Handle sete = eval->eval_h("imply-expected");
+    printf("got %s\n", result->to_string().c_str());
+    printf("expected %s\n", sete->to_string().c_str());
+
+    TS_ASSERT(result == sete);
+
+    // ---------------------------------------------------
+    result = eval->eval_h("(cog-execute! imply-eval)");
+
+    sete = eval->eval_h("eval-expected");
+    printf("--------\n");
+    printf("got %s\n", result->to_string().c_str());
+    printf("expected %s\n", sete->to_string().c_str());
+
+    TS_ASSERT(result == sete);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void FilterLinkUTest::test_glob(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/atoms/flow/filter-link.scm\")");
+
+    Handle result = eval->eval_h("(cog-execute! glob-simple)");
+
+    Handle sete = eval->eval_h("glob-simple-expected");
+    printf("simp got %s", result->to_string().c_str());
+    printf("expected %s\n", sete->to_string().c_str());
+
+    TS_ASSERT(result == sete);
+
+    // ---------------------------------------------------
+    result = eval->eval_h("(cog-execute! glob-simple-tail)");
+
+    sete = eval->eval_h("glob-simple-tail-expected");
+    printf("tail got %s", result->to_string().c_str());
+    printf("expected %s\n", sete->to_string().c_str());
+
+    TS_ASSERT(result == sete);
+
+    // ---------------------------------------------------
+    result = eval->eval_h("(cog-execute! glob-double)");
+
+    sete = eval->eval_h("glob-double-expected");
+    printf("double got %s", result->to_string().c_str());
+    printf("expected %s\n", sete->to_string().c_str());
+
+    TS_ASSERT(result == sete);
+
+    // ---------------------------------------------------
+    result = eval->eval_h("(cog-execute! glob-glob)");
+
+    sete = eval->eval_h("glob-glob-expected");
+    printf("glob-glob got %s", result->to_string().c_str());
+    printf("expected %s\n", sete->to_string().c_str());
+
+    TS_ASSERT(result == sete);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void FilterLinkUTest::test_implication_nodecl(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/atoms/flow/filter-link.scm\")");
+
+    Handle result = eval->eval_h("(cog-execute! imply-map-nodecl)");
+
+    Handle sete = eval->eval_h("imply-expected");
+    printf("nodecl got %s", result->to_string().c_str());
+    printf("expected %s\n", sete->to_string().c_str());
+
+    TS_ASSERT(result == sete);
+    // ---------------------------------------------------
+    result = eval->eval_h("(cog-execute! imply-glob-nodecl)");
+
+    sete = eval->eval_h("imply-glob-expected");
+    printf("imply-glob got %s", result->to_string().c_str());
+    printf("expected %s\n", sete->to_string().c_str());
+
+    TS_ASSERT(result == sete);
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void FilterLinkUTest::test_local_quote_map(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/atoms/flow/filter-link.scm\")");
+
+    Instantiator inst(as.get());
+    Handle local_quote_map = eval->eval_h("local-quote-map"),
+        result = HandleCast(inst.execute(local_quote_map)),
+        expected1 = eval->eval_h("local-quote-map-result-1"),
+        expected2 = eval->eval_h("local-quote-map-result-2");
+
+    printf("result %s\n", result->to_string().c_str());
+    printf("expected1 %s\n", expected1->to_string().c_str());
+    printf("expected2 %s\n", expected2->to_string().c_str());
+
+    TS_ASSERT(result == expected1 or result == expected2);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void FilterLinkUTest::xtest_quote_arg_map(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/atoms/flow/filter-link.scm\")");
+
+    Instantiator inst(as.get());
+    Handle quote_arg_map = eval->eval_h("quote-arg-map"),
+        result = HandleCast(inst.execute(quote_arg_map)),
+        expected = eval->eval_h("quote-arg-map-result");
+
+    printf("result %s", result->to_string().c_str());
+    printf("expected %s\n", expected->to_string().c_str());
+
+    TS_ASSERT(result == expected);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+// Test from bug report #2201
+void FilterLinkUTest::test_dont_exec(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/atoms/flow/filter-link.scm\")");
+
+    Handle dont_exec_get = eval->eval_h("(cog-execute! dont-exec-get)");
+    Handle dont_expected = eval->eval_h("dont-expected");
+
+    printf("dontge %s\n\n", dont_exec_get->to_short_string().c_str());
+    printf("expect %s\n\n", dont_expected->to_short_string().c_str());
+
+    TS_ASSERT(dont_exec_get == dont_expected);
+
+    // ----------------------------------------------------------
+
+    Handle quote_get = eval->eval_h("(cog-execute! quote-get)");
+    Handle quote_exp = eval->eval_h("quote-expected");
+
+    printf("quoget %s\n", quote_get->to_short_string().c_str());
+    printf("quoexp %s\n", quote_exp->to_short_string().c_str());
+
+    TS_ASSERT(quote_get == quote_exp);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void FilterLinkUTest::test_naked_signature(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/atoms/flow/filter-link.scm\")");
+
+    Handle siggy_filter = eval->eval_h("(cog-execute! siggy-filter)");
+    Handle siggy_expect = eval->eval_h("siggy-expect");
+
+    printf("siggy %s\n\n", siggy_filter->to_short_string().c_str());
+    printf("sigex %s\n\n", siggy_expect->to_short_string().c_str());
+
+    TS_ASSERT(siggy_filter == siggy_expect);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void FilterLinkUTest::test_defined_schema(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/atoms/flow/filter-link.scm\")");
+
+    Handle defschm_filter = eval->eval_h("(cog-execute! defschema)");
+    Handle defschm_expect = eval->eval_h("defschema-expect");
+
+    printf("defschema %s\n\n", defschm_filter->to_short_string().c_str());
+    printf("expschema %s\n\n", defschm_expect->to_short_string().c_str());
+
+    TS_ASSERT(defschm_filter == defschm_expect);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void FilterLinkUTest::test_rule_link(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/atoms/flow/filter-link.scm\")");
+
+    Handle frob_filter = eval->eval_h("(cog-execute! frob-rule)");
+    Handle frob_expect = eval->eval_h("frob-expect");
+
+    printf("frob-rule %s\n\n", frob_filter->to_short_string().c_str());
+    printf("frob-xpct %s\n\n", frob_expect->to_short_string().c_str());
+
+    TS_ASSERT(frob_filter == frob_expect);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+void FilterLinkUTest::test_sign_node(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/atoms/flow/filter-link.scm\")");
+
+    Handle sign_filter = eval->eval_h("(cog-execute! sign-filter)");
+    Handle sign_expect = eval->eval_h("sign-expect");
+
+    printf("sign-rule %s\n\n", sign_filter->to_short_string().c_str());
+    printf("sign-xpct %s\n\n", sign_expect->to_short_string().c_str());
+
+    TS_ASSERT(sign_filter == sign_expect);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}

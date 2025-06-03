@@ -1,0 +1,472 @@
+/*
+ * tests/atomspace/MultiSpaceUTest.cxxtest
+ *
+ * Copyright (C) 2014,2015 Linas Vepstas
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <opencog/atoms/base/Node.h>
+#include <opencog/atoms/base/Link.h>
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/atoms/truthvalue/SimpleTruthValue.h>
+
+#include <cxxtest/TestSuite.h>
+
+using namespace opencog;
+
+// Test support for multiple atomspaces.
+// This is pursuant to github bug #523 -- several users want this
+// ability.
+// Tests for removal of atoms in a multi-atomspace usage case is in
+// the RemoveUTest.cxxtest file.
+//
+class MultiSpaceUTest :  public CxxTest::TestSuite
+{
+private:
+
+	AtomSpacePtr asp1;
+	AtomSpacePtr asp2;
+	AtomSpacePtr asp3;
+	AtomSpace& as1;
+	AtomSpace& as2;
+	AtomSpace& as3;
+
+public:
+	MultiSpaceUTest() :
+		asp1(createAtomSpace()),
+		asp2(createAtomSpace()),
+		asp3(createAtomSpace()),
+		as1(*asp1.get()),
+		as2(*asp2.get()),
+		as3(*asp3.get())
+	{}
+
+	void setUp() {}
+
+	void tearDown() {}
+
+	// Simple test of naive multiple atomspaces.  Create three
+	// distinct atomspaces, make sure they behave like atomspaces
+	// should.
+	void testSimple()
+	{
+		// Create three TV's
+		TruthValuePtr tv1(SimpleTruthValue::createTV(0.5, 1.0));
+		TruthValuePtr tv2(SimpleTruthValue::createTV(0.5, 1.0/2.0));
+		TruthValuePtr tv3(SimpleTruthValue::createTV(0.5, 1.0/3.0));
+
+		// Create three atoms in three different atomspaces
+		Handle h1 = as1.add_node(CONCEPT_NODE, "1");
+		h1->setTruthValue(tv1);
+		Handle h2 = as2.add_node(NUMBER_NODE, "2");
+		h2->setTruthValue(tv2);
+		Handle h3 = as3.add_node(VARIABLE_NODE, "3");
+		h3->setTruthValue(tv3);
+
+		// Fetch three atoms in three different atomspaces
+		Handle hn1 = as1.add_node(CONCEPT_NODE, "1");
+		Handle hn2 = as2.add_node(NUMBER_NODE, "2");
+		Handle hn3 = as3.add_node(VARIABLE_NODE, "3");
+
+		// They should match the old handles
+		TS_ASSERT(h1 == hn1);
+		TS_ASSERT(h2 == hn2);
+		TS_ASSERT(h3 == hn3);
+
+		// ... and they should refer to the same atoms.
+		TS_ASSERT(hn1->get_type() == h1->get_type());
+		TS_ASSERT(hn2->get_type() == h2->get_type());
+		TS_ASSERT(hn3->get_type() == h3->get_type());
+
+		// The truth value *pointers* should be identical, as they
+		// should point to the same exact truth value instance.
+		TS_ASSERT(hn1->getTruthValue() == h1->getTruthValue());
+		TS_ASSERT(hn2->getTruthValue() == h2->getTruthValue());
+		TS_ASSERT(hn3->getTruthValue() == h3->getTruthValue());
+	}
+
+	// Test multiple independent atomspaces.  Make sure they do not
+	// collide with one-another in atom insertion, deletion.
+	void testCopy()
+	{
+		// Create three TV's
+		TruthValuePtr tv1(SimpleTruthValue::createTV(0.4, 1.0));
+		TruthValuePtr tv2(SimpleTruthValue::createTV(0.4, 1.0/2.0));
+		TruthValuePtr tv3(SimpleTruthValue::createTV(0.4, 1.0/3.0));
+
+		// Create three nodes
+		Handle n1(createNode(CONCEPT_NODE, "uni-1"));
+		n1->setTruthValue(tv1);
+		Handle n2(createNode(NUMBER_NODE, "2.2222"));
+		n2->setTruthValue(tv2);
+		Handle n3(createNode(VARIABLE_NODE, "uni-3"));
+		n3->setTruthValue(tv3);
+
+		// Create three links holding these three
+		TruthValuePtr tv(SimpleTruthValue::createTV(0.33, 1.0/3.0));
+
+		// Create three copies of this link in three atomspaces
+		Handle h1 = as1.add_link(LIST_LINK, n1, n2, n3);
+		h1->setTruthValue(tv);
+		Handle h2 = as2.add_atom(h1);
+		Handle h3 = as3.add_atom(h2);
+
+		// The truth values themselves should be equal, as values.
+		TS_ASSERT(*h1->getTruthValue() == *tv);
+		TS_ASSERT(*h2->getTruthValue() == *tv);
+		TS_ASSERT(*h3->getTruthValue() == *tv);
+
+		// Fetch three atoms in three different atomspaces
+		Handle h1n1 = as1.get_node(CONCEPT_NODE, "uni-1");
+		Handle h1n2 = as1.get_node(NUMBER_NODE, "2.2222");
+		Handle h1n3 = as1.get_node(VARIABLE_NODE, "uni-3");
+
+		Handle h2n1 = as2.get_node(CONCEPT_NODE, "uni-1");
+		Handle h2n2 = as2.get_node(NUMBER_NODE, "2.2222");
+		Handle h2n3 = as2.get_node(VARIABLE_NODE, "uni-3");
+
+		Handle h3n1 = as3.get_node(CONCEPT_NODE, "uni-1");
+		Handle h3n2 = as3.get_node(NUMBER_NODE, "2.2222");
+		Handle h3n3 = as3.get_node(VARIABLE_NODE, "uni-3");
+
+		// They should NOT match one-another
+		// They should have become copies.
+		TS_ASSERT(h1n1 != h2n1);
+		TS_ASSERT(h1n2 != h2n2);
+		TS_ASSERT(h1n3 != h2n3);
+
+		TS_ASSERT(h1n1 != h3n1);
+		TS_ASSERT(h1n2 != h3n2);
+		TS_ASSERT(h1n3 != h3n3);
+
+		TS_ASSERT(h2n1 != h3n1);
+		TS_ASSERT(h2n2 != h3n2);
+		TS_ASSERT(h2n3 != h3n3);
+
+		// The truth values themselves should be equal, as values.
+		TS_ASSERT(*h1n1->getTruthValue() == *tv1);
+		TS_ASSERT(*h2n1->getTruthValue() == *tv1);
+		TS_ASSERT(*h3n1->getTruthValue() == *tv1);
+
+		TS_ASSERT(*h1n2->getTruthValue() == *tv2);
+		TS_ASSERT(*h2n2->getTruthValue() == *tv2);
+		TS_ASSERT(*h3n2->getTruthValue() == *tv2);
+
+		TS_ASSERT(*h1n3->getTruthValue() == *tv3);
+		TS_ASSERT(*h2n3->getTruthValue() == *tv3);
+		TS_ASSERT(*h3n3->getTruthValue() == *tv3);
+	}
+
+	// Test copying back and forth.
+	void testCopyBack()
+	{
+		// Create a node, copy it back and forth.
+		Handle n1 = as1.add_node(CONCEPT_NODE, "backer");
+		Handle n2 = as2.add_atom(n1);
+		Handle n1copy = as1.add_atom(n2);
+		Handle n2copy = as2.add_atom(n1copy);
+
+		TS_ASSERT(n1 == n1copy);
+		TS_ASSERT(n2 == n2copy);
+
+		// Create a link, copy it back and forth.
+		Handle h1 = as1.add_link(LIST_LINK, n1);
+		Handle h2 = as2.add_atom(h1);
+		Handle h1copy = as1.add_atom(h2);
+		Handle h2copy = as2.add_atom(h1copy);
+
+		TS_ASSERT(h1 == h1copy);
+		TS_ASSERT(h2 == h2copy);
+
+		Handle h3 = as3.add_atom(h1);
+		Handle h3copy = as3.add_atom(h2);
+
+		TS_ASSERT(h3 == h3copy);
+
+		// Do it again, this time with unordered links.
+		Handle ma = as1.add_node(CONCEPT_NODE, "hacker");
+		Handle mb = as1.add_node(CONCEPT_NODE, "cracker");
+		Handle mc = as1.add_node(CONCEPT_NODE, "jacker");
+
+		h1 = as1.add_link(UNORDERED_LINK, n1, mc, mb, n1, mc, ma);
+		h2 = as2.add_atom(h1);
+		h1copy = as1.add_atom(h2);
+		h2copy = as2.add_atom(h1copy);
+
+		TS_ASSERT(h1 == h1copy);
+		TS_ASSERT(h2 == h2copy);
+
+		h3 = as3.add_atom(h1);
+		h3copy = as3.add_atom(h2);
+
+		TS_ASSERT(h3 == h3copy);
+	}
+
+	// Like testCopyBack(), except that it explicitly calls the getAtom
+	// method.  Because the atoms exist, the get should return them.
+	void testGet()
+	{
+		// Create a node, copy it back and forth.
+		Handle n1 = as1.add_node(CONCEPT_NODE, "Ziggy Stardust");
+		Handle n2 = as2.add_atom(n1);
+		Handle n1copy = as1.get_atom(n2);
+		Handle n2copy = as2.get_atom(n1copy);
+
+		TS_ASSERT(n1 == n1copy);
+		TS_ASSERT(n2 == n2copy);
+
+		// Create a link, copy it back and forth.
+		Handle h1 = as1.add_link(LIST_LINK, n1);
+		Handle h2 = as2.add_atom(h1);
+		Handle h1copy = as1.get_atom(h2);
+		Handle h2copy = as2.get_atom(h1copy);
+
+		TS_ASSERT(h1 == h1copy);
+		TS_ASSERT(h2 == h2copy);
+
+		Handle h3 = as3.get_atom(h1);
+		Handle h3copy = as3.get_atom(h2);
+
+		TS_ASSERT(h3 == h3copy);
+
+		// Do it again, this time with unordered links.
+		Handle ma = as1.add_node(CONCEPT_NODE, "ziggy");
+		Handle mb = as1.add_node(CONCEPT_NODE, "weird");
+		Handle mc = as1.add_node(CONCEPT_NODE, "gilly");
+
+		h1 = as1.add_link(UNORDERED_LINK, n1, mc, mb, n1, mc, ma);
+		h2 = as2.add_atom(h1);
+		h1copy = as1.get_atom(h2);
+		h2copy = as2.get_atom(h1copy);
+
+		TS_ASSERT(h1 == h1copy);
+		TS_ASSERT(h2 == h2copy);
+
+		h3 = as3.add_atom(h1);
+		h3copy = as3.get_atom(h2);
+
+		TS_ASSERT(h3 == h3copy);
+	}
+
+	// Like testCopyBack() and testGet(), except that one of the
+	// atomspaces is an expansion.  This exhibits a new bug,
+	// github bug report #1530.
+	void testExpand()
+	{
+		AtomSpacePtr ex(createAtomSpace(asp1));
+		AtomSpace& ex1(*ex);
+
+		// Create a node, copy it back and forth.
+		Handle n1 = ex1.add_node(CONCEPT_NODE, "Spiders from Mars");
+		Handle n2 = as2.add_atom(n1);
+		Handle n1copy = ex1.get_atom(n2);
+		Handle n2copy = as2.get_atom(n1copy);
+
+		TS_ASSERT(n1 == n1copy);
+		TS_ASSERT(n2 == n2copy);
+
+		// Create a link, copy it back and forth.
+		Handle h1 = ex1.add_link(LIST_LINK, n1);
+		Handle h2 = as2.add_atom(h1);
+		Handle h1copy = ex1.get_atom(h2);
+		Handle h2copy = as2.get_atom(h1copy);
+
+		TS_ASSERT(h1 == h1copy);
+		TS_ASSERT(h2 == h2copy);
+
+		Handle h3 = as3.get_atom(h1);
+		Handle h3copy = as3.get_atom(h2);
+
+		TS_ASSERT(h3 == h3copy);
+
+		// Do it again, this time with unordered links.
+		Handle ma = ex1.add_node(CONCEPT_NODE, "wham");
+		Handle mb = ex1.add_node(CONCEPT_NODE, "bam");
+		Handle mc = ex1.add_node(CONCEPT_NODE, "thankyou, mam");
+
+		h1 = ex1.add_link(UNORDERED_LINK, n1, mc, mb, n1, mc, ma);
+		h2 = as2.add_atom(h1);
+		h1copy = ex1.get_atom(h2);
+		h2copy = as2.get_atom(h1copy);
+
+		TS_ASSERT(h1 == h1copy);
+		TS_ASSERT(h2 == h2copy);
+
+		h3 = as3.add_atom(h1);
+		h3copy = as3.get_atom(h2);
+
+		TS_ASSERT(h3 == h3copy);
+	}
+
+	// Test multiple nested (hierarchical) atomspaces.  They should 
+	// work as expected...  The below is a fairly naive test, it does
+	// not test any kind of complicated semantics.  Its minimal.
+	void testNest()
+	{
+		AtomSpacePtr nas1(createAtomSpace());
+		AtomSpacePtr nas2(createAtomSpace(nas1));
+		AtomSpacePtr nas3(createAtomSpace(nas2));
+
+		// Create three TV's
+		TruthValuePtr tv1(SimpleTruthValue::createTV(0.4, 1.0));
+		TruthValuePtr tv2(SimpleTruthValue::createTV(0.4, 1.0/2.0));
+		TruthValuePtr tv3(SimpleTruthValue::createTV(0.4, 1.0/3.0));
+
+		// Create three nodes in the base atomspace
+		Handle hnd1 = nas1->add_node(CONCEPT_NODE, "nest-1");
+		hnd1->setTruthValue(tv1);
+		Handle hnd2 = nas1->add_node(NUMBER_NODE, "2.34");
+		hnd2->setTruthValue(tv2);
+		Handle hnd3 = nas1->add_node(VARIABLE_NODE, "nest-3");
+		hnd3->setTruthValue(tv3);
+
+		// Create three links holding these three
+		TruthValuePtr tv(SimpleTruthValue::createTV(0.33, 1.0/3.0));
+
+		// Create a link in the middle atomspace
+		Handle h2 = nas2->add_link(LIST_LINK, hnd1, hnd2, hnd3);
+		h2->setTruthValue(tv);
+
+		// Try to create a link in the grandchild atomspace
+		Handle h3 = nas3->add_link(LIST_LINK, hnd1, hnd2, hnd3);
+		h3->setTruthValue(tv);
+
+		// The middle and grand-child links should be one and the same.
+		TS_ASSERT(h2 == h3);
+
+		// Fetch three atoms in three different atomspaces
+		Handle h1n1 = nas1->add_node(CONCEPT_NODE, "nest-1");
+		Handle h1n2 = nas1->add_node(NUMBER_NODE, "2.34");
+		Handle h1n3 = nas1->add_node(VARIABLE_NODE, "nest-3");
+
+		Handle h2n1 = nas2->add_node(CONCEPT_NODE, "nest-1");
+		Handle h2n2 = nas2->add_node(NUMBER_NODE, "2.34");
+		Handle h2n3 = nas2->add_node(VARIABLE_NODE, "nest-3");
+
+		Handle h3n1 = nas3->add_node(CONCEPT_NODE, "nest-1");
+		Handle h3n2 = nas3->add_node(NUMBER_NODE, "2.34");
+		Handle h3n3 = nas3->add_node(VARIABLE_NODE, "nest-3");
+
+		// They should be identical
+		// They should NOT be copies.
+		TS_ASSERT(hnd1 == h1n1);
+		TS_ASSERT(hnd2 == h1n2);
+		TS_ASSERT(hnd3 == h1n3);
+
+		TS_ASSERT(hnd1 == h2n1);
+		TS_ASSERT(hnd2 == h2n2);
+		TS_ASSERT(hnd3 == h2n3);
+
+		TS_ASSERT(hnd1 == h3n1);
+		TS_ASSERT(hnd2 == h3n2);
+		TS_ASSERT(hnd3 == h3n3);
+
+		// The truth value *pointers* should be identical, of course,
+		// since they are the very same atoms.
+		TS_ASSERT(hnd1->getTruthValue() == h1n1->getTruthValue());
+		TS_ASSERT(hnd2->getTruthValue() == h1n2->getTruthValue());
+		TS_ASSERT(hnd3->getTruthValue() == h1n3->getTruthValue());
+
+		TS_ASSERT(hnd1->getTruthValue() == h2n1->getTruthValue());
+		TS_ASSERT(hnd2->getTruthValue() == h2n2->getTruthValue());
+		TS_ASSERT(hnd3->getTruthValue() == h2n3->getTruthValue());
+
+		TS_ASSERT(hnd1->getTruthValue() == h3n1->getTruthValue());
+		TS_ASSERT(hnd2->getTruthValue() == h3n2->getTruthValue());
+		TS_ASSERT(hnd3->getTruthValue() == h3n3->getTruthValue());
+	}
+
+	// This tests bug report #9
+	void testCrash()
+	{
+		AtomSpacePtr ex1 = createAtomSpace(asp1);
+
+		// Create mixed nodes.
+		Handle n1 = as1.add_node(CONCEPT_NODE, "aaa");
+		Handle n2 = ex1->add_node(CONCEPT_NODE, "bbb");
+
+		// Create a link
+		Handle h1 = ex1->add_atom(createLink(LIST_LINK, n1, n2));
+
+		std::vector<Handle> handle_set;
+		as1.get_handles_by_type(handle_set, ATOM, false);
+		// cogserver crashes at this point; no crash == pass
+
+		AtomSpacePtr ex2 = createAtomSpace(asp2);
+
+		// Create mixed nodes.
+		n2 = ex2->add_node(CONCEPT_NODE, "bbb");
+
+		// Create a link
+		h1 = ex2->add_atom(createLink(LIST_LINK, n1, n2));
+
+		handle_set.clear();
+		as1.get_handles_by_type(handle_set, ATOM, false);
+		// cogserver crashes at this point; no crash == pass
+	}
+
+	// This tests bug report #97
+	void testGetType()
+	{
+		AtomSpacePtr as = createAtomSpace();
+		AtomSpacePtr ex = createAtomSpace(as);
+
+		// Add nodes of same typ.
+		as->add_node(CONCEPT_NODE, "aaa");
+		ex->add_node(CONCEPT_NODE, "bbb");
+
+		HandleSeq handle_set;
+		ex->get_handles_by_type(handle_set, CONCEPT_NODE);
+
+		TS_ASSERT(handle_set.size() == 2);
+
+		ex->clear();
+
+		TS_ASSERT(as->get_size() == 1);
+		TS_ASSERT(ex->get_size() == 1);
+
+		handle_set.clear();
+		ex->get_handles_by_type(handle_set, CONCEPT_NODE);
+
+		TS_ASSERT(handle_set.size() == 1);
+	}
+
+	// This tests bug report #221
+	void testMoreSpace()
+	{
+		AtomSpacePtr as(createAtomSpace());
+		AtomSpacePtr ex(createAtomSpace(as));
+		AtomSpacePtr ns(createAtomSpace());
+
+		Handle haa = as->add_node(CONCEPT_NODE, "PLN");
+		Handle hab = as->add_node(CONCEPT_NODE, "URE");
+		Handle hea = ex->add_link(LIST_LINK, haa, hab);
+		Handle heb = ex->add_node(CONCEPT_NODE, "VAR");
+		Handle hec = ex->add_link(IMPLICATION_LINK, hea, heb);
+
+		as->add_link(LIST_LINK, haa, hab);
+
+		Handle hna = ns->add_atom(haa);
+		Handle hnb = ns->add_atom(hec);
+		Handle haa_copy = ex->get_atom(hna);
+		Handle hec_copy = ex->get_atom(hnb);
+
+		TS_ASSERT(haa_copy == haa);
+		TS_ASSERT(hec_copy == hec);
+	}
+};

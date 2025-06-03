@@ -1,0 +1,209 @@
+/*
+ * tests/query/DisconnectedUTest.cxxtest
+ *
+ * Copyright (C) 2009,2014 Linas Vepstas <linasvepstas@gmail.com>
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <opencog/atoms/base/Link.h>
+#include <opencog/atoms/base/Node.h>
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/guile/SchemeEval.h>
+#include <opencog/util/Logger.h>
+#include "imply.h"
+
+#include "test-types.h"
+
+using namespace opencog;
+
+class DisconnectedUTest :  public CxxTest::TestSuite
+{
+	private:
+		AtomSpacePtr as;
+		SchemeEval* eval;
+
+	public:
+
+		DisconnectedUTest(void)
+		{
+			logger().set_level(Logger::DEBUG);
+			logger().set_print_to_stdout_flag(true);
+#include "test-types.cc"
+		}
+
+		~DisconnectedUTest()
+		{
+			// Erase the log file if no assertions failed.
+			if (!CxxTest::TestTracker::tracker().suiteFailed())
+				std::remove(logger().get_filename().c_str());
+		}
+
+		void setUp(void);
+		void tearDown(void);
+
+		void test_components(void);
+		void test_variables(void);
+		void test_cvariables(void);
+		void test_dancers(void);
+};
+
+/*
+ * This function sets up an implication link, and some data.
+ */
+#define an as->add_node
+#define al as->add_link
+void DisconnectedUTest::setUp(void)
+{
+	as = createAtomSpace();
+	eval = new SchemeEval(as);
+
+	eval->eval("(add-to-load-path \"" PROJECT_SOURCE_DIR "\")");
+
+	eval->eval("(load-from-path \"tests/query/test_types.scm\")");
+}
+
+void DisconnectedUTest::tearDown(void)
+{
+}
+
+/*
+ * Test bindlink consisting of two disconnected componentns
+ */
+#define getlink(hand,pos) as->getOutgoing(hand,pos)
+#define getarity(hand) as->getArity(hand)
+
+void DisconnectedUTest::test_components(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/disconnected.scm\")");
+
+	Handle bindlinkh = eval->apply("get-bindlink", Handle::UNDEFINED);
+	// Make sure the scheme file actually loaded!
+	TSM_ASSERT("Failed to load test data", Handle::UNDEFINED != bindlinkh);
+
+	// We expect to catch an error here.
+	bool caught = false;
+	try
+	{
+		bindlink(as, bindlinkh);
+	}
+	catch (const InvalidParamException& ex)
+	{
+		logger().debug("Caught exception, just as expected: %s", ex.get_message());
+		caught = true;
+	}
+	logger().info("Caught exception? %d\n", caught);
+
+	// Disable the test, for now. There are legitimate uses of
+	// disconnected queries. Yes, naive users will shoot themselves
+	// in the foot because of this, but wise users need this.
+	// TSM_ASSERT("Failed to catch expected exception", caught);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test several patterns with missing grounding clauses.
+ * These used to be considered to be ill-formed, but now
+ * we allow them to create implicit grounding clauses.
+ */
+void DisconnectedUTest::test_variables(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/disco-vars.scm\")");
+
+	// We do NOT expect to catch an error here.
+	Handle h = eval->eval_h("(B)");
+	TSM_ASSERT("Failed to create GetLink", Handle::UNDEFINED != h);
+
+	h = eval->eval_h("(Ba)");
+	TSM_ASSERT("Failed to create GetLink", Handle::UNDEFINED != h);
+
+	h = eval->eval_h("(Bu)");
+	TSM_ASSERT("Failed to create GetLink", Handle::UNDEFINED != h);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+// Similar to above, except that the stuff is built up in C++ not in
+// scheme.  See bug #172. Note: new trimming code automatically
+// and silently removes declared variables that do not appear in the
+// body. This avoids crazy side-effects and crashes in the URE.
+void DisconnectedUTest::test_cvariables(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	// We expect to catch an error here.
+	bool caught = false;
+	try
+	{
+		// Variable B is bound, but is never used in the body.
+		Handle va(createNode(VARIABLE_NODE, "$A"));
+		Handle vb(createNode(VARIABLE_NODE, "$B"));
+		Handle blv(createLink(VARIABLE_LIST, va, vb));
+		Handle blb(createLink(AND_LINK, va));
+		Handle blt(createLink(LIST_LINK, va));
+		Handle bl_final(createLink(BIND_LINK, blv, blb, blt));
+		as->add_atom(bl_final);
+	}
+	catch (const InvalidParamException& ex)
+	{
+		logger().debug("Caught exception, just as expected: %s", ex.get_message());
+		caught = true;
+	}
+	logger().info("Caught exception? %d\n", caught);
+	// TSM_ASSERT("Failed to catch expected exception", caught);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+
+/*
+ * Test pattern with missing grounding clauses. It should not
+ * only be specifiable, but it should also obtain the correct
+ * (expceted) results.  See issue #2516 for details.
+ */
+void DisconnectedUTest::test_dancers(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	eval->eval("(load-from-path \"tests/query/disco-dancers.scm\")");
+
+	// We do NOT expect to catch an error here.
+	Handle h = eval->eval_h("(get-dancers)");
+	TSM_ASSERT("Failed to create GetLink", Handle::UNDEFINED != h);
+
+	h = eval->eval_h("(cog-execute! (get-dancers))");
+
+	Handle a(createNode(CONCEPT_NODE, "alice"));
+	Handle b(createNode(CONCEPT_NODE, "bob"));
+	Handle ab(createLink(LIST_LINK, a, b));
+	Handle ba(createLink(LIST_LINK, b, a));
+	Handle both(createLink(SET_LINK, ab, ba));
+	Handle ans = as->add_atom(both);
+
+	printf("Expected: %s\n", ans->to_string().c_str());
+	printf("     Got: %s\n",   h->to_string().c_str());
+
+	// They should be identical.
+	TSM_ASSERT("Wrong result", *ans == *h);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}
+

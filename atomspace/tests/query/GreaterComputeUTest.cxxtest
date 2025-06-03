@@ -1,0 +1,101 @@
+/*
+ * tests/query/GreaterComputeUTest.cxxtest
+ *
+ * Copyright (C) 2014, 2015 Linas Vepstas
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <opencog/guile/SchemeEval.h>
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/util/Logger.h>
+#include "imply.h"
+
+using namespace opencog;
+
+class GreaterComputeUTest: public CxxTest::TestSuite
+{
+private:
+        AtomSpacePtr as;
+        SchemeEval* eval;
+
+public:
+    GreaterComputeUTest(void)
+    {
+        logger().set_level(Logger::DEBUG);
+        logger().set_print_to_stdout_flag(true);
+
+        as = createAtomSpace();
+        eval = new SchemeEval(as);
+        eval->eval("(use-modules (opencog exec))");
+        eval->eval("(add-to-load-path \"" PROJECT_SOURCE_DIR "\")");
+
+    }
+
+    ~GreaterComputeUTest()
+    {
+        // Erase the log file if no assertions failed.
+        if (!CxxTest::TestTracker::tracker().suiteFailed())
+                std::remove(logger().get_filename().c_str());
+    }
+
+    void setUp(void);
+    void tearDown(void);
+
+    void test_computation(void);
+};
+
+void GreaterComputeUTest::tearDown(void)
+{
+}
+
+void GreaterComputeUTest::setUp(void)
+{
+}
+
+#define getarity(hand) hand->get_arity()
+
+/*
+ * Computation unit test. Defines a fairly simple search pattern that
+ * requires a variety of computatinos to occur within it.
+ */
+void GreaterComputeUTest::test_computation(void)
+{
+    logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+    eval->eval("(load-from-path \"tests/query/greater-compute.scm\")");
+
+    Handle try_out = eval->eval_h("(threshold)");
+
+    Handle crash_b = bindlink(as, try_out);
+
+    std::cout << "Answer: " << crash_b->to_string() << std::endl;
+    TS_ASSERT_EQUALS(1, getarity(crash_b));
+
+    // Create the expected answer, and compare
+    Handle expected = eval->eval_h(
+    "(SetLink "
+    "   (EvaluationLink "
+    "      (PredicateNode \"power\")"
+    "      (ListLink "
+    "         (ConceptNode \"Ken\")"
+    "         (NumberNode 1000))))");
+
+    TS_ASSERT_EQUALS(crash_b, expected);
+
+    logger().debug("END TEST: %s", __FUNCTION__);
+}

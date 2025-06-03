@@ -1,0 +1,199 @@
+/*
+ * tests/query/StackUTest.cxxtest
+ *
+ * Copyright (C) 2009 Linas Vepstas <linasvepstas@gmail.com>
+ * All Rights Reserved
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/query/InitiateSearchMixin.h>
+#include <opencog/query/TermMatchMixin.h>
+#include <opencog/query/SatisfyMixin.h>
+#include <opencog/util/Logger.h>
+
+#include "imply.h"
+#undef DEBUG
+
+using namespace opencog;
+
+class StackUTest :  public CxxTest::TestSuite
+{
+	private:
+		AtomSpacePtr as;
+		Handle svar, wvar;
+		Handle p1, p2;
+		Handle anch;
+
+	public:
+
+		StackUTest(void)
+		{
+			logger().set_level(Logger::DEBUG);
+			logger().set_print_to_stdout_flag(true);
+			logger().set_timestamp_flag(false);
+		}
+
+		~StackUTest()
+		{
+			// erase the log file if no assertions failed
+			if (!CxxTest::TestTracker::tracker().suiteFailed())
+				std::remove(logger().get_filename().c_str());
+		}
+
+		void setUp(void);
+		void tearDown(void);
+
+		void test_stack(void);
+};
+
+class TestPMCB :
+	public InitiateSearchMixin,
+	public TermMatchMixin,
+	public SatisfyMixin
+{
+	public:
+	int lcnt;
+	int scnt;
+	Handle anch;
+	TestPMCB(AtomSpace* as) :
+		InitiateSearchMixin(as),
+		TermMatchMixin(as), lcnt(0), scnt(0) {}
+
+	virtual void set_pattern(const Variables& vars,
+	                         const Pattern& pat)
+	{
+		InitiateSearchMixin::set_pattern(vars, pat);
+		TermMatchMixin::set_pattern(vars, pat);
+	}
+
+	virtual bool clause_match(const Handle& pattrn,
+	                          const Handle& grnd,
+	                          const HandleMap& term_gnds)
+	{
+		// We need to call TermMatchMixin::clause_match
+		// to handle the case of self-grounding, else the count
+		// in the unit test is off by one.  (This is the
+		// backwards-compat handling for the unit test.)
+		bool OK = TermMatchMixin::clause_match(pattrn, grnd, term_gnds);
+		if (not OK) return false;
+
+		lcnt ++;
+		// match the initial anchor clause, but reject the rest.
+		return anch == grnd;
+	}
+
+	virtual bool propose_grounding(const HandleMap &var_soln,
+	                               const HandleMap &pred_soln)
+	{
+		scnt ++;
+		return false;
+	}
+};
+
+/*
+ * This function sets up the following structures:
+ *
+ * OrderedLink
+ *     ConceptNode "# DOSTUFF"
+ *     VariableNode "$sent"
+ * ListLink
+ *     VariableNode "$sent"
+ *     VariableNode "$var"
+ * 
+ * The pattern matcher should be called seven times, once
+ * for the ordered link, and 6 more times for the 6 list links.
+ * One recent bug was triggered by the clause-matcher returning
+ * "true", which resulted in it being invoked only half the time.
+ */
+#define an as->add_node
+#define al as->add_link
+void StackUTest::tearDown(void)
+{
+}
+void StackUTest::setUp(void)
+{
+	as = createAtomSpace();
+
+	// Create an implication link that will be tested.
+	p1 = al(ORDERED_LINK,
+		an(CONCEPT_NODE, "# DOSTUFF"),
+		an(VARIABLE_NODE, "$sent")
+	);
+	p2 = al(LIST_LINK,
+		svar = an(VARIABLE_NODE, "$sent"),
+		wvar = an(VARIABLE_NODE, "$var")
+	);
+
+	// Create data on which the above pattern should match
+	anch = al(ORDERED_LINK,
+		an(CONCEPT_NODE, "# DOSTUFF"),
+		an(CONCEPT_NODE, "my sentence")
+	);
+	al(LIST_LINK,
+		an(CONCEPT_NODE, "my sentence"),
+		an(CONCEPT_NODE, "thing A")
+	);
+	al(LIST_LINK,
+		an(CONCEPT_NODE, "my sentence"),
+		an(CONCEPT_NODE, "thing B")
+	);
+	al(LIST_LINK,
+		an(CONCEPT_NODE, "my sentence"),
+		an(CONCEPT_NODE, "thing C")
+	);
+	al(LIST_LINK,
+		an(CONCEPT_NODE, "my sentence"),
+		an(CONCEPT_NODE, "thing D")
+	);
+	al(LIST_LINK,
+		an(CONCEPT_NODE, "my sentence"),
+		an(CONCEPT_NODE, "thing E")
+	);
+	al(LIST_LINK,
+		an(CONCEPT_NODE, "my sentence"),
+		an(CONCEPT_NODE, "thing F")
+	);
+}
+
+/*
+ * stack-usage/bound-variable test.
+ * Expect the user callback to be called for each match.
+ * i.e. it should be called three times.
+ *
+ */
+void StackUTest::test_stack(void)
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	HandleSet vars;
+	vars.insert(svar);
+	vars.insert(wvar);
+
+	HandleSeq preds;
+	preds.push_back(p1);
+	preds.push_back(p2);
+
+	TestPMCB pmcb(as.get());
+	pmcb.anch = anch;
+	match(pmcb, vars, preds);
+
+	TSM_ASSERT_EQUALS("bad link-test call count", 7, pmcb.lcnt);
+	TSM_ASSERT_EQUALS("bad solution call count", 0, pmcb.scnt);
+
+	logger().debug("END TEST: %s", __FUNCTION__);
+}

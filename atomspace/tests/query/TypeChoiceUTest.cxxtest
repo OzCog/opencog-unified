@@ -1,0 +1,255 @@
+/*
+ * tests/query/TypeChoiceUTest.cxxtest
+ *
+ * Copyright (C) 2015 OpenCog Foundation
+ * All Rights Reserved
+ *
+ * Author: Nil Geisweiller
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#include <opencog/atomspace/AtomSpace.h>
+#include <opencog/util/Logger.h>
+#include <cxxtest/TestSuite.h>
+#include "imply.h"
+
+
+using namespace opencog;
+
+#define al as->add_link
+#define an as->add_node
+
+class TypeChoiceUTest: public CxxTest::TestSuite
+{
+private:
+	AtomSpacePtr as;
+	Handle X, Y, Z, type_choice_decl,
+		connected_pattern, disconnected_pattern,
+		predicate, lambda, implication;
+
+public:
+	TypeChoiceUTest(void)
+	{
+		logger().set_level(Logger::DEBUG);
+		logger().set_print_to_stdout_flag(true);
+		as = createAtomSpace();
+	}
+
+	~TypeChoiceUTest()
+	{
+		// Erase the log file if no assertions failed.
+		if (!CxxTest::TestTracker::tracker().suiteFailed())
+			std::remove(logger().get_filename().c_str());
+	}
+
+	void setUp(void);
+	void tearDown(void);
+
+	void test_connected();
+	void test_disconnected();
+	void test_forall();
+};
+
+void TypeChoiceUTest::tearDown(void)
+{
+	as->clear();
+}
+
+void TypeChoiceUTest::setUp(void)
+{
+	X = an(VARIABLE_NODE, "$X");
+	Y = an(VARIABLE_NODE, "$Y");
+	Z = an(VARIABLE_NODE, "$Z");
+
+	type_choice_decl =
+		al(VARIABLE_LIST,
+		   al(TYPED_VARIABLE_LINK,
+		      X,
+		      al(TYPE_CHOICE,
+		         an(TYPE_NODE, "PredicateNode"),
+		         an(TYPE_NODE, "LambdaLink"))),
+		   al(TYPED_VARIABLE_LINK,
+		      Y,
+		      al(TYPE_CHOICE,
+		         an(TYPE_NODE, "PredicateNode"),
+		         an(TYPE_NODE, "LambdaLink"))));
+
+	connected_pattern =
+		al(GET_LINK,
+		   type_choice_decl,
+		   al(IMPLICATION_LINK, X, Y));
+
+	disconnected_pattern =
+		al(GET_LINK,
+		   type_choice_decl,
+		   al(AND_LINK, X, Y));
+
+	predicate = an(PREDICATE_NODE, "P");
+
+	lambda =
+		al(LAMBDA_LINK,
+		   X,
+		   al(EVALUATION_LINK,
+		      an(PREDICATE_NODE, "P"),
+		      X));
+
+	implication =
+		al(IMPLICATION_LINK,
+		   predicate,
+		   lambda);
+}
+
+/*
+ * TypeChoice over a connected component
+ */
+void TypeChoiceUTest::test_connected()
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	Handle result = satisfying_set(as, connected_pattern);
+	Handle expected = al(SET_LINK, al(LIST_LINK, predicate, lambda));
+
+	logger().debug() << "result = " << result->to_string();
+	logger().debug() << "expected = " << expected->to_string();
+    
+	TS_ASSERT_EQUALS(result, expected);
+}
+
+/*
+ * TypeChoice over disconnected components
+ */
+void TypeChoiceUTest::test_disconnected()
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	Handle result = satisfying_set(as, disconnected_pattern);
+	Handle expected = al(SET_LINK,
+	                     al(LIST_LINK, lambda, predicate),
+	                     al(LIST_LINK, predicate, predicate),
+	                     al(LIST_LINK, lambda, lambda),
+	                     al(LIST_LINK, predicate, lambda));
+
+	logger().debug() << "result = " << result->to_string();
+	logger().debug() << "expected = " << expected->to_string();
+	
+	TS_ASSERT_EQUALS(result, expected);
+}
+
+/*
+ * TypeChoice over a ForAll pattern. Specifically
+ *
+ * (define forall-instantiation-vardecl
+ *  (VariableList
+ *      (TypedVariableLink
+ *         (VariableNode "$TyVs")
+ *         (TypeChoice
+ *            (TypeNode "TypedVariableLink")
+ *            (TypeNode "VariableList")))
+ *      (VariableNode "$B")))
+ *
+ * (define forall-instantiation-body
+ *   (QuoteLink
+ *      (ForAllLink
+ *         (UnquoteLink (VariableNode "$TyVs"))
+ *         (UnquoteLink (VariableNode "$B"))))
+ *
+ * (define forall-instantiation-get
+ *   (Get
+ *      forall-instantiation-vardecl
+ *      forall-instantiation-body))
+ *
+ * Over
+ *
+ * (define forall-candidate
+ *   (ForAllLink
+ *      (VariableList
+ *         (TypedVariableLink
+ *            (VariableNode "$X")
+ *            (TypeNode "ConceptNode"))
+ *         (TypedVariableLink
+ *            (VariableNode "$Y")
+ *            (TypeNode "PredicateNode")))
+ *      (EvaluationLink
+ *         (PredicateNode "are-concept-and-predicate")
+ *         (ListLink
+ *            (VariableNode "$X")
+ *            (VariableNode "$Y")))))
+ *
+ * With result
+ *
+ * TyVs =
+ *      (VariableList
+ *         (TypedVariableLink
+ *            (VariableNode "$X")
+ *            (TypeNode "ConceptNode"))
+ *         (TypedVariableLink
+ *            (VariableNode "$Y")
+ *            (TypeNode "PredicateNode")))
+ *
+ * B =
+ *      (EvaluationLink
+ *         (PredicateNode "are-concept-and-predicate")
+ *         (ListLink
+ *            (VariableNode "$X")
+ *            (VariableNode "$Y")))
+ */
+void TypeChoiceUTest::test_forall()
+{
+	logger().debug("BEGIN TEST: %s", __FUNCTION__);
+
+	Handle TyVs = an(VARIABLE_NODE, "$TyVs"),
+		TVLT = an(TYPE_NODE, "TypedVariableLink"),
+		VLT = an(TYPE_NODE, "VariableList"),
+		TyVs_vardecl = al(TYPED_VARIABLE_LINK, TyVs, al(TYPE_CHOICE, TVLT, VLT)),
+		B = an(VARIABLE_NODE, "$B"),
+		forall_instantiation_vardecl = al(VARIABLE_LIST, TyVs_vardecl, B),
+		forall_instantiation_body = al(QUOTE_LINK,
+		                               al(FORALL_LINK,
+		                                  al(UNQUOTE_LINK, TyVs),
+		                                  al(UNQUOTE_LINK, B))),
+		forall_instantiation_get = al(GET_LINK,
+		                              forall_instantiation_vardecl,
+		                              forall_instantiation_body),
+		X = an(VARIABLE_NODE, "$X"),
+		CT = an(TYPE_NODE, "ConceptNode"),
+		X_vardecl = al(TYPED_VARIABLE_LINK, X, CT),
+		Y = an(VARIABLE_NODE, "$Y"),
+		PT = an(TYPE_NODE, "PredicateNode"),
+		Y_vardecl = al(TYPED_VARIABLE_LINK, Y, PT),
+		forall_candidate_vardecl = al(VARIABLE_LIST, X_vardecl, Y_vardecl),
+		CNP = an(PREDICATE_NODE, "are-concept-and-predicate"),
+		forall_candidate_body = al(EVALUATION_LINK, CNP, al(LIST_LINK, X, Y)),
+		forall_candidate = al(FORALL_LINK,
+		                      forall_candidate_vardecl,
+		                      forall_candidate_body);
+
+	Handle result = satisfying_set(as, forall_instantiation_get);
+	Handle expected = al(SET_LINK,
+	                     al(LIST_LINK,
+	                        forall_candidate_vardecl,
+	                        forall_candidate_body));
+
+	logger().debug() << "candidate = " << forall_candidate->to_string();
+	logger().debug() << "query = " << forall_instantiation_get->to_string();
+	logger().debug() << "result = " << result->to_string();
+	logger().debug() << "expected = " << expected->to_string();
+
+	TS_ASSERT_EQUALS(result, expected);
+}
+
+#undef al
+#undef an

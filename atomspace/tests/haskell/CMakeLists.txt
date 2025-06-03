@@ -1,0 +1,2 @@
+ADD_SUBDIRECTORY(executionTestLib)
+ADD_SUBDIRECTORY(haskellTest)
