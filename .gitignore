@@ -1,0 +1,12 @@
+# Cloned repositories (created by init-unified-repo.sh)
+cogutil/
+atomspace/
+cogserver/
+
+# Additional directories created by script (empty initially)
+deps/
+scripts/
+docker/
+ci/
+chatbot-tutorial/
+cognitive-gui/
