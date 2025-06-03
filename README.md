@@ -4,12 +4,14 @@
 A unified cognitive nexus harmonizing core OpenCog repositories (`cogutil`, `atomspace`, `cogserver`) into a singular accessible cognitive ecosystem, enhanced by automated builds, neural-symbolic interactive tutorials, and intuitive GUI visualizations.
 
 ## ⟨Repository Structure⟩:
+```
 opencog-unified/
-├── cogutil/ # Low-level cognitive utilities
-├── atomspace/ # Hypergraph-based knowledge representation core
-├── cogserver/ # Cognitive server for distributed cognition
+├── cogutil/          # Low-level cognitive utilities
+├── atomspace/        # Hypergraph-based knowledge representation core
+├── cogserver/        # Cognitive server for distributed cognition
 ├── chatbot-tutorial/ # Neural-symbolic chatbot for guided cognitive exploration
-└── cognitive-gui/ # Intuitive graphical cognitive interface
+└── cognitive-gui/    # Intuitive graphical cognitive interface
+```
 
 ## ⟨Recursive Next Steps⟩:
 - [ ] Docker Compose automation setup (Step α.2)
