@@ -1,0 +1,17 @@
+name: Cognitive Bootstrap
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Ensure bootstrap script is executable
+        run: chmod +x ./init-unified-repo.sh
+      - name: Run cognitive bootstrap script
+        run: ./init-unified-repo.sh
