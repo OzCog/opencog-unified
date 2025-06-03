@@ -1,12 +1,12 @@
 # OpenCog Unified Cognitive Repository
 
 ## Cognitive Vision
-Unified integration of OpenCog core components (\`cogutil\`, \`atomspace\`, \`cogserver\`), designed for ease of deployment, automation, and interactive neural-symbolic exploration.
+Unified integration of OpenCog core components (`cogutil`, `atomspace`, `cogserver`), designed for ease of deployment, automation, and interactive neural-symbolic exploration.
 
 ## Repository Structure
-\`\`\`
+```
 opencog-unified/
-├── deps/                  # External dependencies (self-contained)
+├── deps/                 # External dependencies (self-contained)
 ├── cogutil/              # Core utilities
 ├── atomspace/            # Knowledge representation core
 ├── cogserver/            # Distributed cognitive server
@@ -15,7 +15,7 @@ opencog-unified/
 ├── scripts/              # Automation & cognitive validation scripts
 ├── docker/               # Containerization artifacts
 └── ci/                   # Continuous cognitive integration configurations
-\`\`\`
+```
 
 ## Next Steps
 - Set up containerized builds (Docker)
