@@ -2,33 +2,63 @@
 # Cognitive Initialization Script for Unified OpenCog Repository
 # Timestamp: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
 
-REPO_NAME="opencog-unified"
-echo "✨ Starting cognitive merge initialization into '$REPO_NAME'..."
+echo "✨ Starting cognitive bootstrap initialization..."
 
-# Setup unified repository
-mkdir -p "$REPO_NAME"
-cd "$_"
-git init
-echo "✔️ Initialized unified cognitive repository."
+# Check if we're in a git repository
+if [ ! -d ".git" ]; then
+    echo "❌ Error: This script must be run from the root of the opencog-unified git repository"
+    exit 1
+fi
 
-# Clone repos without history into temporary directories
-git clone --depth=1 https://github.com/opencog/cogutil.git temp_cogutil
-git clone --depth=1 https://github.com/opencog/atomspace.git temp_atomspace
-git clone --depth=1 https://github.com/opencog/cogserver.git temp_cogserver
+# Function to check if directory exists and warn
+check_directory() {
+    local dir_name="$1"
+    if [ -d "$dir_name" ]; then
+        echo "⚠️  Warning: Directory '$dir_name' already exists. Skipping to avoid overwriting existing work."
+        return 1
+    fi
+    return 0
+}
 
-# Move cloned repos to structured directories
-mv temp_cogutil cogutil
-mv temp_atomspace atomspace
-mv temp_cogserver cogserver
+# Clone repositories without history into temporary directories
+clone_repos=()
+if check_directory "cogutil"; then
+    echo "📥 Cloning cogutil (shallow, no history)..."
+    git clone --depth=1 https://github.com/opencog/cogutil.git temp_cogutil
+    clone_repos+=("cogutil")
+fi
 
-# Cleanup temp folders if needed
-rm -rf temp_cogutil/.git temp_atomspace/.git temp_cogserver/.git
+if check_directory "atomspace"; then
+    echo "📥 Cloning atomspace (shallow, no history)..."
+    git clone --depth=1 https://github.com/opencog/atomspace.git temp_atomspace
+    clone_repos+=("atomspace")
+fi
 
-# Create additional directories for cognitive extensions
+if check_directory "cogserver"; then
+    echo "📥 Cloning cogserver (shallow, no history)..."
+    git clone --depth=1 https://github.com/opencog/cogserver.git temp_cogserver
+    clone_repos+=("cogserver")
+fi
+
+# Move cloned repos to structured directories and remove .git history
+for repo in "${clone_repos[@]}"; do
+    if [ -d "temp_$repo" ]; then
+        echo "📁 Moving temp_$repo to $repo/ and removing git history..."
+        mv "temp_$repo" "$repo"
+        rm -rf "$repo/.git"
+    fi
+done
+
+# Create additional directories for cognitive extensions, if not present
+echo "📁 Creating additional directories for cognitive extensions..."
 mkdir -p deps scripts docker ci chatbot-tutorial cognitive-gui
 
-# Craft initial README.md
-cat << EOF > README.md
+# Update README.md with current unified structure and vision (if it matches expected structure)
+if [ -f "README.md" ]; then
+    echo "📝 README.md already exists with current structure - no changes needed"
+else
+    echo "📝 Creating README.md with unified structure and vision..."
+    cat << EOF > README.md
 # OpenCog Unified Cognitive Repository
 
 ## Cognitive Vision
@@ -37,7 +67,7 @@ Unified integration of OpenCog core components (\`cogutil\`, \`atomspace\`, \`co
 ## Repository Structure
 \`\`\`
 opencog-unified/
-├── deps/                  # External dependencies (self-contained)
+├── deps/                 # External dependencies (self-contained)
 ├── cogutil/              # Core utilities
 ├── atomspace/            # Knowledge representation core
 ├── cogserver/            # Distributed cognitive server
@@ -54,15 +84,7 @@ opencog-unified/
 - Develop interactive chatbot tutorial
 - Prototype cognitive visualization GUI
 EOF
+fi
 
-# Move cloned repos into organized directories
-mv temp_cogutil cogutil
-mv temp_atomspace atomspace
-mv temp_cogserver cogserver
-
-# Initialize Git and commit
-git init
-git add .
-git commit -m "🧠 Initialized unified cognitive repository with self-contained OpenCog modules."
-
-echo "✨ Cognitive repository is initialized and ready for recursive expansion."
+echo "✅ Cognitive repository initialization is complete."
+echo "🧠 Ready for neural-symbolic expansion and hypergraph encoding."
