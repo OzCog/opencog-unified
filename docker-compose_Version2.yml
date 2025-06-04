@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  cogutil:
+    build: ./cogutil
+    container_name: cogutil
+    command: ["sleep", "infinity"] # Placeholder command for cognitive interaction
+
+  atomspace:
+    build: ./atomspace
+    container_name: atomspace
+    depends_on:
+      - cogutil
+    command: ["sleep", "infinity"]
+
+  cogserver:
+    build: ./cogserver
+    container_name: cogserver
+    depends_on:
+      - atomspace
+    ports:
+      - "17001:17001"
+    command: ["sleep", "infinity"]

@@ -1,0 +1,22 @@
+cmake_minimum_required(VERSION 3.10)
+project(opencog-unified)
+
+# Set cognitive compilation flags for optimal neural-symbolic integration
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Include external dependencies
+add_subdirectory(deps EXCLUDE_FROM_ALL)
+
+# Include cognitive modules
+add_subdirectory(cogutil)
+add_subdirectory(atomspace)
+add_subdirectory(cogserver)
+
+# Explicit cognitive dependency definition
+add_dependencies(atomspace cogutil)
+add_dependencies(cogserver atomspace)
+
+# Global cognitive build target for recursive synergy
+add_custom_target(cognitive
+    DEPENDS cogutil atomspace cogserver)
