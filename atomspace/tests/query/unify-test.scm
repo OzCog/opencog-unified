@@ -215,7 +215,7 @@
 (format #t "Expected ~A\n" tune5)
 
 ; This test fails! Yikes! See issue #3016
-; (test-assert "UnifyUTest::test_unify_unordered_5" (equal? tun5 tune5))
+(test-assert "UnifyUTest::test_unify_unordered_5" (equal? tun5 tune5))
 
 (test-end "UnifyUTest::test_unify_unordered_5")
 ; --------------------------------------

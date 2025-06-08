@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(opencog-unified)
 
-# Include dependencies
-add_subdirectory(deps)
+# Include dependencies (commented out as deps directory doesn't exist)
+# add_subdirectory(deps)
 
 # Include unified cognitive modules
 add_subdirectory(cogutil)

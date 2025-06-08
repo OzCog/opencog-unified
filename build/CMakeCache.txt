@@ -18,34 +18,32 @@
 BFD_DIR:PATH=BFD_DIR-NOTFOUND
 
 //The directory containing a CMake configuration file for Boost.
-Boost_DIR:PATH=Boost_DIR-NOTFOUND
+Boost_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/Boost-1.83.0
 
 //Boost filesystem library (debug)
 Boost_FILESYSTEM_LIBRARY_DEBUG:FILEPATH=Boost_FILESYSTEM_LIBRARY_DEBUG-NOTFOUND
 
-//Boost filesystem library (release)
-Boost_FILESYSTEM_LIBRARY_RELEASE:FILEPATH=Boost_FILESYSTEM_LIBRARY_RELEASE-NOTFOUND
+Boost_FILESYSTEM_LIBRARY_RELEASE:STRING=/usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.83.0
 
 //Path to a file.
-Boost_INCLUDE_DIR:PATH=Boost_INCLUDE_DIR-NOTFOUND
+Boost_INCLUDE_DIR:PATH=/usr/include
+
+Boost_MATH_C99_LIBRARY_RELEASE:STRING=/usr/lib/x86_64-linux-gnu/libboost_math_c99.so.1.83.0
 
 //Boost program_options library (debug)
 Boost_PROGRAM_OPTIONS_LIBRARY_DEBUG:FILEPATH=Boost_PROGRAM_OPTIONS_LIBRARY_DEBUG-NOTFOUND
 
-//Boost program_options library (release)
-Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE:FILEPATH=Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE-NOTFOUND
+Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE:STRING=/usr/lib/x86_64-linux-gnu/libboost_program_options.so.1.83.0
 
 //Boost system library (debug)
 Boost_SYSTEM_LIBRARY_DEBUG:FILEPATH=Boost_SYSTEM_LIBRARY_DEBUG-NOTFOUND
 
-//Boost system library (release)
-Boost_SYSTEM_LIBRARY_RELEASE:FILEPATH=Boost_SYSTEM_LIBRARY_RELEASE-NOTFOUND
+Boost_SYSTEM_LIBRARY_RELEASE:STRING=/usr/lib/x86_64-linux-gnu/libboost_system.so.1.83.0
 
 //Boost thread library (debug)
 Boost_THREAD_LIBRARY_DEBUG:FILEPATH=Boost_THREAD_LIBRARY_DEBUG-NOTFOUND
 
-//Boost thread library (release)
-Boost_THREAD_LIBRARY_RELEASE:FILEPATH=Boost_THREAD_LIBRARY_RELEASE-NOTFOUND
+Boost_THREAD_LIBRARY_RELEASE:STRING=/usr/lib/x86_64-linux-gnu/libboost_thread.so.1.83.0
 
 //Path to a program.
 CMAKE_ADDR2LINE:FILEPATH=/usr/bin/addr2line
@@ -59,6 +57,9 @@ CMAKE_BUILD_TYPE:STRING=
 
 //Enable/Disable color output during build.
 CMAKE_COLOR_MAKEFILE:BOOL=ON
+
+//Directory for configuration files
+CMAKE_CONF_PREFIX:PATH=/etc
 
 //CXX compiler
 CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/c++
@@ -174,6 +175,18 @@ CMAKE_OBJCOPY:FILEPATH=/usr/bin/objcopy
 //Path to a program.
 CMAKE_OBJDUMP:FILEPATH=/usr/bin/objdump
 
+//Path to a program.
+CMAKE_OCaml_EXECUTABLE:FILEPATH=CMAKE_OCaml_EXECUTABLE-NOTFOUND
+
+//Path to a program.
+CMAKE_OCaml_FIND:FILEPATH=CMAKE_OCaml_FIND-NOTFOUND
+
+//Path to a program.
+CMAKE_OCaml_LEX:FILEPATH=CMAKE_OCaml_LEX-NOTFOUND
+
+//Path to a program.
+CMAKE_OCaml_YACC:FILEPATH=CMAKE_OCaml_YACC-NOTFOUND
+
 //Value Computed by CMake
 CMAKE_PROJECT_DESCRIPTION:STATIC=
 
@@ -248,17 +261,119 @@ CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
+//Enable to build RPM source packages
+CPACK_SOURCE_RPM:BOOL=OFF
+
+//Enable to build TBZ2 source packages
+CPACK_SOURCE_TBZ2:BOOL=ON
+
+//Enable to build TGZ source packages
+CPACK_SOURCE_TGZ:BOOL=ON
+
+//Enable to build TXZ source packages
+CPACK_SOURCE_TXZ:BOOL=ON
+
+//Enable to build TZ source packages
+CPACK_SOURCE_TZ:BOOL=ON
+
+//Enable to build ZIP source packages
+CPACK_SOURCE_ZIP:BOOL=OFF
+
+//CxxTest binary filepath
+CXXTEST_GEN:FILEPATH=/usr/bin/cxxtestgen
+
+//Where is cxxtest located?
+CXXTEST_PYTHON_BIN_DIR:PATH=/usr/bin
+
+//Path to a program.
+CYTHON_EXECUTABLE:FILEPATH=CYTHON_EXECUTABLE-NOTFOUND
+
+//The directory containing a CMake configuration file for CogUtil.
+CogUtil_DIR:PATH=/usr/local/lib/cmake/CogUtil
+
 //The directory containing a CMake configuration file for Cxxtest.
 Cxxtest_DIR:PATH=Cxxtest_DIR-NOTFOUND
+
+//Dot tool for use with Doxygen
+DOXYGEN_DOT_EXECUTABLE:FILEPATH=DOXYGEN_DOT_EXECUTABLE-NOTFOUND
+
+//Doxygen documentation generation tool (https://www.doxygen.nl)
+DOXYGEN_EXECUTABLE:FILEPATH=DOXYGEN_EXECUTABLE-NOTFOUND
+
+//Path to a library.
+FOLLY_BENCHMARK_LIBRARIES:FILEPATH=FOLLY_BENCHMARK_LIBRARIES-NOTFOUND
+
+//Path to a file.
+FOLLY_INCLUDE_DIR:PATH=FOLLY_INCLUDE_DIR-NOTFOUND
+
+//Path to a library.
+FOLLY_LIBRARIES:FILEPATH=FOLLY_LIBRARIES-NOTFOUND
+
+//Path to a file.
+FOLLY_ROOT_DIR:PATH=FOLLY_ROOT_DIR-NOTFOUND
+
+//Path to a file.
+GMP_INCLUDE_DIR:PATH=/usr/include/x86_64-linux-gnu
+
+//Path to a library.
+GMP_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libgmp.so
 
 //The directory containing a CMake configuration file for GNUBacktrace.
 GNUBacktrace_DIR:PATH=GNUBacktrace_DIR-NOTFOUND
 
+//Path to a file.
+GUILE_INCLUDE_DIR:PATH=/usr/include/guile/3.0
+
+//Path to a library.
+GUILE_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libguile-3.0.so
+
 //The directory containing a CMake configuration file for Iberty.
 Iberty_DIR:PATH=Iberty_DIR-NOTFOUND
 
+//Path to a program.
+NOSETESTS_EXECUTABLE:FILEPATH=NOSETESTS_EXECUTABLE-NOTFOUND
+
 //The directory containing a CMake configuration file for ParallelSTL.
 ParallelSTL_DIR:PATH=ParallelSTL_DIR-NOTFOUND
+
+//Path to a program.
+STACK_EXECUTABLE:FILEPATH=/usr/local/bin/stack
+
+//Path to a file.
+VALGRIND_INCLUDE_DIR:PATH=VALGRIND_INCLUDE_DIR-NOTFOUND
+
+//Path to a program.
+VALGRIND_PROGRAM:FILEPATH=VALGRIND_PROGRAM-NOTFOUND
+
+//Value Computed by CMake
+atomspace_BINARY_DIR:STATIC=/home/runner/work/opencog-unified/opencog-unified/build/atomspace
+
+//Value Computed by CMake
+atomspace_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+atomspace_SOURCE_DIR:STATIC=/home/runner/work/opencog-unified/opencog-unified/atomspace
+
+//The directory containing a CMake configuration file for boost_atomic.
+boost_atomic_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/boost_atomic-1.83.0
+
+//The directory containing a CMake configuration file for boost_filesystem.
+boost_filesystem_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/boost_filesystem-1.83.0
+
+//The directory containing a CMake configuration file for boost_headers.
+boost_headers_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/boost_headers-1.83.0
+
+//The directory containing a CMake configuration file for boost_math_c99.
+boost_math_c99_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/boost_math_c99-1.83.0
+
+//The directory containing a CMake configuration file for boost_program_options.
+boost_program_options_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/boost_program_options-1.83.0
+
+//The directory containing a CMake configuration file for boost_system.
+boost_system_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/boost_system-1.83.0
+
+//The directory containing a CMake configuration file for boost_thread.
+boost_thread_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/boost_thread-1.83.0
 
 //Value Computed by CMake
 cogutil_BINARY_DIR:STATIC=/home/runner/work/opencog-unified/opencog-unified/build/cogutil
@@ -407,11 +522,19 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=3
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=14
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
 CMAKE_OBJDUMP-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_OCaml_EXECUTABLE
+CMAKE_OCaml_EXECUTABLE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_OCaml_FIND
+CMAKE_OCaml_FIND-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_OCaml_LEX
+CMAKE_OCaml_LEX-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_OCaml_YACC
+CMAKE_OCaml_YACC-ADVANCED:INTERNAL=1
 //Platform information initialized
 CMAKE_PLATFORM_INFO_INITIALIZED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_RANLIB
@@ -452,8 +575,48 @@ CMAKE_TAPI-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CPACK_SOURCE_RPM
+CPACK_SOURCE_RPM-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CPACK_SOURCE_TBZ2
+CPACK_SOURCE_TBZ2-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CPACK_SOURCE_TGZ
+CPACK_SOURCE_TGZ-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CPACK_SOURCE_TXZ
+CPACK_SOURCE_TXZ-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CPACK_SOURCE_TZ
+CPACK_SOURCE_TZ-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CPACK_SOURCE_ZIP
+CPACK_SOURCE_ZIP-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CYTHON_EXECUTABLE
+CYTHON_EXECUTABLE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: DOXYGEN_DOT_EXECUTABLE
+DOXYGEN_DOT_EXECUTABLE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: DOXYGEN_EXECUTABLE
+DOXYGEN_EXECUTABLE-ADVANCED:INTERNAL=1
+//Details about finding Boost
+FIND_PACKAGE_MESSAGE_DETAILS_Boost:INTERNAL=[/usr/lib/x86_64-linux-gnu/cmake/Boost-1.83.0/BoostConfig.cmake][cfound components: filesystem program_options system thread ][v1.83.0(1.60)]
+//Details about finding Python3
+FIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[/usr/bin/python3.12][cfound components: Interpreter ][v3.12.3()]
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
+//ADVANCED property for variable: FOLLY_BENCHMARK_LIBRARIES
+FOLLY_BENCHMARK_LIBRARIES-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: FOLLY_INCLUDE_DIR
+FOLLY_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: FOLLY_LIBRARIES
+FOLLY_LIBRARIES-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: FOLLY_ROOT_DIR
+FOLLY_ROOT_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: GUILE_INCLUDE_DIR
+GUILE_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: GUILE_LIBRARY
+GUILE_LIBRARY-ADVANCED:INTERNAL=1
+//Have symbol secure_getenv
+HAVE_SECURE_GETENV:INTERNAL=
+//ADVANCED property for variable: VALGRIND_INCLUDE_DIR
+VALGRIND_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: VALGRIND_PROGRAM
+VALGRIND_PROGRAM-ADVANCED:INTERNAL=1
 //Components requested for this build tree.
 _Boost_COMPONENTS_SEARCHED:INTERNAL=filesystem;program_options;system;thread
 //Last used Boost_INCLUDE_DIR value.
@@ -470,4 +633,36 @@ _CMAKE_CXX_LINKER_PUSHPOP_STATE_SUPPORTED:INTERNAL=TRUE
 _CMAKE_C_LINKER_PUSHPOP_STATE_SUPPORTED:INTERNAL=TRUE
 //linker supports push/pop state
 _CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED:INTERNAL=TRUE
+//Compiler reason failure
+_Python3_Compiler_REASON_FAILURE:INTERNAL=
+_Python3_DEVELOPMENT_EMBED_SIGNATURE:INTERNAL=8924d64e1f8344061708419b72756d91
+_Python3_DEVELOPMENT_MODULE_SIGNATURE:INTERNAL=a80fdade31ace3e44fbb2c81da19bc52
+//Development reason failure
+_Python3_Development_REASON_FAILURE:INTERNAL=
+_Python3_EXECUTABLE:INTERNAL=/usr/bin/python3.12
+//Path to a file.
+_Python3_INCLUDE_DIR:INTERNAL=/usr/include/python3.12
+//Python3 Properties
+_Python3_INTERPRETER_PROPERTIES:INTERNAL=Python;3;12;3;64;<none>;cpython-312-x86_64-linux-gnu;abi3;/usr/lib/python3.12;/usr/lib/python3.12;/usr/local/lib/python3.12/dist-packages;/usr/local/lib/python3.12/dist-packages
+_Python3_INTERPRETER_SIGNATURE:INTERNAL=f811b8a062a8994e96ffe87747bf9bfe
+//Interpreter reason failure
+_Python3_Interpreter_REASON_FAILURE:INTERNAL=
+//Path to a library.
+_Python3_LIBRARY_RELEASE:INTERNAL=/usr/lib/x86_64-linux-gnu/libpython3.12.so
+//NumPy reason failure
+_Python3_NumPy_REASON_FAILURE:INTERNAL=
+//ADVANCED property for variable: boost_atomic_DIR
+boost_atomic_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: boost_filesystem_DIR
+boost_filesystem_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: boost_headers_DIR
+boost_headers_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: boost_math_c99_DIR
+boost_math_c99_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: boost_program_options_DIR
+boost_program_options_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: boost_system_DIR
+boost_system_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: boost_thread_DIR
+boost_thread_DIR-ADVANCED:INTERNAL=1
 

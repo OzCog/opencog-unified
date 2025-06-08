@@ -23,7 +23,7 @@ macro(check_required_components _NAME)
 endmacro()
 
 ####################################################################################
-set(COGUTIL_VERSION "")
+set(COGUTIL_VERSION "2.0.3")
 
 set(COGUTIL_INCLUDE_DIR "/usr/local/include")
 set(COGUTIL_DATA_DIR   "/usr/local/share/opencog")

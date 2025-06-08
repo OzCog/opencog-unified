@@ -1,0 +1,12 @@
+
+cogutil.pc:
+prefix=/usr/local
+exec_prefix=${prefix}
+includedir=${prefix}/include
+libdir=${exec_prefix}/lib/opencog
+
+Name: CogUtil
+Description: The OpenCog Development Utilities Collection
+Version: 2.0.3
+Cflags: -I${includedir}
+Libs: -L${libdir} -lcogutil
