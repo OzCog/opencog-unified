@@ -1965,19 +1965,40 @@ bool PatternMatchEngine::explore_odometer(const PatternTermPtr& ptm,
 /// subterms. When there is a glob node, the search takes on a different
 /// form; see `explore_sparse_branches()`.
 ///
+//
+// XXX FIXME: Issue #3016 - Unification with unordered AndLinks
+// The current implementation of unordered link permutation exploration
+// in IdenticalLinks stops after finding the first valid permutation 
+// instead of continuing to find all possible permutations. This is 
+// a known architectural limitation where the pattern matching engine
+// is designed for finding single matches rather than exhaustive search.
+//
+// The issue occurs because:
+// 1. unorder_compare finds one valid permutation and returns true
+// 2. The caller interprets this as "success, stop searching"
+// 3. Additional permutations are never explored
+//
+// A proper fix would require architectural changes to the pattern
+// matching engine to support continuation of search after finding
+// successful matches in unordered link contexts.
+//
 bool PatternMatchEngine::explore_unordered_branches(const PatternTermPtr& ptm,
                                                     const Handle& hg,
                                                     const PatternTermPtr& clause)
 {
+	bool found_any = false;
 	do
 	{
-		// If the pattern was satisfied, then we are done for good.
+		// Check if this permutation satisfies the pattern
 		if (explore_single_branch(ptm, hg, clause))
-			return true;
+		{
+			found_any = true;
+			// For exhaustive search, continue looking for more permutations
+			// instead of returning immediately
+		}
 
 		logmsg("Step to next permutation");
 
-		// If we are here, there was no match.
 		// On the next go-around, take a step.
 		_perm_take_step = true;
 		_perm_have_more = false;
@@ -1988,7 +2009,7 @@ bool PatternMatchEngine::explore_unordered_branches(const PatternTermPtr& ptm,
 	_perm_have_more = false;
 	logmsg("No more unordered permutations");
 
-	return false;
+	return found_any;
 }
 
 /// explore_sparse_branches -- explore "sparse" unordered links.
