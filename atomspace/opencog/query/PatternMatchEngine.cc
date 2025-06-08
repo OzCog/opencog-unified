@@ -495,6 +495,9 @@ the stack are explored first, before those lower in the stack.
 bool PatternMatchEngine::unorder_compare(const PatternTermPtr& ptm,
                                          const Handle& hg)
 {
+	// DEBUG: Add simple output to track if this is called
+	std::cout << "DEBUG: unorder_compare called for " << ptm->to_string() << std::endl;
+	
 	const Handle& hp = ptm->getHandle();
 	const HandleSeq& osg = hg->getOutgoingSet();
 	const PatternTermSeq& osp = ptm->getOutgoingSet();
@@ -605,6 +608,10 @@ bool PatternMatchEngine::unorder_compare(const PatternTermPtr& ptm,
 				              << _perm_count[ptm] + 1
 				              << " of " << num_perms
 				              << " for term=" << ptm->to_string();})
+				
+				// DEBUG: Add output when a good permutation is found
+				std::cout << "DEBUG: Good permutation found, continue searching? " << std::endl;
+				
 				_perm_state[ptm] = mutation;
 				_perm_have_more = true;
 				_perm_go_around = false;
