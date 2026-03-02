@@ -709,7 +709,7 @@ jobs:
         uses: actions/checkout@v6
       
       - name: Download All Issue Artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           pattern: issue-*
           merge-multiple: true

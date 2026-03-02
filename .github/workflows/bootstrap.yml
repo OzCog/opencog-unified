@@ -278,13 +278,13 @@ jobs:
         uses: actions/checkout@v6
         
       - name: Download cognitive analysis artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: cognitive-enhancement-reports
           path: ./cognitive-reports/
           
       - name: Download verification report
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: verification-report
           path: ./verification-reports/
