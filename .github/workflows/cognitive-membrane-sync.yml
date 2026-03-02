@@ -529,7 +529,7 @@ jobs:
           python cognitive_grammar_generator.py
           
       - name: Archive Cognitive Grammar
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: cognitive-grammar-artifacts
           path: |

@@ -322,7 +322,7 @@ jobs:
           ")" >> $GITHUB_OUTPUT
       
       - name: Upload Architecture Artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: architecture-analysis
           path: |
@@ -693,7 +693,7 @@ jobs:
           EOF
       
       - name: Upload Issue Data
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: issue-${{ matrix.layer }}-${{ matrix.component }}
           path: /tmp/issue-${{ matrix.layer }}-${{ matrix.component }}.json
@@ -970,7 +970,7 @@ jobs:
           EOF
       
       - name: Upload Summary Artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ontogenesis-summary
           path: ontogenesis-summary.md

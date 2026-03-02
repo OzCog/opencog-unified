@@ -792,7 +792,7 @@ jobs:
           EOF
       
       - name: "🎭 Upload Cognitive Synthesis Artifacts"
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: cognitive-orchestration-synthesis
@@ -900,7 +900,7 @@ jobs:
           echo "Note: Autonomous PR creation would require additional permissions and implementation"
       
       - name: "📦 Archive Evolution Artifacts"
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: meta-cognitive-evolution

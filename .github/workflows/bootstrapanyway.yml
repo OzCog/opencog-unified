@@ -129,7 +129,7 @@ jobs:
           cat verification-report.txt
           
       - name: Upload verification report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: verification-report
           path: verification-report.txt
@@ -191,7 +191,7 @@ jobs:
           ./scripts/generate-recursive-feedback.sh
           
       - name: Upload cognitive analysis artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: cognitive-enhancement-reports
           path: |
@@ -390,7 +390,7 @@ jobs:
           cat enhanced-verification-report.txt
           
       - name: Upload enhanced verification report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: enhanced-verification-report
           path: enhanced-verification-report.txt

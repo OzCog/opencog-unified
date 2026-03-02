@@ -132,7 +132,7 @@ jobs:
       
       - name: Upload Build Artifacts
         if: matrix.build-type == 'Release' && matrix.compiler == 'gcc'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: build-${{ matrix.os }}-${{ matrix.compiler }}
           path: |
@@ -142,7 +142,7 @@ jobs:
       
       - name: Upload Test Results
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.build-type }}
           path: build/Testing/**/*.xml
@@ -186,7 +186,7 @@ jobs:
           REPORT
       
       - name: Upload Quality Report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: code-quality-report
           path: code_quality_report.md
@@ -216,7 +216,7 @@ jobs:
           echo "Benchmark results would go here"
       
       - name: Upload Benchmark Results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: benchmark-results
           path: benchmark_results.json

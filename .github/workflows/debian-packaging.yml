@@ -84,7 +84,7 @@ jobs:
         mv ../*.deb ../debian-packages/ 2>/dev/null || true
     
     - name: Upload Packages
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: debian-packages-${{ github.event.inputs.component }}
         path: debian-packages/

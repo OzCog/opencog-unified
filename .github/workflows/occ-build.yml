@@ -112,7 +112,7 @@ jobs:
         sudo ldconfig
     
     - name: Upload CogUtil Build
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: cogutil-build
         path: |
@@ -241,7 +241,7 @@ jobs:
       continue-on-error: true
     
     - name: Upload AtomSpace Build
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: atomspace-build
         path: |
@@ -1969,7 +1969,7 @@ jobs:
         cat BUILD_REPORT.md
     
     - name: Upload Build Report
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: occ-build-report
         path: BUILD_REPORT.md

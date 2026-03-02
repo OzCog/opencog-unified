@@ -131,7 +131,7 @@ jobs:
       continue-on-error: true
     
     - name: Upload Package
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: chocolatey-package-${{ github.event.inputs.component || 'cogutil' }}
         path: choco-packages/**/*.nupkg
