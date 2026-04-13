@@ -717,7 +717,7 @@ jobs:
       
       - name: Create Orchestration Master Issue
         id: master-issue
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');
@@ -850,7 +850,7 @@ jobs:
             return masterIssue.data.number;
       
       - name: Create Individual Layer Issues
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');
