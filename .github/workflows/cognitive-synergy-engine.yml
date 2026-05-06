@@ -38,7 +38,7 @@ jobs:
                   "- [ ] Validate scheme-to-hypergraph encoding accuracy",
                   "- [ ] Document cognitive grammar tensor signatures",
                   "",
-                  "### Tensor Fragment Architecture", 
+                  "### Tensor Fragment Architecture",
                   "- [ ] Encode agent/state as hypergraph nodes/links with tensor shapes: `[modality, depth, context, salience, autonomy_index]`",
                   "- [ ] Document tensor signatures and prime factorization mapping",
                   "- [ ] Implement tensor shape validation for cognitive primitives",
@@ -367,16 +367,16 @@ jobs:
             ];
 
             console.log('🧠 Starting creation of Distributed Agentic Cognitive Grammar Network issues...');
-            
+
             let successCount = 0;
             let failureCount = 0;
-            
+
             for (const phase of phases) {
               console.log(`\n📝 Creating issue: ${phase.title}`);
-              
+
               try {
                 const labels = ['cognitive-synergy', 'distributed-intelligence', 'neural-symbolic', 'agentic-grammar'].concat(phase.labels);
-                
+
                 await github.rest.issues.create({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
@@ -384,7 +384,7 @@ jobs:
                   body: phase.body,
                   labels: labels
                 });
-                
+
                 console.log(`✅ Successfully created: ${phase.title}`);
                 successCount++;
               } catch (error) {
@@ -393,7 +393,7 @@ jobs:
                 failureCount++;
               }
             }
-            
+
             console.log(`\n🎯 Summary:`);
             console.log(`   ✅ Successfully created: ${successCount} issues`);
             console.log(`   ❌ Failed to create: ${failureCount} issues`);

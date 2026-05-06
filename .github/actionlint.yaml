@@ -1,0 +1,16 @@
+# actionlint configuration for OpenCog Unified
+# https://github.com/rhysd/actionlint/blob/main/docs/config.md
+#
+# Self-hosted runner labels and additional configuration. We currently use
+# only GitHub-hosted runners so this section is empty, but the file exists
+# so contributors know where to add custom labels.
+
+self-hosted-runner:
+  labels: []
+
+# Configuration variables that may be referenced via `${{ vars.* }}`.
+# Adding them here suppresses "undefined config var" actionlint warnings.
+config-variables:
+  - COGNITIVE_LAYER
+  - TENSOR_SHAPE
+  - MAX_FIX_ATTEMPTS

@@ -1,0 +1,54 @@
+name: ✨ Feature request
+description: Propose a new capability, optimisation, or research direction.
+title: "[Feature]: "
+labels: ["type:enhancement", "needs-triage"]
+body:
+  - type: dropdown
+    id: layer
+    attributes:
+      label: Cognitive layer affected
+      options:
+        - Foundation
+        - Core (AtomSpace)
+        - Logic
+        - Cognitive control / attention
+        - Advanced (PLN, miner, asmoses)
+        - Learning
+        - Language
+        - Robotics
+        - Integration
+        - CI / tooling
+        - Cross-cutting / new layer
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: What problem does this feature solve? Who benefits?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Sketch the design, API, or workflow you have in mind.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Links to papers, related upstream OpenCog issues, or prior art.
+    validations:
+      required: false

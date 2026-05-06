@@ -41,17 +41,17 @@ jobs:
       architecture-matrix: ${{ steps.parse-architecture.outputs.matrix }}
       tensor-mapping: ${{ steps.tensor-analysis.outputs.mapping }}
       dependency-graph: ${{ steps.dependency-analysis.outputs.graph }}
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
-      
+
       - name: Setup Python Environment
         run: |
           set -eu
           python3 -m pip install --upgrade pip
           python3 -m pip install pyyaml networkx matplotlib
-          
+
       - name: Parse Architecture from Mermaid
         id: parse-architecture
         run: |
@@ -60,11 +60,11 @@ jobs:
           import re
           import json
           import yaml
-          
+
           # Read the architecture document
           with open('GITHUB_ACTIONS_ARCHITECTURE.md', 'r') as f:
               content = f.read()
-          
+
           # Extract cognitive layers with tensor shapes and dependencies
           architecture_layers = {
               "foundation": {
@@ -138,7 +138,7 @@ jobs:
                   "cognitive_function": "distribution-membrane"
               }
           }
-          
+
           # Create dependency mapping
           dependencies = {
               "foundation": [],
@@ -152,7 +152,7 @@ jobs:
               "integration": ["learning", "language", "embodiment"],
               "packaging": ["integration"]
           }
-          
+
           # Generate matrix for GitHub Actions
           matrix_data = []
           for layer_name, layer_data in architecture_layers.items():
@@ -166,39 +166,39 @@ jobs:
                       "cognitive_function": layer_data["cognitive_function"],
                       "dependencies": dependencies.get(layer_name, [])
                   })
-          
+
           matrix_json = json.dumps({"include": matrix_data}, separators=(',', ':'))
           print(f"matrix={matrix_json}")
-          
+
           # Save to output
           with open('/tmp/architecture-matrix.json', 'w') as f:
               json.dump({"include": matrix_data}, f, indent=2)
           EOF
-          
+
           # Export matrix to GitHub output
-          echo "matrix=$(cat /tmp/architecture-matrix.json | jq -c .)" >> $GITHUB_OUTPUT
-          
+          echo "matrix=$(cat /tmp/architecture-matrix.json | jq -c .)" >> "${GITHUB_OUTPUT}"
+
       - name: Generate Tensor Analysis
         id: tensor-analysis
         run: |
           set -eu
           python3 << 'EOF'
           import json
-          
+
           # Calculate tensor metrics
           with open('/tmp/architecture-matrix.json', 'r') as f:
               architecture = json.load(f)
-          
+
           tensor_mapping = {}
           total_dof = 0
-          
+
           for item in architecture["include"]:
               layer = item["layer"]
               shape = item["tensor_shape"]
               dof = 1
               for dim in shape:
                   dof *= dim
-              
+
               tensor_mapping[layer] = {
                   "shape": shape,
                   "degrees_of_freedom": dof,
@@ -206,31 +206,31 @@ jobs:
                   "cognitive_function": item["cognitive_function"]
               }
               total_dof += dof
-          
+
           tensor_mapping["total_system_dof"] = total_dof
           tensor_mapping["cognitive_complexity"] = total_dof / 1000000  # Convert to millions
-          
+
           mapping_json = json.dumps(tensor_mapping, separators=(',', ':'))
           print(f"mapping={mapping_json}")
           EOF
-          
+
           echo "mapping=$(python3 -c "
           import json
-          
+
           # Calculate tensor metrics
           with open('/tmp/architecture-matrix.json', 'r') as f:
               architecture = json.load(f)
-          
+
           tensor_mapping = {}
           total_dof = 0
-          
+
           for item in architecture['include']:
               layer = item['layer']
               shape = item['tensor_shape']
               dof = 1
               for dim in shape:
                   dof *= dim
-              
+
               if layer not in tensor_mapping:
                   tensor_mapping[layer] = {
                       'shape': shape,
@@ -240,20 +240,20 @@ jobs:
                   }
               tensor_mapping[layer]['components'].append(item['component'])
               total_dof += dof
-          
+
           tensor_mapping['total_system_dof'] = total_dof
           tensor_mapping['cognitive_complexity'] = total_dof / 1000000
-          
+
           print(json.dumps(tensor_mapping, separators=(',', ':')))
-          ")" >> $GITHUB_OUTPUT
-      
+          ")" >> "${GITHUB_OUTPUT}"
+
       - name: Dependency Analysis
         id: dependency-analysis
         run: |
           set -eu
           python3 << 'EOF'
           import json
-          
+
           # Create dependency graph
           dependency_graph = {
               "nodes": [
@@ -282,13 +282,13 @@ jobs:
                   {"from": "integration", "to": "packaging"}
               ]
           }
-          
+
           print(json.dumps(dependency_graph, separators=(',', ':')))
           EOF
-          
+
           echo "graph=$(python3 -c "
           import json
-          
+
           # Create dependency graph
           dependency_graph = {
               'nodes': [
@@ -317,10 +317,10 @@ jobs:
                   {'from': 'integration', 'to': 'packaging'}
               ]
           }
-          
+
           print(json.dumps(dependency_graph, separators=(',', ':')))
-          ")" >> $GITHUB_OUTPUT
-      
+          ")" >> "${GITHUB_OUTPUT}"
+
       - name: Upload Architecture Artifacts
         uses: actions/upload-artifact@v6
         with:
@@ -335,11 +335,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{ fromJson(needs.architecture-parser.outputs.architecture-matrix) }}
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
-      
+
       - name: Generate Layer-Specific Issue Template
         id: issue-template
         run: |
@@ -347,7 +347,7 @@ jobs:
           python3 << 'EOF'
           import json
           import os
-          
+
           # Get matrix data
           layer = "${{ matrix.layer }}"
           component = "${{ matrix.component }}"
@@ -356,12 +356,12 @@ jobs:
           description = "${{ matrix.description }}"
           cognitive_function = "${{ matrix.cognitive_function }}"
           dependencies = ${{ toJSON(matrix.dependencies) }}
-          
+
           # Calculate degrees of freedom
           total_dof = 1
           for dim in tensor_shape:
               total_dof *= dim
-          
+
           # Generate detailed task breakdown
           if layer == "foundation":
               tasks = [
@@ -553,7 +553,7 @@ jobs:
                   "Create Docker containers and deployment scripts",
                   "Implement package integrity verification"
               ]
-          
+
           # Generate issue title
           title = f"🧬 {layer.title()} Layer: {component.title()} Implementation"
           if layer == "cognitive":
@@ -562,17 +562,17 @@ jobs:
               title = f"⚡ {layer.title()} Layer: {component.title()} - Emergent Reasoning"
           elif layer == "integration":
               title = f"🎭 {layer.title()} Layer: {component.title()} - System Synergy"
-          
+
           # Generate issue body
           body = f"""## 🧬 {layer.title()} Layer: {component.title()} Implementation
-          
-          **Cognitive Function:** `{cognitive_function}`  
-          **Tensor Shape:** `{tensor_shape}`  
-          **Degrees of Freedom:** `{total_dof:,}`  
+
+          **Cognitive Function:** `{cognitive_function}`
+          **Tensor Shape:** `{tensor_shape}`
+          **Degrees of Freedom:** `{total_dof:,}`
           **Description:** {description}
-          
+
           ### 📐 Tensor Architecture
-          
+
           ```yaml
           layer: {layer}
           component: {component}
@@ -581,19 +581,19 @@ jobs:
           cognitive_function: {cognitive_function}
           dependencies: {dependencies}
           ```
-          
+
           ### 🎯 Implementation Tasks
-          
+
           """
-          
+
           for i, task in enumerate(tasks, 1):
               body += f"- [ ] **Task {i}:** {task}\n"
-          
+
           body += f"""
           ### 🔧 Detailed Implementation Steps
-          
+
           """
-          
+
           for i, step in enumerate(implementation_steps, 1):
               body += f"#### Step {i}: {step}\n"
               body += f"```bash\n"
@@ -614,16 +614,16 @@ jobs:
                   body += f"# Implementation step for {component}\n"
                   body += f"# TODO: Add specific commands\n"
               body += f"```\n\n"
-          
+
           # Add dependency information
           if dependencies:
               body += f"### ⚡ Dependencies\n\n"
               body += f"This layer depends on: {', '.join([f'`{dep}`' for dep in dependencies])}\n\n"
               body += f"Ensure all dependency layers are implemented and tested before starting this layer.\n\n"
-          
+
           # Add validation steps
           body += f"""### ✅ Validation Criteria
-          
+
           - [ ] All unit tests pass with 100% success rate
           - [ ] Integration tests validate component interactions
           - [ ] Performance benchmarks meet tensor shape requirements
@@ -631,48 +631,48 @@ jobs:
           - [ ] API documentation is complete and accurate
           - [ ] Component integrates properly with dependent layers
           - [ ] Cognitive function operates as specified
-          
+
           ### 📊 Tensor Metrics Validation
-          
+
           ```python
           # Expected tensor metrics for {component}
           tensor_shape = {tensor_shape}
           degrees_of_freedom = {total_dof}
           cognitive_complexity = {total_dof / 1000000:.2f}M DOF
-          
+
           # Validation criteria
           assert tensor_shape == {tensor_shape}
           assert degrees_of_freedom == {total_dof}
           assert cognitive_function == "{cognitive_function}"
           ```
-          
+
           ### 🔗 Related Issues
-          
+
           This issue is part of the cognitive architecture implementation. Related layers:
           """
-          
+
           if dependencies:
               body += f"- **Dependencies:** Issues for {', '.join(dependencies)} layers\n"
-          
+
           body += f"""
           ### 🚀 Next Steps
-          
+
           1. Review tensor architecture and validate requirements
           2. Set up development environment with dependencies
           3. Implement core functionality following the step-by-step guide
           4. Run comprehensive testing and validation
           5. Document implementation and update architecture
           6. Integrate with downstream cognitive layers
-          
+
           ---
-          
-          **Implementation Status:** 🔴 Not Started  
-          **Assignee:** TBD  
+
+          **Implementation Status:** 🔴 Not Started
+          **Assignee:** TBD
           **Estimated Effort:** {len(tasks)} tasks × {len(implementation_steps)} steps = {len(tasks) * len(implementation_steps)} implementation units
-          
+
           *This issue was automatically generated by the Ontogenesis orchestration system.*
           """
-          
+
           # Write to files for upload
           with open(f'/tmp/issue-{layer}-{component}.json', 'w') as f:
               issue_data = {
@@ -688,10 +688,10 @@ jobs:
                   ]
               }
               json.dump(issue_data, f, indent=2)
-          
+
           print(f"Generated issue for {layer}:{component}")
           EOF
-      
+
       - name: Upload Issue Data
         uses: actions/upload-artifact@v6
         with:
@@ -703,18 +703,18 @@ jobs:
     name: "🎯 Create GitHub Issues"
     needs: [architecture-parser, generate-orchestration-issues]
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
-      
+
       - name: Download All Issue Artifacts
         uses: actions/download-artifact@v7
         with:
           pattern: issue-*
           merge-multiple: true
           path: /tmp/issues/
-      
+
       - name: Create Orchestration Master Issue
         id: master-issue
         uses: actions/github-script@v8
@@ -722,31 +722,31 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-            
+
             // Get tensor mapping from previous job
             const tensorMapping = JSON.parse('${{ needs.architecture-parser.outputs.tensor-mapping }}');
-            
+
             // Create master issue
             const title = "🧬 Ontogenesis Master: Cognitive Architecture Orchestration";
-            
+
             let body = `## 🧬 Ontogenesis - Dynamic Cognitive Architecture Implementation
-            
+
             This is the master orchestration issue for implementing the complete cognitive architecture based on the OpenCog Central GitHub Actions Build Architecture.
-            
+
             ### 🎯 System Overview
-            
-            **Total System Complexity:** ${tensorMapping.total_system_dof.toLocaleString()} degrees of freedom  
-            **Cognitive Complexity Index:** ${tensorMapping.cognitive_complexity.toFixed(2)}M DOF  
-            **Architecture Mode:** ${{ github.event.inputs.architecture_mode }}  
-            **Issue Scope:** ${{ github.event.inputs.issue_scope }}  
+
+            **Total System Complexity:** ${tensorMapping.total_system_dof.toLocaleString()} degrees of freedom
+            **Cognitive Complexity Index:** ${tensorMapping.cognitive_complexity.toFixed(2)}M DOF
+            **Architecture Mode:** ${{ github.event.inputs.architecture_mode }}
+            **Issue Scope:** ${{ github.event.inputs.issue_scope }}
             **Tensor Validation:** ${{ github.event.inputs.tensor_validation }}
-            
+
             ### 📊 Layer Implementation Status
-            
+
             | Layer | Components | Tensor Shape | DOF | Status |
             |-------|-----------|--------------|-----|--------|
             `;
-            
+
             // Add layer status table
             const layers = ['foundation', 'core', 'logic', 'cognitive', 'advanced', 'learning', 'language', 'embodiment', 'integration', 'packaging'];
             for (const layer of layers) {
@@ -756,34 +756,34 @@ jobs:
                 body += `| ${layer} | ${components} | \`${JSON.stringify(layerData.shape)}\` | ${layerData.degrees_of_freedom.toLocaleString()} | 🔴 Pending |\n`;
               }
             }
-            
+
             body += `
             ### 🎭 Implementation Phases
-            
+
             #### Phase 1: Foundation & Core (Weeks 1-2)
             - [ ] 🧬 Foundation Layer: Cognitive Kernel Genesis
             - [ ] ⚛️ Core Layer: Hypergraph Substrate Materialization
-            
-            #### Phase 2: Logic & Cognitive (Weeks 3-4)  
+
+            #### Phase 2: Logic & Cognitive (Weeks 3-4)
             - [ ] 🔗 Logic Layer: Reasoning Engine Implementation
             - [ ] 🧠 Cognitive Layer: Attention Dynamics Integration
-            
+
             #### Phase 3: Advanced & Learning (Weeks 5-6)
-            - [ ] ⚡ Advanced Layer: Emergent Pattern Recognition  
+            - [ ] ⚡ Advanced Layer: Emergent Pattern Recognition
             - [ ] 🔄 Learning Layer: Adaptive Intelligence Systems
-            
+
             #### Phase 4: Language & Embodiment (Weeks 7-8)
             - [ ] 🗣️ Language Layer: Natural Language Cognition
             - [ ] 🤖 Embodiment Layer: Sensorimotor Integration
-            
+
             #### Phase 5: Integration & Packaging (Weeks 9-10)
             - [ ] 🎭 Integration Layer: Unified Consciousness
             - [ ] 📦 Packaging Layer: Deployment Genesis
-            
+
             ### 🧮 Tensor Field Coherence Analysis
-            
+
             The cognitive architecture implements a hierarchical tensor field with increasing degrees of freedom:
-            
+
             \`\`\`mermaid
             graph TD
                 F[Foundation DOF=524,288] --> C[Core DOF=16,777,216]
@@ -798,17 +798,17 @@ jobs:
                 Emb --> I
                 I --> P[Packaging DOF=65,536]
             \`\`\`
-            
+
             ### 🚀 Quick Start Guide
-            
+
             1. **Prerequisites:** Ensure you have the development environment set up
             2. **Phase Order:** Follow the implementation phases in sequence
             3. **Dependency Management:** Complete dependency layers before starting dependent layers
             4. **Testing:** Run comprehensive tests after each layer implementation
             5. **Integration:** Validate inter-layer communications and tensor coherence
-            
+
             ### 📋 Global Checklist
-            
+
             - [ ] All layer-specific issues created and assigned
             - [ ] Development environment configured
             - [ ] CI/CD pipeline validated and operational
@@ -816,29 +816,29 @@ jobs:
             - [ ] Performance benchmarking system active
             - [ ] Documentation generation automated
             - [ ] Integration testing framework ready
-            
+
             ### 🔗 Related Issues
-            
+
             Individual layer implementation issues will be created automatically. Each issue contains:
             - Detailed tensor architecture specifications
             - Step-by-step implementation guide
             - Validation criteria and test procedures
             - Integration requirements with other layers
-            
+
             ### 📈 Progress Tracking
-            
+
             Progress will be automatically tracked and updated as individual issues are completed. The cognitive complexity index will be recalculated based on implemented layers.
-            
+
             ---
-            
-            **Master Issue Status:** 🟢 Active  
-            **Last Updated:** ${new Date().toISOString()}  
-            **Total Implementation Issues:** ${layers.length} layers  
+
+            **Master Issue Status:** 🟢 Active
+            **Last Updated:** ${new Date().toISOString()}
+            **Total Implementation Issues:** ${layers.length} layers
             **Estimated Timeline:** 10 weeks for complete implementation
-            
+
             *This master issue was automatically generated by the Ontogenesis orchestration system.*
             `;
-            
+
             const masterIssue = await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -846,32 +846,32 @@ jobs:
               body: body,
               labels: ['ontogenesis', 'master-issue', 'cognitive-architecture', 'orchestration']
             });
-            
+
             return masterIssue.data.number;
-      
+
       - name: Create Individual Layer Issues
         uses: actions/github-script@v8
         with:
           script: |
             const fs = require('fs');
             const path = require('path');
-            
+
             const masterIssueNumber = ${{ steps.master-issue.outputs.result }};
             const issuesDir = '/tmp/issues/';
-            
+
             // Read all issue files
             const issueFiles = fs.readdirSync(issuesDir).filter(f => f.endsWith('.json'));
-            
+
             let createdIssues = [];
-            
+
             for (const filename of issueFiles) {
               try {
                 const filePath = path.join(issuesDir, filename);
                 const issueData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-                
+
                 // Add reference to master issue
                 issueData.body += `\n\n### 🔗 Master Issue Reference\n\nThis issue is part of: #${masterIssueNumber}\n`;
-                
+
                 const createdIssue = await github.rest.issues.create({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
@@ -879,103 +879,103 @@ jobs:
                   body: issueData.body,
                   labels: issueData.labels
                 });
-                
+
                 createdIssues.push({
                   filename: filename,
                   issue_number: createdIssue.data.number,
                   title: issueData.title
                 });
-                
+
                 console.log(`Created issue #${createdIssue.data.number}: ${issueData.title}`);
-                
+
                 // Add small delay to avoid rate limiting
                 await new Promise(resolve => setTimeout(resolve, 1000));
-                
+
               } catch (error) {
                 console.error(`Error creating issue from ${filename}:`, error);
               }
             }
-            
+
             // Comment on master issue with links to all created issues
             let commentBody = "## 🎯 Layer Implementation Issues Created\n\n";
             commentBody += "The following individual layer issues have been automatically created:\n\n";
-            
+
             for (const issue of createdIssues) {
               commentBody += `- #${issue.issue_number}: ${issue.title}\n`;
             }
-            
+
             commentBody += `\n**Total Issues Created:** ${createdIssues.length}\n`;
             commentBody += `**Creation Timestamp:** ${new Date().toISOString()}\n`;
-            
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: masterIssueNumber,
               body: commentBody
             });
-            
+
             console.log(`Created ${createdIssues.length} layer implementation issues`);
-            
+
   generate-summary:
     name: "📊 Generate Implementation Summary"
     needs: [architecture-parser, generate-orchestration-issues, create-github-issues]
     runs-on: ubuntu-latest
     if: always()
-    
+
     steps:
       - name: Generate Architecture Summary
         run: |
           set -eu
           cat > ontogenesis-summary.md << 'EOF'
           # 🧬 Ontogenesis Implementation Summary
-          
+
           ## Workflow Execution Results
-          
+
           - **Architecture Parser:** ${{ needs.architecture-parser.result }}
           - **Issue Generation:** ${{ needs.generate-orchestration-issues.result }}
           - **GitHub Issues Created:** ${{ needs.create-github-issues.result }}
-          
+
           ## System Architecture Overview
-          
+
           The Ontogenesis system has generated a complete cognitive architecture implementation plan based on:
-          
+
           ### Tensor Field Configuration
           ```json
           ${{ needs.architecture-parser.outputs.tensor-mapping }}
           ```
-          
+
           ### Dependency Graph
           ```json
           ${{ needs.architecture-parser.outputs.dependency-graph }}
           ```
-          
+
           ## Implementation Strategy
-          
+
           1. **Dynamic Architecture Parsing:** Automatically extracted cognitive layers from documentation
           2. **Tensor Validation:** Generated tensor shape specifications for each layer
-          3. **Dependency Management:** Created proper build order based on cognitive dependencies  
+          3. **Dependency Management:** Created proper build order based on cognitive dependencies
           4. **Issue Orchestration:** Generated detailed implementation issues for each component
           5. **Progress Tracking:** Integrated with GitHub Issues for automated progress monitoring
-          
+
           ## Next Steps
-          
+
           1. Review the generated master issue for overall coordination
           2. Assign individual layer issues to development teams
           3. Follow the phased implementation approach
           4. Monitor tensor field coherence during implementation
           5. Validate cognitive functions as layers come online
-          
+
           ---
           *Generated by Ontogenesis orchestration system at $(date)*
           EOF
-      
+
       - name: Upload Summary Artifacts
         uses: actions/upload-artifact@v6
         with:
           name: ontogenesis-summary
           path: ontogenesis-summary.md
           retention-days: 90
-      
+
       - name: Display Summary
         run: |
           set -eu

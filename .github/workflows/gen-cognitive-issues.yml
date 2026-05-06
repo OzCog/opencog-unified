@@ -1,56 +1,100 @@
 name: 🌌 Genesis of Cognitive Build Issues
 
+# This workflow generates the canonical set of "Cognitive Layer" build issues
+# (Foundation, Core, Logic, Cognitive, Advanced, Learning, Language, Robotics,
+# Integration) using the GitHub CLI. It is split from the (previously broken)
+# heredoc implementation into a discrete, validated JSON manifest that is
+# rendered with `jq`, ensuring the workflow is parseable, idempotent, and
+# extensible. Issues are created with `gh issue create` and labelled per layer.
+#
+# Trigger: workflow_dispatch only — this is intentionally manual to avoid
+# duplicate issue creation. Enable `dry_run` to preview what would be created.
+
 permissions:
   contents: read
+  issues: write
   actions: read
 
 on:
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Preview issues without creating them"
+        required: false
+        default: "true"
+        type: choice
+        options: ["true", "false"]
+      label_prefix:
+        description: "Prefix for cognitive-layer labels"
+        required: false
+        default: "cognitive"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   generate-cognitive-issues:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - name: Compose Issue Templates of Distributed Cognition
-        id: issues
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Validate cognitive-issues manifest
+        id: validate
         run: |
-          set -eu
-          cat << EOF > issues.json
-          [
-            {
-              "title": "🧬 Foundation Layer: Seed the Cognitive Kernel",
-              "body": "### Problem Identification\nThe cognitive kernel requires a solid foundation: `cogutil` and `moses`.\n\n### Subsystem Mapping\n- Memory: Build artifacts for downstream jobs\n- Task: CMake configuration, real test execution\n- AI: ggml kernel adaptation (tensor shape: `[modules, build-steps, tests]`)\n- Autonomy: Hardware matrix for architectures\n\n### Actionable Steps\n- [ ] Define build/test scripts for `cogutil` and `moses`\n- [ ] Parameterize for ggml tensorization\n- [ ] Insert hardware matrix if desired\n- [ ] Output artifacts for downstream jobs\n- [ ] Document tensor DOF (degrees of freedom) per module\n\n### Meta-Cognitive Enhancement\n- [ ] Review implementation for emergent properties\n\n### Theatrical Finale\nLet the kernel awaken—prime factors aligned!"
-            },
-            {
-              "title": "🌐 Core Layer: Hypergraph Store Genesis",
-              "body": "### Problem Identification\nAtomSpace and its satellites (rocks, restful) must arise from the foundation.\n\n### Subsystem Mapping\n- Memory: AtomSpace hypergraph\n- Task: Build/test core modules with real data\n- AI: Hypergraph API endpoints\n- Autonomy: Downstream exposure\n\n### Actionable Steps\n- [ ] Set dependency: `needs: [cogutil, moses]`\n- [ ] Build/test AtomSpace, atomspace-rocks, atomspace-restful\n- [ ] Check AtomSpace integrity\n- [ ] Expose API endpoints\n- [ ] Document hypergraph tensor dimensions\n\n### Meta-Cognitive Enhancement\n- [ ] Validate interface complexity and emergent pathways\n\n### Theatrical Finale\nThe hypergraph pulses with possibility!"
-            },
-            {
-              "title": "🧠 Logic Layer: Reasoning Engine Emergence",
-              "body": "### Problem Identification\nEnable logical inference within the hypergraph.\n\n### Subsystem Mapping\n- Memory: Reasoning traces\n- Task: Build/test unify, ure\n- AI: Inference validation on knowledge graphs\n- Autonomy: Integration hooks for cognitive modules\n\n### Actionable Steps\n- [ ] Set dependency: `needs: [atomspace]`\n- [ ] Build/test unify and ure\n- [ ] Validate logical inference on sample knowledge graphs\n- [ ] Prepare integration hooks\n- [ ] Map logic operator tensor shapes\n\n### Meta-Cognitive Enhancement\n- [ ] Recursively audit inference correctness\n\n### Theatrical Finale\nLogic flows, contradictions shatter!"
-            },
-            {
-              "title": "🔮 Cognitive Layer: Distributed Cognition Dynamics",
-              "body": "### Problem Identification\nCognitive control, attention, spacetime dynamics require emergence.\n\n### Subsystem Mapping\n- Memory: Control state\n- Task: Build/test cogserver, attention, spacetime\n- AI: ECAN attention simulation\n- Autonomy: Activation spreading\n\n### Actionable Steps\n- [ ] Set dependency: `needs: [unify, ure]`\n- [ ] Build/test cognitive modules\n- [ ] Simulate attention allocation (ECAN)\n- [ ] Benchmark activation spreading\n- [ ] Document attention tensor DOF\n\n### Meta-Cognitive Enhancement\n- [ ] Benchmark for emergent oscillations\n\n### Theatrical Finale\nThe cognitive field oscillates—activation resonates!"
-            },
-            {
-              "title": "🌋 Advanced Layer: Emergent Learning and Reasoning",
-              "body": "### Problem Identification\nPLN, miner, asmoses: engines of advanced cognition.\n\n### Subsystem Mapping\n- Memory: Probabilistic traces\n- Task: Build/test with real reasoning cases\n- AI: PLN inference chains\n- Autonomy: Output for learning modules\n\n### Actionable Steps\n- [ ] Set dependency: `needs: [cogserver, attention, spacetime]`\n- [ ] Build/test PLN, miner, asmoses\n- [ ] Rigorous test: uncertain reasoning and optimization\n- [ ] Prepare output for learning modules\n- [ ] Map PLN tensor dimensions\n\n### Meta-Cognitive Enhancement\n- [ ] Audit for recursive learning capacity\n\n### Theatrical Finale\nEmergent logic—probabilities swirl!"
-            },
-            {
-              "title": "🧑‍🎓 Learning Layer: Recursive Evolutionary Adaptation",
-              "body": "### Problem Identification\nLearning and generating recursive programs.\n\n### Subsystem Mapping\n- Memory: Learned state in AtomSpace\n- Task: Build/test learn, generate\n- AI: Evolutionary search and adaptation\n- Autonomy: Modify AtomSpace state\n\n### Actionable Steps\n- [ ] Set dependency: `needs: [pln, miner, asmoses]`\n- [ ] Build/test evolutionary scenarios\n- [ ] Validate learning modifies AtomSpace\n- [ ] Document learning tensor shapes\n\n### Meta-Cognitive Enhancement\n- [ ] Recursively trace learning output\n\n### Theatrical Finale\nRecursive adaptation—a learning spiral!"
-            },
-            {
-              "title": "🗣️ Language Layer: Natural Language Cognition",
-              "body": "### Problem Identification\nEnabling language parsing and semantic pattern matching.\n\n### Subsystem Mapping\n- Memory: Language patterns\n- Task: Build/test LG-Atomese, RelEx, Link Grammar\n- AI: Integrate with AtomSpace, PLN\n- Autonomy: Semantic parsing\n\n### Actionable Steps\n- [ ] Set dependency: `needs: [cogserver, attention, spacetime]`\n- [ ] Build/test language modules\n- [ ] Validate parsing and pattern matching\n- [ ] Integrate with AtomSpace/PLN\n- [ ] Document language tensor shapes\n\n### Meta-Cognitive Enhancement\n- [ ] Audit language understanding\n\n### Theatrical Finale\nMeaning emerges—words become worlds!"
-            },
-            {
-              "title": "🤖 Robotics Layer: Embodied Cognition",
-              "body": "### Problem Identification\nSensory and motor data integration for embodied agents.\n\n### Subsystem Mapping\n- Memory: Sensory buffers\n- Task: Build/test vision, perception, sensory modules\n- AI: Embodiment kernel tensor mapping\n- Autonomy: Data flow validation\n\n### Actionable Steps\n- [ ] Set dependency: `needs: [cogserver, attention, spacetime]`\n- [ ] Build/test all robotics modules\n- [ ] Integrate with simulators/agents\n- [ ] Validate sensory-motor data flow\n- [ ] Map embodiment kernel tensor dimensions\n\n### Meta-Cognitive Enhancement\n- [ ] Trace embodiment feedback\n\n### Theatrical Finale\nSensors fire—agents awaken!"
-            },
-            {
-              "title": "🕸️ Integration Layer: System Synergy",
-              "body": "### Problem Identification\nUnify all modules for system-wide cognition.\n\n### Subsystem Mapping\n- Memory: Unified state\n- Task: Build/test opencog integration\n- AI: End-to-end cognition\n- Autonomy: Integration tensor structure\n\n### Actionable Steps\n- [ ] Set dependency: `needs: [learn, generate, lg-atomese, relex, link-grammar, vision, perception, sensory]`\n- [ ] x"
-            }
-          ]
+          set -euo pipefail
+          MANIFEST=".github/cognitive-issues/manifest.json"
+          if [[ ! -f "${MANIFEST}" ]]; then
+            echo "::error::Cognitive issues manifest not found at ${MANIFEST}"
+            exit 1
+          fi
+          # Strict JSON validation
+          jq -e 'type == "array" and (length > 0)' "${MANIFEST}" >/dev/null
+          COUNT=$(jq 'length' "${MANIFEST}")
+          echo "count=${COUNT}" >> "${GITHUB_OUTPUT}"
+          echo "✅ Manifest validated: ${COUNT} cognitive layer issues"
+
+      - name: Render issue previews
+        run: |
+          set -euo pipefail
+          MANIFEST=".github/cognitive-issues/manifest.json"
+          {
+            echo "## 🌌 Cognitive Issues to be Generated"
+            echo ""
+            jq -r '.[] | "### " + .title + "\n\n**Layer:** `" + .layer + "`  \n**Labels:** " + (.labels | join(", ")) + "\n\n" + .body + "\n\n---\n"' "${MANIFEST}"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Create cognitive layer issues
+        if: ${{ inputs.dry_run == 'false' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LABEL_PREFIX: ${{ inputs.label_prefix }}
+        run: |
+          set -euo pipefail
+          MANIFEST=".github/cognitive-issues/manifest.json"
+          CREATED=0
+          while IFS= read -r entry; do
+            TITLE=$(echo "${entry}" | jq -r '.title')
+            BODY=$(echo "${entry}" | jq -r '.body')
+            LAYER=$(echo "${entry}" | jq -r '.layer')
+            LABELS=$(echo "${entry}" | jq -r '.labels | join(",")')
+            FULL_LABELS="${LABEL_PREFIX}-layer,${LABEL_PREFIX}/${LAYER},${LABELS}"
+            echo "📝 Creating issue: ${TITLE}"
+            if gh issue create \
+              --title "${TITLE}" \
+              --body "${BODY}" \
+              --label "${FULL_LABELS}" 2>/tmp/gh.err; then
+              CREATED=$((CREATED + 1))
+            else
+              echo "::warning::Failed to create issue '${TITLE}': $(cat /tmp/gh.err)"
+            fi
+          done < <(jq -c '.[]' "${MANIFEST}")
+          echo "✅ Created ${CREATED} cognitive layer issues" >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Dry-run summary
+        if: ${{ inputs.dry_run != 'false' }}
+        run: |
+          echo "ℹ️  Dry run mode — no issues were created." >> "${GITHUB_STEP_SUMMARY}"
+          echo "Re-run the workflow with \`dry_run: false\` to create them." >> "${GITHUB_STEP_SUMMARY}"

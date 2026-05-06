@@ -56,14 +56,14 @@ jobs:
   build-chocolatey-packages:
     runs-on: windows-latest
     name: Build Chocolatey Package
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
-    
+
     - name: Setup MSVC
       uses: microsoft/setup-msbuild@v2
-    
+
     - name: Install Chocolatey
       run: |
         $ErrorActionPreference = 'Stop'
@@ -74,7 +74,7 @@ jobs:
         }
         choco --version
       shell: powershell
-    
+
     - name: Install Dependencies
       run: |
         $ErrorActionPreference = 'Stop'
@@ -83,7 +83,7 @@ jobs:
         # Install all required Boost components for cogutil
         .\vcpkg install boost-filesystem:x64-windows boost-system:x64-windows boost-thread:x64-windows boost-program-options:x64-windows boost-algorithm:x64-windows boost-lexical-cast:x64-windows boost-spirit:x64-windows
       shell: powershell
-    
+
     - name: Build Component
       run: |
         $ErrorActionPreference = 'Stop'
@@ -93,7 +93,7 @@ jobs:
           $component = "${{ env.DEFAULT_COMPONENT }}"
         }
         Write-Host "Building component: $component"
-        
+
         if (Test-Path $component) {
           mkdir "$component\build" -Force
           cd "$component\build"
@@ -104,7 +104,7 @@ jobs:
         }
       shell: powershell
       continue-on-error: true
-    
+
     - name: Create Package
       run: |
         $ErrorActionPreference = 'Stop'
@@ -118,18 +118,18 @@ jobs:
           $version = "${{ env.DEFAULT_VERSION }}"
         }
         Write-Host "Creating package for: $component v$version"
-        
+
         $pkgDir = "choco-packages\opencog-$component"
         New-Item -ItemType Directory -Force -Path "$pkgDir\tools"
-        
+
         $nuspec = "<?xml version='1.0'?><package><metadata><id>opencog-$component</id><version>$version</version><title>OpenCog $component</title><authors>OpenCog Foundation</authors><description>OpenCog $component</description></metadata></package>"
         Set-Content -Path "$pkgDir\opencog-$component.nuspec" -Value $nuspec
-        
+
         cd $pkgDir
         choco pack
       shell: powershell
       continue-on-error: true
-    
+
     - name: Upload Package
       uses: actions/upload-artifact@v6
       with:

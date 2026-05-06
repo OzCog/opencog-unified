@@ -19,33 +19,33 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-        
+
       - name: Install dependencies
         run: |
           set -eu
           sudo apt-get update
           sudo apt-get install -y guile-3.0 cmake build-essential g++
-          
+
       - name: Verify no placeholder implementations
         run: |
           set -eu
           echo "🔍 Scanning for placeholder implementations..."
-          
+
           # Exclude certain directories and acceptable patterns
           # - atomspace-* subdirectories (external submodules with their own TODO/FIXME)
           # - examples/ directories (demonstration code may have intentional TODOs)
           # - XXX FIXME pattern (common OpenCog convention for known issues)
           # - mockup/mock in comments (acceptable for test data descriptions)
-          
+
           PLACEHOLDER_COUNT=$(grep -r -i -E "(TODO|FIXME|STUB|PLACEHOLDER|NOT IMPLEMENTED)" \
             --include="*.cc" --include="*.h" --include="*.scm" \
             --exclude-dir="atomspace-*" \
             --exclude-dir="examples" \
             --exclude-dir="tests" \
-            . | grep -v "XXX FIXME" | grep -v "mockup" | grep -v "A mockup" | wc -l || echo "0")
-          
+            . | grep -vE "XXX FIXME|mockup|A mockup" | wc -l || echo "0")
+
           echo "📊 Found $PLACEHOLDER_COUNT placeholder implementations (excluding acceptable patterns)"
-          
+
           # Allow up to 50 placeholders in active development areas
           # This is a pragmatic threshold for a large codebase
           if [ "$PLACEHOLDER_COUNT" -gt 50 ]; then
@@ -55,18 +55,18 @@ jobs:
           else
             echo "✅ Placeholder count within acceptable range"
           fi
-          
+
       - name: Run comprehensive verification framework
         run: |
           set -eu
           chmod +x ./tests/comprehensive-test-runner.sh
           ./tests/comprehensive-test-runner.sh
-          
+
       - name: Verify implementation completeness
         run: |
           set -eu
           echo "🧪 Verifying implementation completeness..."
-          
+
           # Check C++ implementations have substantial content
           for file in cognitive-patterns/src/*.cc; do
             if [[ -f "$file" ]]; then
@@ -79,7 +79,7 @@ jobs:
               fi
             fi
           done
-          
+
           # Check Scheme implementations have substantial content
           for file in */scheme/*.scm; do
             if [[ -f "$file" ]]; then
@@ -92,7 +92,7 @@ jobs:
               fi
             fi
           done
-          
+
       - name: Test tensor kernel compilation
         run: |
           set -eu
@@ -102,7 +102,7 @@ jobs:
             /tmp/test_tensor_kernel
             echo "✅ Tensor kernel compiles and runs successfully"
           fi
-          
+
       - name: Validate Scheme syntax
         run: |
           set -eu
@@ -115,43 +115,43 @@ jobs:
               }
             fi
           done
-          
+
       - name: Bootstrap verification
         run: |
           set -eu
           chmod +x ./init-unified-repo.sh
           ./init-unified-repo.sh
-          
+
       - name: Generate verification report
         run: |
           set -eu
           echo "📊 VERIFICATION SUMMARY" > verification-report.txt
           echo "======================" >> verification-report.txt
           echo "Timestamp: $(date)" >> verification-report.txt
-          echo "Commit: $GITHUB_SHA" >> verification-report.txt
+          echo "Commit: ${GITHUB_SHA}" >> verification-report.txt
           echo "" >> verification-report.txt
-          
+
           # Count implementations
           cpp_files=$(find . -name "*.cc" -o -name "*.cpp" | wc -l)
           header_files=$(find . -name "*.h" -o -name "*.hpp" | wc -l)
           scheme_files=$(find . -name "*.scm" | wc -l)
-          
+
           echo "Implementation Statistics:" >> verification-report.txt
           echo "- C++ source files: $cpp_files" >> verification-report.txt
           echo "- C++ header files: $header_files" >> verification-report.txt
           echo "- Scheme files: $scheme_files" >> verification-report.txt
           echo "" >> verification-report.txt
-          
+
           # Calculate total size
-          total_size=$(find . -name "*.cc" -o -name "*.h" -o -name "*.scm" -exec stat -c%s {} + | awk '{sum+=$1} END {print sum}')
+          total_size=$(find . \( -name "*.cc" -o -name "*.h" -o -name "*.scm" \) -exec stat -c%s {} + | awk '{sum+=$1} END {print sum}')
           echo "Total implementation size: $total_size bytes" >> verification-report.txt
           echo "" >> verification-report.txt
-          
+
           echo "✅ ALL IMPLEMENTATIONS VERIFIED AS REAL AND FUNCTIONAL" >> verification-report.txt
           echo "🛡️  Recursive safeguard against simulation: ACTIVE" >> verification-report.txt
-          
+
           cat verification-report.txt
-          
+
       - name: Upload verification report
         uses: actions/upload-artifact@v6
         with:
@@ -165,62 +165,62 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-        
+
       - name: Install cognitive analysis dependencies
         run: |
           set -eu
           sudo apt-get update
           sudo apt-get install -y jq bc guile-3.0
-          
+
       - name: Extract ECAN-style attention metrics
         run: |
           set -eu
           echo "🧠 Extracting ECAN-style attention allocation metrics..."
           chmod +x ./scripts/extract-attention-metrics.sh
           ./scripts/extract-attention-metrics.sh
-          
+
       - name: Test neural-symbolic integration
         run: |
           set -eu
           echo "🔬 Testing neural-symbolic (C++/Scheme/GGML) integration..."
           chmod +x ./scripts/test-neural-symbolic-integration.sh
           ./scripts/test-neural-symbolic-integration.sh
-          
+
       - name: Estimate tensor dimensions and field synthesis
         run: |
           set -eu
           echo "📐 Estimating tensor dimensions and field synthesis potential..."
           chmod +x ./scripts/simple-tensor-analysis.sh
           ./scripts/simple-tensor-analysis.sh
-          
+
       - name: Encode hypergraph patterns
         run: |
           set -eu
           echo "🕸️  Encoding workflow logic as hypergraph patterns..."
           chmod +x ./scripts/encode-hypergraph-patterns.sh
           ./scripts/encode-hypergraph-patterns.sh
-          
+
       - name: Analyze meta-completeness
         run: |
           set -eu
           echo "🔍 Analyzing meta-completeness and cognitive coverage..."
           chmod +x ./scripts/analyze-meta-completeness.sh
           ./scripts/analyze-meta-completeness.sh
-          
+
       - name: Generate recursive feedback
         run: |
           set -eu
           echo "🔄 Generating recursive feedback and enhancement proposals..."
           chmod +x ./scripts/generate-recursive-feedback.sh
           ./scripts/generate-recursive-feedback.sh
-          
+
       - name: Execute autognostic ontogenesis
         run: |
           set -eu
           echo "🧬 Executing autognostic ontogenesis cycle..."
           chmod +x ./scripts/autognostic-ontogenesis.sh
           ./scripts/autognostic-ontogenesis.sh
-          
+
       - name: Upload cognitive analysis artifacts
         uses: actions/upload-artifact@v6
         with:
@@ -235,7 +235,7 @@ jobs:
             recursive-feedback-report.json
             cognitive-enhancement-issue.md
             ontogenesis-state.json
-          
+
   build-verification:
     runs-on: ubuntu-latest
     needs: [comprehensive-verification, cognitive-enhancement]
@@ -243,13 +243,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-        
+
       - name: Install build dependencies
         run: |
           set -eu
           sudo apt-get update
           sudo apt-get install -y cmake build-essential g++ pkg-config
-          
+
       - name: CMake configuration test
         run: |
           set -eu
@@ -257,7 +257,7 @@ jobs:
           cd build
           cmake .. -DCMAKE_BUILD_TYPE=Debug
           echo "✅ CMake configuration successful"
-          
+
       - name: Test partial build
         run: |
           set -eu
@@ -268,7 +268,7 @@ jobs:
           fi
           echo "✅ Build verification completed"
 
-          
+
   cognitive-synergy-report:
     runs-on: ubuntu-latest
     needs: [comprehensive-verification, cognitive-enhancement, build-verification]
@@ -276,45 +276,45 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-        
+
       - name: Download cognitive analysis artifacts
         uses: actions/download-artifact@v7
         with:
           name: cognitive-enhancement-reports
           path: ./cognitive-reports/
-          
+
       - name: Download verification report
         uses: actions/download-artifact@v7
         with:
           name: verification-report
           path: ./verification-reports/
-          
+
       - name: Install reporting dependencies
         run: |
           set -eu
           sudo apt-get update
           sudo apt-get install -y jq bc
-          
+
       - name: Generate enhanced verification report with cognitive synergy
         run: |
           set -eu
           echo "📊 ENHANCED VERIFICATION WITH COGNITIVE SYNERGY" > enhanced-verification-report.txt
           echo "===============================================" >> enhanced-verification-report.txt
           echo "Timestamp: $(date)" >> enhanced-verification-report.txt
-          echo "Commit: $GITHUB_SHA" >> enhanced-verification-report.txt
+          echo "Commit: ${GITHUB_SHA}" >> enhanced-verification-report.txt
           echo "Workflow Run: $GITHUB_RUN_ID" >> enhanced-verification-report.txt
           echo "" >> enhanced-verification-report.txt
-          
+
           # Include original verification results
           if [[ -f "./verification-reports/verification-report.txt" ]]; then
             echo "=== CORE VERIFICATION RESULTS ===" >> enhanced-verification-report.txt
             cat "./verification-reports/verification-report.txt" >> enhanced-verification-report.txt
             echo "" >> enhanced-verification-report.txt
           fi
-          
+
           # Add cognitive enhancement metrics
           echo "=== COGNITIVE ENHANCEMENT METRICS ===" >> enhanced-verification-report.txt
-          
+
           # Attention allocation metrics
           if [[ -f "./cognitive-reports/attention-metrics.json" ]]; then
             echo "🧠 ECAN-Style Attention Allocation:" >> enhanced-verification-report.txt
@@ -325,7 +325,7 @@ jobs:
             echo "  - Attention Balance: $attention_balance" >> enhanced-verification-report.txt
             echo "  - System Urgency: $system_urgency units" >> enhanced-verification-report.txt
           fi
-          
+
           # Neural-symbolic integration metrics
           if [[ -f "./cognitive-reports/neural-symbolic-integration-report.json" ]]; then
             echo "🔬 Neural-Symbolic Integration:" >> enhanced-verification-report.txt
@@ -334,7 +334,7 @@ jobs:
             echo "  - Integration Success Rate: ${success_rate}%" >> enhanced-verification-report.txt
             echo "  - Neural-Symbolic Synergy: $synergy" >> enhanced-verification-report.txt
           fi
-          
+
           # Tensor field synthesis metrics
           if [[ -f "./cognitive-reports/tensor-field-analysis.json" ]]; then
             echo "⚡ Tensor Field Synthesis:" >> enhanced-verification-report.txt
@@ -345,7 +345,7 @@ jobs:
             echo "  - Field Coherence: ${field_coherence}%" >> enhanced-verification-report.txt
             echo "  - Meta-Completeness: ${meta_completeness}%" >> enhanced-verification-report.txt
           fi
-          
+
           # Hypergraph pattern metrics
           if [[ -f "./cognitive-reports/hypergraph-patterns.json" ]]; then
             echo "🕸️  Hypergraph Pattern Encoding:" >> enhanced-verification-report.txt
@@ -354,7 +354,7 @@ jobs:
             echo "  - Total Hypergraph Nodes: $total_nodes" >> enhanced-verification-report.txt
             echo "  - Integration Strength: $integration_strength" >> enhanced-verification-report.txt
           fi
-          
+
           # Overall completeness assessment
           if [[ -f "./cognitive-reports/meta-completeness-analysis.json" ]]; then
             echo "🔍 Meta-Completeness Assessment:" >> enhanced-verification-report.txt
@@ -363,7 +363,7 @@ jobs:
             echo "  - Overall Completeness: ${overall_completeness}%" >> enhanced-verification-report.txt
             echo "  - Completeness Level: $completeness_level" >> enhanced-verification-report.txt
           fi
-          
+
           # Recursive feedback summary
           if [[ -f "./cognitive-reports/recursive-feedback-report.json" ]]; then
             echo "🔄 Recursive Enhancement Status:" >> enhanced-verification-report.txt
@@ -372,36 +372,36 @@ jobs:
             echo "  - Cognitive Gaps Identified: $gaps_identified" >> enhanced-verification-report.txt
             echo "  - Enhancement Priority: $priority_level" >> enhanced-verification-report.txt
           fi
-          
+
           echo "" >> enhanced-verification-report.txt
           echo "=== COGNITIVE SYNERGY ASSESSMENT ===" >> enhanced-verification-report.txt
-          
+
           # Calculate overall cognitive readiness score
           cognitive_score=0
           max_score=500
-          
+
           # Add scores from available metrics
           if [[ -n "$total_attention" && $total_attention -gt 0 ]]; then
             cognitive_score=$((cognitive_score + total_attention / 100))
           fi
-          
+
           if [[ -n "$success_rate" && $success_rate -gt 0 ]]; then
             cognitive_score=$((cognitive_score + success_rate))
           fi
-          
+
           if [[ -n "$synthesis_energy" && $synthesis_energy -gt 0 ]]; then
             cognitive_score=$((cognitive_score + synthesis_energy / 10))
           fi
-          
+
           if [[ -n "$overall_completeness" && $overall_completeness -gt 0 ]]; then
             cognitive_score=$((cognitive_score + overall_completeness))
           fi
-          
+
           cognitive_percentage=$((cognitive_score * 100 / max_score))
           cognitive_percentage=$((cognitive_percentage > 100 ? 100 : cognitive_percentage))
-          
+
           echo "🌟 Overall Cognitive Synergy Score: ${cognitive_percentage}% ($cognitive_score/$max_score)" >> enhanced-verification-report.txt
-          
+
           if [[ $cognitive_percentage -gt 80 ]]; then
             echo "🎉 EXCELLENT: Cognitive unity approaching optimal synthesis!" >> enhanced-verification-report.txt
           elif [[ $cognitive_percentage -gt 60 ]]; then
@@ -411,22 +411,18 @@ jobs:
           else
             echo "🔧 DEVELOPING: Early cognitive patterns detected, significant enhancement opportunities!" >> enhanced-verification-report.txt
           fi
-          
+
           echo "" >> enhanced-verification-report.txt
           echo "🛡️  RECURSIVE SAFEGUARD AGAINST SIMULATION: ACTIVE AND ENHANCED" >> enhanced-verification-report.txt
           echo "🧠 COGNITIVE ENHANCEMENT SYSTEM: OPERATIONAL" >> enhanced-verification-report.txt
           echo "⚡ TENSOR FIELD SYNTHESIS: READY FOR RECURSIVE EVOLUTION" >> enhanced-verification-report.txt
           echo "🕸️  HYPERGRAPH PATTERNS: CATALOGED FOR ATOMSPACE INGESTION" >> enhanced-verification-report.txt
           echo "🔄 RECURSIVE FEEDBACK LOOPS: INITIALIZED FOR CONTINUOUS IMPROVEMENT" >> enhanced-verification-report.txt
-          
+
           cat enhanced-verification-report.txt
-          
+
       - name: Upload enhanced verification report
         uses: actions/upload-artifact@v6
         with:
           name: enhanced-verification-report
           path: enhanced-verification-report.txt
-
-
-
-

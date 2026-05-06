@@ -18,7 +18,7 @@ jobs:
   pre-commit:
     name: "🔍 Code Quality Checks"
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: "📥 Checkout Repository"
         uses: actions/checkout@v6
@@ -56,18 +56,23 @@ jobs:
       - name: "📊 Generate Report"
         if: always()
         run: |
-          echo "## Pre-commit Check Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          if [ $? -eq 0 ]; then
-            echo "✅ All checks passed!" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ Some checks failed. Please review the logs above." >> $GITHUB_STEP_SUMMARY
-          fi
+          # Read prior step status from `job.status` (success / failure /
+          # cancelled). `$?` of the preceding `echo` is always 0, so SC2181
+          # / SC2320 — read the GitHub job context instead.
+          {
+            echo "## Pre-commit Check Results"
+            echo ""
+            if [ "${{ job.status }}" = "success" ]; then
+              echo "✅ All checks passed!"
+            else
+              echo "❌ Some checks failed. Please review the logs above."
+            fi
+          } >> "${GITHUB_STEP_SUMMARY}"
 
   yaml-lint:
     name: "📋 YAML Validation"
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: "📥 Checkout Repository"
         uses: actions/checkout@v6
@@ -85,7 +90,7 @@ jobs:
   actionlint:
     name: "⚙️ GitHub Actions Validation"
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: "📥 Checkout Repository"
         uses: actions/checkout@v6
@@ -99,7 +104,7 @@ jobs:
   shellcheck:
     name: "🐚 Shell Script Validation"
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: "📥 Checkout Repository"
         uses: actions/checkout@v6
@@ -117,7 +122,7 @@ jobs:
   python-lint:
     name: "🐍 Python Validation"
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: "📥 Checkout Repository"
         uses: actions/checkout@v6
@@ -139,7 +144,7 @@ jobs:
   security-scan:
     name: "🔒 Security Scan"
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: "📥 Checkout Repository"
         uses: actions/checkout@v6

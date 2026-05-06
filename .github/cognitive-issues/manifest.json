@@ -1,0 +1,56 @@
+[
+  {
+    "layer": "foundation",
+    "title": "🧬 Foundation Layer: Seed the Cognitive Kernel",
+    "labels": ["build:foundation", "module:cogutil", "module:moses"],
+    "body": "### Problem Identification\nThe cognitive kernel requires a solid foundation: `cogutil` and `moses`.\n\n### Subsystem Mapping\n- **Memory**: Build artifacts for downstream jobs\n- **Task**: CMake configuration, real test execution\n- **AI**: ggml kernel adaptation (tensor shape: `[modules, build-steps, tests]`)\n- **Autonomy**: Hardware matrix for architectures\n\n### Actionable Steps\n- [ ] Define build/test scripts for `cogutil` and `moses`\n- [ ] Parameterize for ggml tensorization\n- [ ] Insert hardware matrix if desired\n- [ ] Output artifacts for downstream jobs\n- [ ] Document tensor DOF (degrees of freedom) per module\n\n### Meta-Cognitive Enhancement\n- [ ] Review implementation for emergent properties\n\n### Theatrical Finale\nLet the kernel awaken — prime factors aligned!"
+  },
+  {
+    "layer": "core",
+    "title": "🌐 Core Layer: Hypergraph Store Genesis",
+    "labels": ["build:core", "module:atomspace", "module:atomspace-rocks", "module:atomspace-restful"],
+    "body": "### Problem Identification\nAtomSpace and its satellites (rocks, restful) must arise from the foundation.\n\n### Subsystem Mapping\n- **Memory**: AtomSpace hypergraph\n- **Task**: Build/test core modules with real data\n- **AI**: Hypergraph API endpoints\n- **Autonomy**: Downstream exposure\n\n### Actionable Steps\n- [ ] Set dependency: `needs: [cogutil, moses]`\n- [ ] Build/test AtomSpace, atomspace-rocks, atomspace-restful\n- [ ] Check AtomSpace integrity\n- [ ] Expose API endpoints\n- [ ] Document hypergraph tensor dimensions\n\n### Meta-Cognitive Enhancement\n- [ ] Validate interface complexity and emergent pathways\n\n### Theatrical Finale\nThe hypergraph pulses with possibility!"
+  },
+  {
+    "layer": "logic",
+    "title": "🧠 Logic Layer: Reasoning Engine Emergence",
+    "labels": ["build:logic", "module:unify", "module:ure"],
+    "body": "### Problem Identification\nEnable logical inference within the hypergraph.\n\n### Subsystem Mapping\n- **Memory**: Reasoning traces\n- **Task**: Build/test unify, ure\n- **AI**: Inference validation on knowledge graphs\n- **Autonomy**: Integration hooks for cognitive modules\n\n### Actionable Steps\n- [ ] Set dependency: `needs: [atomspace]`\n- [ ] Build/test unify and ure\n- [ ] Validate logical inference on sample knowledge graphs\n- [ ] Prepare integration hooks\n- [ ] Map logic operator tensor shapes\n\n### Meta-Cognitive Enhancement\n- [ ] Recursively audit inference correctness\n\n### Theatrical Finale\nLogic flows, contradictions shatter!"
+  },
+  {
+    "layer": "cognitive",
+    "title": "🔮 Cognitive Layer: Distributed Cognition Dynamics",
+    "labels": ["build:cognitive", "module:cogserver", "module:attention", "module:spacetime"],
+    "body": "### Problem Identification\nCognitive control, attention, spacetime dynamics require emergence.\n\n### Subsystem Mapping\n- **Memory**: Control state\n- **Task**: Build/test cogserver, attention, spacetime\n- **AI**: ECAN attention simulation\n- **Autonomy**: Activation spreading\n\n### Actionable Steps\n- [ ] Set dependency: `needs: [unify, ure]`\n- [ ] Build/test cognitive modules\n- [ ] Simulate attention allocation (ECAN)\n- [ ] Benchmark activation spreading\n- [ ] Document attention tensor DOF\n\n### Meta-Cognitive Enhancement\n- [ ] Benchmark for emergent oscillations\n\n### Theatrical Finale\nThe cognitive field oscillates — activation resonates!"
+  },
+  {
+    "layer": "advanced",
+    "title": "🌋 Advanced Layer: Emergent Learning and Reasoning",
+    "labels": ["build:advanced", "module:pln", "module:miner", "module:asmoses"],
+    "body": "### Problem Identification\nPLN, miner, asmoses: engines of advanced cognition.\n\n### Subsystem Mapping\n- **Memory**: Probabilistic traces\n- **Task**: Build/test with real reasoning cases\n- **AI**: PLN inference chains\n- **Autonomy**: Output for learning modules\n\n### Actionable Steps\n- [ ] Set dependency: `needs: [cogserver, attention, spacetime]`\n- [ ] Build/test PLN, miner, asmoses\n- [ ] Rigorous test: uncertain reasoning and optimization\n- [ ] Prepare output for learning modules\n- [ ] Map PLN tensor dimensions\n\n### Meta-Cognitive Enhancement\n- [ ] Audit for recursive learning capacity\n\n### Theatrical Finale\nEmergent logic — probabilities swirl!"
+  },
+  {
+    "layer": "learning",
+    "title": "🧑‍🎓 Learning Layer: Recursive Evolutionary Adaptation",
+    "labels": ["build:learning", "module:learn", "module:generate"],
+    "body": "### Problem Identification\nLearning and generating recursive programs.\n\n### Subsystem Mapping\n- **Memory**: Learned state in AtomSpace\n- **Task**: Build/test learn, generate\n- **AI**: Evolutionary search and adaptation\n- **Autonomy**: Modify AtomSpace state\n\n### Actionable Steps\n- [ ] Set dependency: `needs: [pln, miner, asmoses]`\n- [ ] Build/test evolutionary scenarios\n- [ ] Validate learning modifies AtomSpace\n- [ ] Document learning tensor shapes\n\n### Meta-Cognitive Enhancement\n- [ ] Recursively trace learning output\n\n### Theatrical Finale\nRecursive adaptation — a learning spiral!"
+  },
+  {
+    "layer": "language",
+    "title": "🗣️ Language Layer: Natural Language Cognition",
+    "labels": ["build:language", "module:lg-atomese", "module:relex", "module:link-grammar"],
+    "body": "### Problem Identification\nEnabling language parsing and semantic pattern matching.\n\n### Subsystem Mapping\n- **Memory**: Language patterns\n- **Task**: Build/test LG-Atomese, RelEx, Link Grammar\n- **AI**: Integrate with AtomSpace, PLN\n- **Autonomy**: Semantic parsing\n\n### Actionable Steps\n- [ ] Set dependency: `needs: [cogserver, attention, spacetime]`\n- [ ] Build/test language modules\n- [ ] Validate parsing and pattern matching\n- [ ] Integrate with AtomSpace/PLN\n- [ ] Document language tensor shapes\n\n### Meta-Cognitive Enhancement\n- [ ] Audit language understanding\n\n### Theatrical Finale\nMeaning emerges — words become worlds!"
+  },
+  {
+    "layer": "robotics",
+    "title": "🤖 Robotics Layer: Embodied Cognition",
+    "labels": ["build:robotics", "module:vision", "module:perception", "module:sensory"],
+    "body": "### Problem Identification\nSensory and motor data integration for embodied agents.\n\n### Subsystem Mapping\n- **Memory**: Sensory buffers\n- **Task**: Build/test vision, perception, sensory modules\n- **AI**: Embodiment kernel tensor mapping\n- **Autonomy**: Data flow validation\n\n### Actionable Steps\n- [ ] Set dependency: `needs: [cogserver, attention, spacetime]`\n- [ ] Build/test all robotics modules\n- [ ] Integrate with simulators/agents\n- [ ] Validate sensory-motor data flow\n- [ ] Map embodiment kernel tensor dimensions\n\n### Meta-Cognitive Enhancement\n- [ ] Trace embodiment feedback\n\n### Theatrical Finale\nSensors fire — agents awaken!"
+  },
+  {
+    "layer": "integration",
+    "title": "🕸️ Integration Layer: System Synergy",
+    "labels": ["build:integration", "module:opencog"],
+    "body": "### Problem Identification\nUnify all modules for system-wide cognition.\n\n### Subsystem Mapping\n- **Memory**: Unified state\n- **Task**: Build/test opencog integration\n- **AI**: End-to-end cognition\n- **Autonomy**: Integration tensor structure\n\n### Actionable Steps\n- [ ] Set dependency: `needs: [learn, generate, lg-atomese, relex, link-grammar, vision, perception, sensory]`\n- [ ] Build the integrated `opencog` umbrella module\n- [ ] Run end-to-end cognitive integration tests (chat, reasoning, perception loop)\n- [ ] Verify all upstream artifacts are linked into the unified install prefix\n- [ ] Publish integration tensor diagram describing module-to-module connectivity\n\n### Meta-Cognitive Enhancement\n- [ ] Measure system-wide synergy: integrated information vs. sum of components\n- [ ] Identify emergent capabilities not present in any individual module\n\n### Theatrical Finale\nThe integration crystallizes — a unified cognitive being awakens, and the parts dissolve into a coherent whole!"
+  }
+]

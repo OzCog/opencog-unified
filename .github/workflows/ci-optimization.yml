@@ -28,13 +28,13 @@ jobs:
     timeout-minutes: 30
     outputs:
       cache-hit: ${{ steps.cache-deps.outputs.cache-hit }}
-      
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 1
-      
+
       - name: Cache System Dependencies
         id: cache-deps
         uses: actions/cache@v5
@@ -46,7 +46,7 @@ jobs:
           key: system-deps-${{ runner.os }}-${{ hashFiles('**/CMakeLists.txt', '.github/workflows/*.yml') }}
           restore-keys: |
             system-deps-${{ runner.os }}-
-      
+
       - name: Install and Cache Dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: |
@@ -56,17 +56,17 @@ jobs:
             cmake build-essential ccache \
             libboost-all-dev guile-3.0-dev \
             cxxtest python3-dev cython3
-          
+
           # Warm up ccache
           ccache -z
           ccache -M ${{ env.CCACHE_MAXSIZE }}
-  
+
   # Matrix build strategy for comprehensive testing
   build-matrix:
     needs: cache-dependencies
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
-    
+
     strategy:
       fail-fast: false
       matrix:
@@ -76,14 +76,14 @@ jobs:
         exclude:
           - os: ubuntu-20.04
             build-type: Debug
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
         with:
           submodules: recursive
           fetch-depth: 0
-      
+
       - name: Restore Dependency Cache
         uses: actions/cache@v5
         with:
@@ -93,19 +93,19 @@ jobs:
           key: system-deps-${{ runner.os }}-${{ hashFiles('**/CMakeLists.txt') }}
           restore-keys: |
             system-deps-${{ runner.os }}-
-      
+
       - name: Setup Compiler
         run: |
           set -eu
           if [ "${{ matrix.compiler }}" = "clang" ]; then
             sudo apt-get install -y clang
-            echo "CC=clang" >> $GITHUB_ENV
-            echo "CXX=clang++" >> $GITHUB_ENV
+            echo "CC=clang" >> "${GITHUB_ENV}"
+            echo "CXX=clang++" >> "${GITHUB_ENV}"
           else
-            echo "CC=gcc" >> $GITHUB_ENV
-            echo "CXX=g++" >> $GITHUB_ENV
+            echo "CC=gcc" >> "${GITHUB_ENV}"
+            echo "CXX=g++" >> "${GITHUB_ENV}"
           fi
-      
+
       - name: Configure Build
         run: |
           set -eu
@@ -116,20 +116,20 @@ jobs:
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-      
+
       - name: Build with Progress
         run: |
           set -eu
           cd build
-          cmake --build . --parallel $(nproc) --verbose
-      
+          cmake --build . --parallel "$(nproc)" --verbose
+
       - name: Run Tests
         run: |
           set -eu
           cd build
-          ctest --output-on-failure --parallel $(nproc)
+          ctest --output-on-failure --parallel "$(nproc)"
         continue-on-error: ${{ matrix.build-type == 'Debug' }}
-      
+
       - name: Upload Build Artifacts
         if: matrix.build-type == 'Release' && matrix.compiler == 'gcc'
         uses: actions/upload-artifact@v6
@@ -139,7 +139,7 @@ jobs:
             build/**/*.so*
             build/**/*.a
           retention-days: 7
-      
+
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v6
@@ -152,13 +152,13 @@ jobs:
   code-quality:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      
+
       - name: Run Static Analysis
         run: |
           set -eu
@@ -166,25 +166,25 @@ jobs:
           echo "🔍 Checking for TODO/FIXME patterns..."
           TODO_COUNT=$(grep -r "TODO\|FIXME" --include="*.cc" --include="*.h" . | wc -l || true)
           echo "Found $TODO_COUNT TODO/FIXME comments"
-          
+
           echo "🔍 Checking for placeholder implementations..."
           PLACEHOLDER_COUNT=$(grep -r "PLACEHOLDER\|STUB\|NOT IMPLEMENTED" --include="*.cc" --include="*.h" . | wc -l || true)
           echo "Found $PLACEHOLDER_COUNT placeholder implementations"
-          
+
           # Create quality report
           cat > code_quality_report.md << 'REPORT'
           # Code Quality Report
-          
+
           ## Metrics
           - TODO/FIXME Comments: $TODO_COUNT
           - Placeholder Implementations: $PLACEHOLDER_COUNT
-          
+
           ## Recommendations
           - Address high-priority TODOs
           - Implement placeholder functions
           - Add comprehensive tests
           REPORT
-      
+
       - name: Upload Quality Report
         uses: actions/upload-artifact@v6
         with:
@@ -197,24 +197,24 @@ jobs:
     needs: build-matrix
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
-      
+
       - name: Download Build Artifacts
         uses: actions/download-artifact@v7
         with:
           name: build-ubuntu-22.04-gcc
           path: build/
-      
+
       - name: Run Benchmarks
         run: |
           set -eu
           echo "🚀 Running performance benchmarks..."
           # Placeholder for actual benchmarks
           echo "Benchmark results would go here"
-      
+
       - name: Upload Benchmark Results
         uses: actions/upload-artifact@v6
         with:
@@ -228,24 +228,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     if: always()
-    
+
     steps:
       - name: Generate Summary Report
         run: |
           set -eu
-          cat > $GITHUB_STEP_SUMMARY << 'SUMMARY'
+          cat > "${GITHUB_STEP_SUMMARY}" << 'SUMMARY'
           # 🎯 CI Optimization Workflow Summary
-          
+
           ## Build Status
           - Matrix builds completed across multiple OS and compiler combinations
           - Comprehensive caching implemented for faster builds
           - Artifacts preserved for downstream usage
-          
+
           ## Quality Checks
           - Static analysis completed
           - Code quality metrics collected
           - Performance benchmarks executed
-          
+
           ## Engineering Excellence Achieved ✨
           - Advanced concurrency control
           - Comprehensive error handling

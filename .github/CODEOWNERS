@@ -1,0 +1,50 @@
+# OpenCog Unified — Code Owners
+# Reference: https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Each line is a file pattern followed by one or more owners. The last
+# matching pattern takes precedence.
+
+# Default owner for everything in the repo (catch-all)
+* @OzCog/maintainers
+
+# CI / build infrastructure
+/.github/                 @OzCog/devops
+/.github/workflows/       @OzCog/devops
+/scripts/                 @OzCog/devops
+/scripts/auto_fix.py      @OzCog/devops
+/scripts/fix_workflow_shellcheck.py @OzCog/devops
+
+# Foundation modules
+/cogutil/                 @OzCog/foundation
+/moses/                   @OzCog/foundation
+
+# Core hypergraph store
+/atomspace/               @OzCog/core
+/atomspace-rocks/         @OzCog/core
+/atomspace-storage/       @OzCog/core
+/atomspace-restful/       @OzCog/core
+
+# Logic & reasoning
+/unify/                   @OzCog/reasoning
+/ure/                     @OzCog/reasoning
+/pln/                     @OzCog/reasoning
+/miner/                   @OzCog/reasoning
+
+# Cognitive control & attention
+/cogserver/               @OzCog/cognitive
+/attention/               @OzCog/cognitive
+/spacetime/               @OzCog/cognitive
+
+# Learning & evolution
+/learn/                   @OzCog/learning
+/asmoses/                 @OzCog/learning
+/language-learning/       @OzCog/learning
+
+# Tensor & neural-symbolic
+/ggml-tensor-kernel/      @OzCog/tensor
+/neural-symbolic-integration/ @OzCog/tensor
+/atenspace/               @OzCog/tensor
+
+# Documentation
+/*.md                     @OzCog/docs
+/documentation/           @OzCog/docs
