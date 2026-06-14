@@ -1,0 +1,100 @@
+name: 🐛 Bug report
+description: Report a defect, build failure, or incorrect behaviour in OpenCog Unified.
+title: "[Bug]: "
+labels: ["type:bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report! Please fill in as
+        much detail as you can. Issues with reproducible steps and complete
+        environment information are triaged dramatically faster.
+
+  - type: input
+    id: version
+    attributes:
+      label: OpenCog Unified version / commit
+      description: Run `git rev-parse HEAD` in your checkout and paste the result.
+      placeholder: "ab12cd34..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: layer
+    attributes:
+      label: Cognitive layer
+      description: Which subsystem is affected?
+      options:
+        - Foundation (cogutil, moses)
+        - Core (atomspace, atomspace-rocks, atomspace-restful)
+        - Logic (unify, ure)
+        - Cognitive (cogserver, attention, spacetime)
+        - Advanced (pln, miner, asmoses)
+        - Learning (learn, generate)
+        - Language (lg-atomese, relex, link-grammar)
+        - Robotics (vision, perception, sensory)
+        - Integration / opencog umbrella
+        - CI / build infrastructure
+        - Other / unsure
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug description
+      description: Clearly and concisely describe what is broken.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Provide a minimal, copy-pasteable reproduction.
+      placeholder: |
+        1. `git clone … && cd opencog-unified`
+        2. `cmake -B build -S .`
+        3. `cmake --build build --target …`
+        4. Observe …
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include error messages, stack traces, and the last 50 lines of relevant logs.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: |
+        Provide:
+          * OS / distribution / kernel
+          * Compiler version (`g++ --version`)
+          * CMake version
+          * Python version
+          * Boost / Guile / RocksDB versions if relevant
+      render: text
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I have searched the existing issues and confirmed this is not a duplicate.
+          required: true

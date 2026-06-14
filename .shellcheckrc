@@ -1,0 +1,26 @@
+# OpenCog Unified — ShellCheck configuration
+#
+# We disable a few stylistic checks that produce a lot of noise inside
+# GitHub Actions report-generation blocks where individual `echo … >> file`
+# lines are intentionally kept on one line each for readability and easier
+# git diffs. These are *style* checks, not correctness checks.
+#
+# All warning- and error-level checks remain ENABLED.
+
+# SC2129 — "Consider using { cmd1; cmd2; } >> file instead of individual redirects."
+#   Style only; per-line redirects are easier to diff and reason about in
+#   long report-generation blocks.
+disable=SC2129
+
+# SC2002 — "Useless cat" — sometimes intentional for pipeline readability.
+disable=SC2002
+
+# SC2126 — "Consider using grep -c instead of grep|wc -l" — sometimes the
+#   wc form is preferred for portability across non-GNU grep variants.
+disable=SC2126
+
+# Default severity
+severity=warning
+
+# Apply external sources for `source` directives (used by some helpers)
+external-sources=true

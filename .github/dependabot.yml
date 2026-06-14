@@ -1,12 +1,59 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-
+# Dependabot configuration for OpenCog Unified
+# Reference: https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# Strategy:
+#   * Group GitHub Actions updates into a single weekly PR to avoid PR storms
+#   * Group Python dependency updates similarly
+#   * Pin major-version bumps to require manual review
 version: 2
 updates:
-  - package-ecosystem: "github-actions" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  # GitHub Actions used by all .github/workflows/*.yml
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
+      prefix-development: "ci"
+      include: "scope"
+    groups:
+      actions-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      # Pin major bumps so we can review breaking changes manually
+      - dependency-name: "actions/*"
+        update-types: ["version-update:semver-major"]
 
+  # Python tooling used by entelechy/, scripts/, tests/
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:30"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    groups:
+      python-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"

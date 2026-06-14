@@ -27,18 +27,18 @@ jobs:
   build-debian-packages:
     runs-on: ubuntu-latest
     name: Build Debian Packages
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
-    
+
     - name: Install Build Tools
       run: |
         set -eu
         sudo apt-get update
         sudo apt-get install -y devscripts debhelper dh-make build-essential cmake fakeroot lintian dpkg-dev
         sudo apt-get install -y libboost-dev libboost-filesystem-dev libboost-program-options-dev libboost-system-dev libboost-thread-dev guile-3.0-dev python3-dev cython3 cxxtest
-    
+
     - name: Build CogUtil Package
       if: github.event.inputs.component == 'cogutil'
       run: |
@@ -46,7 +46,7 @@ jobs:
         cd cogutil
         mkdir -p debian/source
         echo "3.0 (native)" > debian/source/format
-        
+
         echo 'Source: opencog-cogutil' > debian/control
         echo 'Section: science' >> debian/control
         echo 'Priority: optional' >> debian/control
@@ -58,13 +58,13 @@ jobs:
         echo 'Architecture: any' >> debian/control
         echo 'Depends: ${shlibs:Depends}, ${misc:Depends}' >> debian/control
         echo 'Description: OpenCog CogUtil Library' >> debian/control
-        
+
         echo "opencog-cogutil (${{ github.event.inputs.version }}-1) unstable; urgency=medium" > debian/changelog
         echo "" >> debian/changelog
         echo "  * Automated build" >> debian/changelog
         echo "" >> debian/changelog
         echo " -- OpenCog Developers <opencog-dev@googlegroups.com>  $(date -R)" >> debian/changelog
-        
+
         echo '#!/usr/bin/make -f' > debian/rules
         echo '%:' >> debian/rules
         echo 'dh $@ --buildsystem=cmake' >> debian/rules
@@ -72,17 +72,17 @@ jobs:
         echo 'override_dh_auto_test:' >> debian/rules
         echo 'true' >> debian/rules
         chmod +x debian/rules
-        
+
         echo 'Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/' > debian/copyright
         echo 'Upstream-Name: cogutil' >> debian/copyright
         echo 'Files: *' >> debian/copyright
         echo 'Copyright: 2024 OpenCog Foundation' >> debian/copyright
         echo 'License: AGPL-3.0' >> debian/copyright
-        
+
         dpkg-buildpackage -us -uc -b || true
         mkdir -p ../debian-packages
         mv ../*.deb ../debian-packages/ 2>/dev/null || true
-    
+
     - name: Upload Packages
       uses: actions/upload-artifact@v6
       with:
