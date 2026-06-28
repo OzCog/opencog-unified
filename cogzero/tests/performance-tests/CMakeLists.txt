@@ -7,8 +7,8 @@ project(AgentZeroBenchmark)
 
 # Find required packages
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(COGUTIL REQUIRED cogutil)
-pkg_check_modules(ATOMSPACE REQUIRED atomspace)
+pkg_check_modules(COGUTIL cogutil)
+pkg_check_modules(ATOMSPACE atomspace)
 
 # Build Agent-Zero Benchmarking Library
 add_library(agentzero-benchmark SHARED

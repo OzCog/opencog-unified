@@ -307,11 +307,14 @@ endif()
 
 # Phase VI: CogZero - Agent-Zero C++ Implementation
 # High-performance autonomous agent framework optimized for OpenCog
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/cogzero/CMakeLists.txt")
+# Requires CogUtil and AtomSpace to be installed as system packages.
+# Set BUILD_COGZERO=ON to enable when deps are available.
+option(BUILD_COGZERO "Build the CogZero Agent-Zero framework (requires installed OpenCog packages)" OFF)
+if(BUILD_COGZERO AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/cogzero/CMakeLists.txt")
     add_subdirectory(cogzero)
     message(STATUS "CogZero Agent Framework: ENABLED")
 else()
-    message(STATUS "CogZero Agent Framework: NOT FOUND")
+    message(STATUS "CogZero Agent Framework: DISABLED (set BUILD_COGZERO=ON to enable)")
 endif()
 
 # Add Phase VI CogZero target

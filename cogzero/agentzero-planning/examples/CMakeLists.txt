@@ -39,8 +39,8 @@ cmake_minimum_required(VERSION 3.16)
 
 # Find required libraries
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(COGUTIL REQUIRED cogutil)
-pkg_check_modules(ATOMSPACE REQUIRED atomspace)
+pkg_check_modules(COGUTIL cogutil)
+pkg_check_modules(ATOMSPACE atomspace)
 
 # Include directories
 include_directories(

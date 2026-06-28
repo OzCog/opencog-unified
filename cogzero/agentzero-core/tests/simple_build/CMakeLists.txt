@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find dependencies
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(COGUTIL REQUIRED cogutil)
+pkg_check_modules(COGUTIL cogutil)
 
 # Manually specify atomspace paths
 set(ATOMSPACE_INCLUDE_DIRS "/usr/local/include")

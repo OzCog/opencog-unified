@@ -27,7 +27,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(PkgConfig REQUIRED)
 
 # Find cogutil
-pkg_check_modules(COGUTIL REQUIRED cogutil)
+pkg_check_modules(COGUTIL cogutil)
 if (COGUTIL_FOUND)
     message(STATUS "Found cogutil version ${COGUTIL_VERSION}")
 # Try to find cogutil
@@ -46,7 +46,7 @@ if (COGUTIL_FOUND OR CogUtil_FOUND)
 endif()
 
 # Find atomspace  
-pkg_check_modules(ATOMSPACE REQUIRED atomspace)
+pkg_check_modules(ATOMSPACE atomspace)
 if (ATOMSPACE_FOUND)
     message(STATUS "Found atomspace version ${ATOMSPACE_VERSION}")
 # Try to find atomspace  

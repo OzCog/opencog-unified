@@ -53,7 +53,7 @@ cmake_minimum_required(VERSION 3.16)
 find_package(PkgConfig REQUIRED)
 
 # Find cogutil and atomspace
-pkg_check_modules(COGUTIL REQUIRED cogutil)
+pkg_check_modules(COGUTIL cogutil)
 pkg_check_modules(ATOMSPACE atomspace)
 if (NOT ATOMSPACE_FOUND)
     # Find atomspace manually

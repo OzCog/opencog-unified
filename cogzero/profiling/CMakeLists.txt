@@ -7,8 +7,8 @@ project(AgentZeroProfiler)
 
 # Find required packages
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(COGUTIL REQUIRED cogutil)
-pkg_check_modules(ATOMSPACE REQUIRED atomspace)
+pkg_check_modules(COGUTIL cogutil)
+pkg_check_modules(ATOMSPACE atomspace)
 
 # Check for profiling tools
 find_program(GPROF_PATH gprof)

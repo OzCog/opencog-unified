@@ -82,7 +82,7 @@ if(NOT OCTOMAP_FOUND)
 find_package(PkgConfig REQUIRED)
 
 # Find cogutil
-pkg_check_modules(COGUTIL REQUIRED cogutil)
+pkg_check_modules(COGUTIL cogutil)
 if (COGUTIL_FOUND)
     message(STATUS "Found cogutil version ${COGUTIL_VERSION}")
     include_directories(${COGUTIL_INCLUDE_DIRS})
@@ -90,7 +90,7 @@ if (COGUTIL_FOUND)
 endif()
 
 # Find atomspace  
-pkg_check_modules(ATOMSPACE REQUIRED atomspace)
+pkg_check_modules(ATOMSPACE atomspace)
 if (ATOMSPACE_FOUND)
     message(STATUS "Found atomspace version ${ATOMSPACE_VERSION}")
     include_directories(${ATOMSPACE_INCLUDE_DIRS})
