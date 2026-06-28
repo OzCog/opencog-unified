@@ -34,13 +34,13 @@ jobs:
   build-cogutil:
     runs-on: ubuntu-latest
     name: Build CogUtil
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
       with:
         submodules: false
-    
+
     - name: Cache CCache
       uses: actions/cache@v5
       with:
@@ -48,7 +48,7 @@ jobs:
         key: ccache-cogutil-${{ runner.os }}-${{ hashFiles('cogutil/**') }}
         restore-keys: |
           ccache-cogutil-${{ runner.os }}-
-    
+
     - name: Install Dependencies
       run: |
         set -eu
@@ -69,33 +69,33 @@ jobs:
         valgrind \
         doxygen \
         ccache
-    
+
     - name: Configure CogUtil
       run: |
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
         cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-    
+
     - name: Build CogUtil
       run: |
         set -eu
         cd cogutil/build
         make ${{ env.MAKEFLAGS }}
-    
+
     - name: Build CogUtil Tests
       run: |
         set -eu
         cd cogutil/build
         make ${{ env.MAKEFLAGS }} tests
-    
+
     - name: Run CogUtil Tests
       run: |
         set -eu
         cd cogutil/build
         make check ARGS="${{ env.MAKEFLAGS }}"
       continue-on-error: true
-    
+
     - name: Print Test Log
       if: always()
       run: |
@@ -103,14 +103,14 @@ jobs:
         if [ -f cogutil/build/tests/Testing/Temporary/LastTest.log ]; then
           cat cogutil/build/tests/Testing/Temporary/LastTest.log
         fi
-    
+
     - name: Install CogUtil
       run: |
         set -eu
         cd cogutil/build
         sudo make install
         sudo ldconfig
-    
+
     - name: Upload CogUtil Build
       uses: actions/upload-artifact@v6
       with:
@@ -125,13 +125,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build AtomSpace
     needs: build-cogutil
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
       with:
         submodules: false
-    
+
     - name: Cache CCache
       uses: actions/cache@v5
       with:
@@ -139,7 +139,7 @@ jobs:
         key: ccache-atomspace-${{ runner.os }}-${{ hashFiles('atomspace/**') }}
         restore-keys: |
           ccache-atomspace-${{ runner.os }}-
-    
+
     - name: Cache GHC
       uses: actions/cache@v5
       with:
@@ -147,7 +147,7 @@ jobs:
         key: ghc-${{ runner.os }}-${{ hashFiles('atomspace/opencog/haskell/stack.yaml') }}
         restore-keys: |
           ghc-${{ runner.os }}-
-    
+
     - name: Cache Haskell Dependencies
       uses: actions/cache@v5
       with:
@@ -155,7 +155,7 @@ jobs:
         key: haskelldeps-${{ runner.os }}-${{ hashFiles('atomspace/opencog/haskell/stack.yaml', 'atomspace/opencog/haskell/opencog-atomspace.cabal') }}
         restore-keys: |
           haskelldeps-${{ runner.os }}-
-    
+
     - name: Install Dependencies
       run: |
         set -eu
@@ -181,7 +181,7 @@ jobs:
           valgrind \
           doxygen \
           ccache
-    
+
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
@@ -191,33 +191,33 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Configure AtomSpace
       run: |
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
         cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-    
+
     - name: Build AtomSpace
       run: |
         set -eu
         cd atomspace/build
         make ${{ env.MAKEFLAGS }}
-    
+
     - name: Build AtomSpace Tests
       run: |
         set -eu
         cd atomspace/build
         make ${{ env.MAKEFLAGS }} tests
-    
+
     - name: Run AtomSpace Tests
       run: |
         set -eu
         cd atomspace/build
         make check ARGS="${{ env.MAKEFLAGS }}"
       continue-on-error: true
-    
+
     - name: Print Test Log
       if: always()
       run: |
@@ -225,21 +225,21 @@ jobs:
         if [ -f atomspace/build/tests/Testing/Temporary/LastTest.log ]; then
           cat atomspace/build/tests/Testing/Temporary/LastTest.log
         fi
-    
+
     - name: Install AtomSpace
       run: |
         set -eu
         cd atomspace/build
         sudo make install
         sudo ldconfig
-    
+
     - name: Build Examples
       run: |
         set -eu
         cd atomspace/build
         make ${{ env.MAKEFLAGS }} examples
       continue-on-error: true
-    
+
     - name: Upload AtomSpace Build
       uses: actions/upload-artifact@v6
       with:
@@ -254,13 +254,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build AtomSpace Storage
     needs: build-atomspace
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
       with:
         submodules: false
-    
+
     - name: Install Dependencies
       run: |
         set -eu
@@ -282,7 +282,7 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-    
+
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
@@ -292,7 +292,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace
       run: |
         set -eu
@@ -302,7 +302,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Check AtomSpace Storage Directory
       run: |
         set -eu
@@ -313,7 +313,7 @@ jobs:
           echo "AtomSpace Storage directory not found, skipping build"
           exit 0
         fi
-    
+
     - name: Configure AtomSpace Storage
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
       run: |
@@ -321,14 +321,14 @@ jobs:
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
         cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-    
+
     - name: Build AtomSpace Storage
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
       run: |
         set -eu
         cd atomspace-storage/build
         make ${{ env.MAKEFLAGS }}
-    
+
     - name: Build Tests
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
       run: |
@@ -336,7 +336,7 @@ jobs:
         cd atomspace-storage/build
         make ${{ env.MAKEFLAGS }} tests
       continue-on-error: true
-    
+
     - name: Run Tests
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
       run: |
@@ -344,7 +344,7 @@ jobs:
         cd atomspace-storage/build
         make check ARGS="${{ env.MAKEFLAGS }}"
       continue-on-error: true
-    
+
     - name: Install AtomSpace Storage
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
       run: |
@@ -358,13 +358,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build AtomSpace RocksDB Storage
     needs: build-atomspace-storage
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
       with:
         submodules: false
-    
+
     - name: Install Dependencies
       run: |
         set -eu
@@ -387,7 +387,7 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-    
+
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
@@ -397,7 +397,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace
       run: |
         set -eu
@@ -407,7 +407,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace Storage
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
       run: |
@@ -418,7 +418,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Verify AtomSpace Storage Installation
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
       run: |
@@ -427,7 +427,7 @@ jobs:
         find /usr/local -name "*AtomSpaceStorage*Config.cmake" || echo "AtomSpaceStorageConfig.cmake not found"
         ls -la /usr/local/lib/cmake/ || echo "No cmake directory"
         ls -la /usr/local/share/cmake/ || echo "No share/cmake directory"
-    
+
     - name: Check AtomSpace Rocks Directory
       run: |
         set -eu
@@ -438,7 +438,7 @@ jobs:
           echo "AtomSpace Rocks directory not found, skipping build"
           exit 0
         fi
-    
+
     - name: Configure AtomSpace Rocks
       if: hashFiles('atomspace-rocks/CMakeLists.txt') != ''
       run: |
@@ -448,14 +448,14 @@ jobs:
         cmake .. \
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
           -DCMAKE_PREFIX_PATH="/usr/local/lib/cmake;/usr/local/share/cmake"
-    
+
     - name: Build AtomSpace Rocks
       if: hashFiles('atomspace-rocks/CMakeLists.txt') != ''
       run: |
         set -eu
         cd atomspace-rocks/build
         make ${{ env.MAKEFLAGS }}
-    
+
     - name: Build Tests
       if: hashFiles('atomspace-rocks/CMakeLists.txt') != ''
       run: |
@@ -463,7 +463,7 @@ jobs:
         cd atomspace-rocks/build
         make ${{ env.MAKEFLAGS }} tests
       continue-on-error: true
-    
+
     - name: Run Tests
       if: hashFiles('atomspace-rocks/CMakeLists.txt') != ''
       run: |
@@ -471,7 +471,7 @@ jobs:
         cd atomspace-rocks/build
         make check ARGS="${{ env.MAKEFLAGS }}"
       continue-on-error: true
-    
+
     - name: Install AtomSpace Rocks
       if: hashFiles('atomspace-rocks/CMakeLists.txt') != ''
       run: |
@@ -485,13 +485,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build CogServer
     needs: build-atomspace-storage
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
       with:
         submodules: false
-    
+
     - name: Install Dependencies
       run: |
         set -eu
@@ -514,7 +514,7 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-    
+
     - name: Verify Asio Installation
       run: |
         set -eu
@@ -523,7 +523,7 @@ jobs:
         ls -la /usr/share/pkgconfig/asio.pc || echo "WARNING: asio.pc not found"
         pkg-config --modversion asio || echo "WARNING: Asio not found via pkg-config"
         pkg-config --cflags asio || echo "WARNING: Could not get Asio cflags"
-    
+
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
@@ -533,7 +533,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace
       run: |
         set -eu
@@ -543,7 +543,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Build and Install AtomSpace Storage
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
       run: |
@@ -555,7 +555,7 @@ jobs:
         sudo make install
         sudo ldconfig
       continue-on-error: true
-    
+
     - name: Check CogServer Directory
       run: |
         set -eu
@@ -566,7 +566,7 @@ jobs:
           echo "CogServer directory not found, skipping build"
           exit 0
         fi
-    
+
     - name: Configure CogServer
       if: hashFiles('cogserver/CMakeLists.txt') != ''
       run: |
@@ -574,14 +574,14 @@ jobs:
         mkdir -p cogserver/build
         cd cogserver/build
         cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-    
+
     - name: Build CogServer
       if: hashFiles('cogserver/CMakeLists.txt') != ''
       run: |
         set -eu
         cd cogserver/build
         make ${{ env.MAKEFLAGS }}
-    
+
     - name: Build Tests
       if: hashFiles('cogserver/CMakeLists.txt') != ''
       run: |
@@ -589,7 +589,7 @@ jobs:
         cd cogserver/build
         make ${{ env.MAKEFLAGS }} tests
       continue-on-error: true
-    
+
     - name: Run Tests
       if: hashFiles('cogserver/CMakeLists.txt') != ''
       run: |
@@ -597,7 +597,7 @@ jobs:
         cd cogserver/build
         make check ARGS="${{ env.MAKEFLAGS }}"
       continue-on-error: true
-    
+
     - name: Install CogServer
       if: hashFiles('cogserver/CMakeLists.txt') != ''
       run: |
@@ -611,13 +611,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build AtomSpace Cog Network Storage
     needs: build-cogserver
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
       with:
         submodules: false
-    
+
     - name: Install Dependencies
       run: |
         set -eu
@@ -640,7 +640,7 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-    
+
     - name: Verify Asio Installation
       run: |
         set -eu
@@ -649,7 +649,7 @@ jobs:
         ls -la /usr/share/pkgconfig/asio.pc || echo "WARNING: asio.pc not found"
         pkg-config --modversion asio || echo "WARNING: Asio not found via pkg-config"
         pkg-config --cflags asio || echo "WARNING: Could not get Asio cflags"
-    
+
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
@@ -659,7 +659,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace
       run: |
         set -eu
@@ -669,7 +669,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace Storage
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
       run: |
@@ -681,7 +681,7 @@ jobs:
         sudo make install
         sudo ldconfig
       continue-on-error: true
-    
+
     - name: Rebuild and Install CogServer
       if: hashFiles('cogserver/CMakeLists.txt') != ''
       run: |
@@ -692,7 +692,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Check AtomSpace Cog Directory
       run: |
         set -eu
@@ -703,7 +703,7 @@ jobs:
           echo "AtomSpace Cog directory not found, skipping build"
           exit 0
         fi
-    
+
     - name: Configure AtomSpace Cog
       if: hashFiles('atomspace-cog/CMakeLists.txt') != ''
       run: |
@@ -711,14 +711,14 @@ jobs:
         mkdir -p atomspace-cog/build
         cd atomspace-cog/build
         cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-    
+
     - name: Build AtomSpace Cog
       if: hashFiles('atomspace-cog/CMakeLists.txt') != ''
       run: |
         set -eu
         cd atomspace-cog/build
         make ${{ env.MAKEFLAGS }}
-    
+
     - name: Build Tests
       if: hashFiles('atomspace-cog/CMakeLists.txt') != ''
       run: |
@@ -726,7 +726,7 @@ jobs:
         cd atomspace-cog/build
         make ${{ env.MAKEFLAGS }} tests
       continue-on-error: true
-    
+
     - name: Run Tests
       if: hashFiles('atomspace-cog/CMakeLists.txt') != ''
       run: |
@@ -734,7 +734,7 @@ jobs:
         cd atomspace-cog/build
         make check ARGS="${{ env.MAKEFLAGS }}"
       continue-on-error: true
-    
+
     - name: Install AtomSpace Cog
       if: hashFiles('atomspace-cog/CMakeLists.txt') != ''
       run: |
@@ -748,13 +748,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build Unify
     needs: build-atomspace
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
       with:
         submodules: false
-    
+
     - name: Install Dependencies
       run: |
         set -eu
@@ -776,7 +776,7 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-    
+
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
@@ -786,7 +786,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace
       run: |
         set -eu
@@ -796,7 +796,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Check Unify Directory
       run: |
         set -eu
@@ -807,7 +807,7 @@ jobs:
           echo "Unify directory not found, skipping build"
           exit 0
         fi
-    
+
     - name: Configure Unify
       if: hashFiles('unify/CMakeLists.txt') != ''
       run: |
@@ -815,14 +815,14 @@ jobs:
         mkdir -p unify/build
         cd unify/build
         cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-    
+
     - name: Build Unify
       if: hashFiles('unify/CMakeLists.txt') != ''
       run: |
         set -eu
         cd unify/build
         make ${{ env.MAKEFLAGS }}
-    
+
     - name: Build Tests
       if: hashFiles('unify/CMakeLists.txt') != ''
       run: |
@@ -830,7 +830,7 @@ jobs:
         cd unify/build
         make ${{ env.MAKEFLAGS }} tests
       continue-on-error: true
-    
+
     - name: Run Tests
       if: hashFiles('unify/CMakeLists.txt') != ''
       run: |
@@ -838,7 +838,7 @@ jobs:
         cd unify/build
         make check ARGS="${{ env.MAKEFLAGS }}"
       continue-on-error: true
-    
+
     - name: Install Unify
       if: hashFiles('unify/CMakeLists.txt') != ''
       run: |
@@ -852,13 +852,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build URE (Unified Rule Engine)
     needs: build-unify
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
       with:
         submodules: false
-    
+
     - name: Install Dependencies
       run: |
         set -eu
@@ -880,7 +880,7 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-    
+
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
@@ -890,7 +890,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace
       run: |
         set -eu
@@ -900,7 +900,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install Unify
       if: hashFiles('unify/CMakeLists.txt') != ''
       run: |
@@ -911,7 +911,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Check URE Directory
       run: |
         set -eu
@@ -922,7 +922,7 @@ jobs:
           echo "URE directory not found, skipping build"
           exit 0
         fi
-    
+
     - name: Configure URE
       if: hashFiles('ure/CMakeLists.txt') != ''
       run: |
@@ -930,14 +930,14 @@ jobs:
         mkdir -p ure/build
         cd ure/build
         cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-    
+
     - name: Build URE
       if: hashFiles('ure/CMakeLists.txt') != ''
       run: |
         set -eu
         cd ure/build
         make ${{ env.MAKEFLAGS }}
-    
+
     - name: Build Tests
       if: hashFiles('ure/CMakeLists.txt') != ''
       run: |
@@ -945,7 +945,7 @@ jobs:
         cd ure/build
         make ${{ env.MAKEFLAGS }} tests
       continue-on-error: true
-    
+
     - name: Run Tests
       if: hashFiles('ure/CMakeLists.txt') != ''
       run: |
@@ -953,7 +953,7 @@ jobs:
         cd ure/build
         make check ARGS="${{ env.MAKEFLAGS }}"
       continue-on-error: true
-    
+
     - name: Install URE
       if: hashFiles('ure/CMakeLists.txt') != ''
       run: |
@@ -967,13 +967,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build Miner
     needs: build-ure
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
       with:
         submodules: false
-    
+
     - name: Cache GHC
       uses: actions/cache@v5
       with:
@@ -981,7 +981,7 @@ jobs:
         key: ghc-miner-${{ runner.os }}-${{ hashFiles('atomspace/opencog/haskell/stack.yaml') }}
         restore-keys: |
           ghc-miner-${{ runner.os }}-
-    
+
     - name: Install Dependencies
       run: |
         set -eu
@@ -1003,7 +1003,7 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-    
+
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
@@ -1013,7 +1013,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace
       run: |
         set -eu
@@ -1023,7 +1023,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install Unify
       if: hashFiles('unify/CMakeLists.txt') != ''
       run: |
@@ -1034,7 +1034,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install URE
       if: hashFiles('ure/CMakeLists.txt') != ''
       run: |
@@ -1045,7 +1045,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Check Miner Directory
       run: |
         set -eu
@@ -1056,7 +1056,7 @@ jobs:
           echo "Miner directory not found, skipping build"
           exit 0
         fi
-    
+
     - name: Configure Miner
       if: hashFiles('miner/CMakeLists.txt') != ''
       run: |
@@ -1064,14 +1064,14 @@ jobs:
         mkdir -p miner/build
         cd miner/build
         cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-    
+
     - name: Build Miner
       if: hashFiles('miner/CMakeLists.txt') != ''
       run: |
         set -eu
         cd miner/build
         make ${{ env.MAKEFLAGS }}
-    
+
     - name: Build Tests
       if: hashFiles('miner/CMakeLists.txt') != ''
       run: |
@@ -1079,7 +1079,7 @@ jobs:
         cd miner/build
         make ${{ env.MAKEFLAGS }} tests
       continue-on-error: true
-    
+
     - name: Run Tests
       if: hashFiles('miner/CMakeLists.txt') != ''
       run: |
@@ -1087,7 +1087,7 @@ jobs:
         cd miner/build
         make check ARGS="${{ env.MAKEFLAGS }}"
       continue-on-error: true
-    
+
     - name: Install Miner
       if: hashFiles('miner/CMakeLists.txt') != ''
       run: |
@@ -1101,13 +1101,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build Attention
     needs: build-cogserver
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
       with:
         submodules: false
-    
+
     - name: Install Dependencies
       run: |
         set -eu
@@ -1130,7 +1130,7 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-    
+
     - name: Verify Asio Installation
       run: |
         set -eu
@@ -1139,7 +1139,7 @@ jobs:
         ls -la /usr/share/pkgconfig/asio.pc || echo "WARNING: asio.pc not found"
         pkg-config --modversion asio || echo "WARNING: Asio not found via pkg-config"
         pkg-config --cflags asio || echo "WARNING: Could not get Asio cflags"
-    
+
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
@@ -1149,7 +1149,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace
       run: |
         set -eu
@@ -1159,7 +1159,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace Storage
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
       run: |
@@ -1171,7 +1171,7 @@ jobs:
         sudo make install
         sudo ldconfig
       continue-on-error: true
-    
+
     - name: Rebuild and Install CogServer
       if: hashFiles('cogserver/CMakeLists.txt') != ''
       run: |
@@ -1182,7 +1182,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Check Attention Directory
       run: |
         set -eu
@@ -1193,7 +1193,7 @@ jobs:
           echo "Attention directory not found, skipping build"
           exit 0
         fi
-    
+
     - name: Configure Attention
       if: hashFiles('attention/CMakeLists.txt') != ''
       run: |
@@ -1201,14 +1201,14 @@ jobs:
         mkdir -p attention/build
         cd attention/build
         cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-    
+
     - name: Build Attention
       if: hashFiles('attention/CMakeLists.txt') != ''
       run: |
         set -eu
         cd attention/build
         make ${{ env.MAKEFLAGS }}
-    
+
     - name: Build Tests
       if: hashFiles('attention/CMakeLists.txt') != ''
       run: |
@@ -1216,7 +1216,7 @@ jobs:
         cd attention/build
         make ${{ env.MAKEFLAGS }} tests
       continue-on-error: true
-    
+
     - name: Run Tests
       if: hashFiles('attention/CMakeLists.txt') != ''
       run: |
@@ -1224,7 +1224,7 @@ jobs:
         cd attention/build
         make check ARGS="${{ env.MAKEFLAGS }}"
       continue-on-error: true
-    
+
     - name: Install Attention
       if: hashFiles('attention/CMakeLists.txt') != ''
       run: |
@@ -1238,13 +1238,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build AS-MOSES
     needs: build-ure
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
       with:
         submodules: false
-    
+
     - name: Install Dependencies
       run: |
         set -eu
@@ -1267,7 +1267,7 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-    
+
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
@@ -1277,7 +1277,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace
       run: |
         set -eu
@@ -1287,7 +1287,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install Unify
       if: hashFiles('unify/CMakeLists.txt') != ''
       run: |
@@ -1298,7 +1298,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install URE
       if: hashFiles('ure/CMakeLists.txt') != ''
       run: |
@@ -1309,7 +1309,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Check AS-MOSES Directory
       run: |
         set -eu
@@ -1320,7 +1320,7 @@ jobs:
           echo "AS-MOSES directory not found, skipping build"
           exit 0
         fi
-    
+
     - name: Configure AS-MOSES
       if: hashFiles('asmoses/CMakeLists.txt') != ''
       run: |
@@ -1330,14 +1330,14 @@ jobs:
         cmake .. \
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
           -DBoost_NO_SYSTEM_PATHS=OFF
-    
+
     - name: Build AS-MOSES
       if: hashFiles('asmoses/CMakeLists.txt') != ''
       run: |
         set -eu
         cd asmoses/build
         make ${{ env.MAKEFLAGS }}
-    
+
     # Temporary fix: install asmoses to please the unit tests
     # Note: Some AS-MOSES unit tests require the libraries to be installed
     # before they can run. This matches the pattern from CircleCI config.
@@ -1348,7 +1348,7 @@ jobs:
         cd asmoses/build
         sudo make install
         sudo ldconfig
-    
+
     - name: Build Tests
       if: hashFiles('asmoses/CMakeLists.txt') != ''
       run: |
@@ -1356,7 +1356,7 @@ jobs:
         cd asmoses/build
         make ${{ env.MAKEFLAGS }} tests
       continue-on-error: true
-    
+
     - name: Run Tests
       if: hashFiles('asmoses/CMakeLists.txt') != ''
       run: |
@@ -1370,13 +1370,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build Matrix
     needs: build-atomspace
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
       with:
         submodules: false
-    
+
     - name: Install Dependencies
       run: |
         set -eu
@@ -1398,7 +1398,7 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-    
+
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
@@ -1408,7 +1408,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace
       run: |
         set -eu
@@ -1418,7 +1418,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Check Matrix Directory
       run: |
         set -eu
@@ -1429,7 +1429,7 @@ jobs:
           echo "Matrix directory not found, skipping build"
           exit 0
         fi
-    
+
     - name: Configure Matrix
       if: hashFiles('matrix/CMakeLists.txt') != ''
       run: |
@@ -1437,14 +1437,14 @@ jobs:
         mkdir -p matrix/build
         cd matrix/build
         cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-    
+
     - name: Build Matrix
       if: hashFiles('matrix/CMakeLists.txt') != ''
       run: |
         set -eu
         cd matrix/build
         make ${{ env.MAKEFLAGS }}
-    
+
     - name: Build Tests
       if: hashFiles('matrix/CMakeLists.txt') != ''
       run: |
@@ -1452,7 +1452,7 @@ jobs:
         cd matrix/build
         make ${{ env.MAKEFLAGS }} tests
       continue-on-error: true
-    
+
     - name: Run Tests
       if: hashFiles('matrix/CMakeLists.txt') != ''
       run: |
@@ -1460,7 +1460,7 @@ jobs:
         cd matrix/build
         make check ARGS="${{ env.MAKEFLAGS }}"
       continue-on-error: true
-    
+
     - name: Install Matrix
       if: hashFiles('matrix/CMakeLists.txt') != ''
       run: |
@@ -1474,13 +1474,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build SpaceTime
     needs: build-cogserver
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
       with:
         submodules: false
-    
+
     - name: Install Dependencies
       run: |
         set -eu
@@ -1504,7 +1504,7 @@ jobs:
           valgrind \
           doxygen \
           liboctomap-dev
-    
+
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
@@ -1514,7 +1514,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace
       run: |
         set -eu
@@ -1536,7 +1536,7 @@ jobs:
         sudo make install
         sudo ldconfig
       continue-on-error: true
-    
+
     - name: Rebuild and Install CogServer
       if: hashFiles('cogserver/CMakeLists.txt') != ''
       run: |
@@ -1547,7 +1547,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Check SpaceTime Directory
       run: |
         set -eu
@@ -1558,7 +1558,7 @@ jobs:
           echo "SpaceTime directory not found, skipping build"
           exit 0
         fi
-    
+
     - name: Configure SpaceTime
       if: hashFiles('spacetime/CMakeLists.txt') != ''
       run: |
@@ -1566,14 +1566,14 @@ jobs:
         mkdir -p spacetime/build
         cd spacetime/build
         cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-    
+
     - name: Build SpaceTime
       if: hashFiles('spacetime/CMakeLists.txt') != ''
       run: |
         set -eu
         cd spacetime/build
         make ${{ env.MAKEFLAGS }}
-    
+
     - name: Build Tests
       if: hashFiles('spacetime/CMakeLists.txt') != ''
       run: |
@@ -1581,7 +1581,7 @@ jobs:
         cd spacetime/build
         make ${{ env.MAKEFLAGS }} tests
       continue-on-error: true
-    
+
     - name: Run Tests
       if: hashFiles('spacetime/CMakeLists.txt') != ''
       run: |
@@ -1589,7 +1589,7 @@ jobs:
         cd spacetime/build
         make check ARGS="${{ env.MAKEFLAGS }}"
       continue-on-error: true
-    
+
     - name: Install SpaceTime
       if: hashFiles('spacetime/CMakeLists.txt') != ''
       run: |
@@ -1603,13 +1603,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build PLN (Probabilistic Logic Networks)
     needs: [build-ure, build-spacetime]
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
       with:
         submodules: false
-    
+
     - name: Install Dependencies
       run: |
         set -eu
@@ -1633,7 +1633,7 @@ jobs:
           valgrind \
           doxygen \
           liboctomap-dev
-    
+
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
@@ -1643,7 +1643,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace
       run: |
         set -eu
@@ -1665,7 +1665,7 @@ jobs:
         sudo make install
         sudo ldconfig
       continue-on-error: true
-    
+
     - name: Rebuild and Install CogServer
       if: hashFiles('cogserver/CMakeLists.txt') != ''
       run: |
@@ -1676,7 +1676,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install Unify
       if: hashFiles('unify/CMakeLists.txt') != ''
       run: |
@@ -1687,7 +1687,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install URE
       if: hashFiles('ure/CMakeLists.txt') != ''
       run: |
@@ -1698,7 +1698,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install SpaceTime
       if: hashFiles('spacetime/CMakeLists.txt') != ''
       run: |
@@ -1709,7 +1709,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Check PLN Directory
       run: |
         set -eu
@@ -1720,7 +1720,7 @@ jobs:
           echo "PLN directory not found, skipping build"
           exit 0
         fi
-    
+
     - name: Configure PLN
       if: hashFiles('pln/CMakeLists.txt') != ''
       run: |
@@ -1728,14 +1728,14 @@ jobs:
         mkdir -p pln/build
         cd pln/build
         cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-    
+
     - name: Build PLN
       if: hashFiles('pln/CMakeLists.txt') != ''
       run: |
         set -eu
         cd pln/build
         make ${{ env.MAKEFLAGS }}
-    
+
     - name: Build Tests
       if: hashFiles('pln/CMakeLists.txt') != ''
       run: |
@@ -1743,7 +1743,7 @@ jobs:
         cd pln/build
         make ${{ env.MAKEFLAGS }} tests
       continue-on-error: true
-    
+
     - name: Run Tests
       if: hashFiles('pln/CMakeLists.txt') != ''
       run: |
@@ -1751,7 +1751,7 @@ jobs:
         cd pln/build
         make check ARGS="${{ env.MAKEFLAGS }}"
       continue-on-error: true
-    
+
     - name: Install PLN
       if: hashFiles('pln/CMakeLists.txt') != ''
       run: |
@@ -1765,13 +1765,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build Learn
     needs: build-cogserver
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
       with:
         submodules: false
-    
+
     - name: Install Dependencies
       run: |
         set -eu
@@ -1794,7 +1794,7 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-    
+
     - name: Verify Asio Installation
       run: |
         set -eu
@@ -1803,7 +1803,7 @@ jobs:
         ls -la /usr/share/pkgconfig/asio.pc || echo "WARNING: asio.pc not found"
         pkg-config --modversion asio || echo "WARNING: Asio not found via pkg-config"
         pkg-config --cflags asio || echo "WARNING: Could not get Asio cflags"
-    
+
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
@@ -1813,7 +1813,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace
       run: |
         set -eu
@@ -1823,7 +1823,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace Storage
       # Note: atomspace-storage is optional, so we continue even if it fails
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
@@ -1836,7 +1836,7 @@ jobs:
         sudo make install
         sudo ldconfig
       continue-on-error: true
-    
+
     - name: Rebuild and Install CogServer
       if: hashFiles('cogserver/CMakeLists.txt') != ''
       run: |
@@ -1847,7 +1847,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Check Learn Directory
       run: |
         set -eu
@@ -1858,7 +1858,7 @@ jobs:
           echo "Learn directory not found, skipping build"
           exit 0
         fi
-    
+
     - name: Configure Learn
       if: hashFiles('learn/CMakeLists.txt') != ''
       run: |
@@ -1866,14 +1866,14 @@ jobs:
         mkdir -p learn/build
         cd learn/build
         cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-    
+
     - name: Build Learn
       if: hashFiles('learn/CMakeLists.txt') != ''
       run: |
         set -eu
         cd learn/build
         make ${{ env.MAKEFLAGS }}
-    
+
     - name: Build Tests
       if: hashFiles('learn/CMakeLists.txt') != ''
       run: |
@@ -1881,7 +1881,7 @@ jobs:
         cd learn/build
         make ${{ env.MAKEFLAGS }} tests
       continue-on-error: true
-    
+
     - name: Run Tests
       if: hashFiles('learn/CMakeLists.txt') != ''
       run: |
@@ -1889,7 +1889,7 @@ jobs:
         cd learn/build
         make check ARGS="${{ env.MAKEFLAGS }}"
       continue-on-error: true
-    
+
     - name: Install Learn
       if: hashFiles('learn/CMakeLists.txt') != ''
       run: |
@@ -1913,17 +1913,17 @@ jobs:
       - build-atomspace-rocks
       - build-atomspace-cog
     if: always()
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
-    
+
     - name: Download All Artifacts
       uses: actions/download-artifact@v7
       with:
         path: artifacts
       continue-on-error: true
-    
+
     - name: Generate Build Report
       run: |
         set -eu
@@ -1934,14 +1934,14 @@ jobs:
         echo "" >> BUILD_REPORT.md
         echo "## Components Built" >> BUILD_REPORT.md
         echo "" >> BUILD_REPORT.md
-        
+
         if [ -d "artifacts" ]; then
           echo "### Artifacts Generated:" >> BUILD_REPORT.md
           ls -lh artifacts/ >> BUILD_REPORT.md
         else
           echo "No artifacts found" >> BUILD_REPORT.md
         fi
-        
+
         echo "" >> BUILD_REPORT.md
         echo "## Build Order" >> BUILD_REPORT.md
         echo "1. CogUtil (Foundation)" >> BUILD_REPORT.md
@@ -1965,9 +1965,9 @@ jobs:
         echo "- Components are built in dependency order" >> BUILD_REPORT.md
         echo "- Tests are run but allowed to fail (continue-on-error)" >> BUILD_REPORT.md
         echo "- Build artifacts are cached for 1 day" >> BUILD_REPORT.md
-        
+
         cat BUILD_REPORT.md
-    
+
     - name: Upload Build Report
       uses: actions/upload-artifact@v6
       with:

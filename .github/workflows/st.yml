@@ -34,13 +34,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build SpaceTime
 #    needs: build-cogserver
-    
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v6
       with:
         submodules: false
-    
+
     - name: Cache APT packages
       uses: actions/cache@v5
       with:
@@ -48,7 +48,7 @@ jobs:
         key: apt-cache-${{ runner.os }}-${{ hashFiles('**/*.yml') }}
         restore-keys: |
           apt-cache-${{ runner.os }}-
-    
+
     - name: Install Dependencies
       run: |
         set -eu
@@ -72,7 +72,7 @@ jobs:
           valgrind \
           doxygen \
           liboctomap-dev
-    
+
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
@@ -82,7 +82,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Rebuild and Install AtomSpace
       run: |
         set -eu
@@ -104,7 +104,7 @@ jobs:
         sudo make install
         sudo ldconfig
       continue-on-error: true
-    
+
     - name: Rebuild and Install CogServer
       if: hashFiles('cogserver/CMakeLists.txt') != ''
       run: |
@@ -115,7 +115,7 @@ jobs:
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
-    
+
     - name: Check SpaceTime Directory
       run: |
         set -eu
@@ -126,7 +126,7 @@ jobs:
           echo "SpaceTime directory not found, skipping build"
           exit 0
         fi
-    
+
     - name: Configure SpaceTime
       if: hashFiles('spacetime/CMakeLists.txt') != ''
       run: |
@@ -134,14 +134,14 @@ jobs:
         mkdir -p spacetime/build
         cd spacetime/build
         cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-    
+
     - name: Build SpaceTime
       if: hashFiles('spacetime/CMakeLists.txt') != ''
       run: |
         set -eu
         cd spacetime/build
         make ${{ env.MAKEFLAGS }}
-    
+
     - name: Build Tests
       if: hashFiles('spacetime/CMakeLists.txt') != ''
       run: |
@@ -149,7 +149,7 @@ jobs:
         cd spacetime/build
         make ${{ env.MAKEFLAGS }} tests
       continue-on-error: true
-    
+
     - name: Run Tests
       if: hashFiles('spacetime/CMakeLists.txt') != ''
       run: |
@@ -157,7 +157,7 @@ jobs:
         cd spacetime/build
         make check ARGS="${{ env.MAKEFLAGS }}"
       continue-on-error: true
-    
+
     - name: Install SpaceTime
       if: hashFiles('spacetime/CMakeLists.txt') != ''
       run: |
@@ -171,13 +171,13 @@ jobs:
 #    runs-on: ubuntu-latest
 #    name: Build PLN (Probabilistic Logic Networks)
 #    needs: [build-ure, build-spacetime]
-    
+
 #    steps:
 #    - name: Checkout Repository
 #      uses: actions/checkout@v6
 #      with:
 #        submodules: false
-    
+
 #    - name: Install Dependencies
 #      run: |
 #        sudo apt-get update
@@ -199,7 +199,7 @@ jobs:
 #          python3-dev \
 #          valgrind \
 #          doxygen
-    
+
 #    - name: Rebuild and Install CogUtil
 #      run: |
 #        mkdir -p cogutil/build
@@ -208,7 +208,7 @@ jobs:
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
-    
+
 #    - name: Rebuild and Install AtomSpace
 #      run: |
 #        mkdir -p atomspace/build
@@ -228,7 +228,7 @@ jobs:
 #        sudo make install
 #        sudo ldconfig
 #      continue-on-error: true
-    
+
 #    - name: Rebuild and Install CogServer
 #      if: hashFiles('cogserver/CMakeLists.txt') != ''
 #      run: |
@@ -238,7 +238,7 @@ jobs:
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
-    
+
 #    - name: Rebuild and Install Unify
 #      if: hashFiles('unify/CMakeLists.txt') != ''
 #      run: |
@@ -248,7 +248,7 @@ jobs:
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
-    
+
 #    - name: Rebuild and Install URE
 #      if: hashFiles('ure/CMakeLists.txt') != ''
 #      run: |
@@ -258,7 +258,7 @@ jobs:
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
-    
+
 #    - name: Rebuild and Install SpaceTime
 #      if: hashFiles('spacetime/CMakeLists.txt') != ''
 #      run: |
@@ -268,7 +268,7 @@ jobs:
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
-    
+
 #    - name: Check PLN Directory
 #      run: |
 #        if [ -d "pln" ]; then
@@ -278,38 +278,38 @@ jobs:
 #          echo "PLN directory not found, skipping build"
 #          exit 0
 #        fi
-    
+
 #    - name: Configure PLN
 #      if: hashFiles('pln/CMakeLists.txt') != ''
 #      run: |
 #        mkdir -p pln/build
 #        cd pln/build
 #        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-    
+
 #    - name: Build PLN
 #      if: hashFiles('pln/CMakeLists.txt') != ''
 #      run: |
 #        cd pln/build
 #        make ${{ env.MAKEFLAGS }}
-    
+
 #    - name: Build Tests
 #      if: hashFiles('pln/CMakeLists.txt') != ''
 #      run: |
 #        cd pln/build
 #        make ${{ env.MAKEFLAGS }} tests
 #      continue-on-error: true
-    
+
 #    - name: Run Tests
 #      if: hashFiles('pln/CMakeLists.txt') != ''
 #      run: |
 #        cd pln/build
 #        make check ARGS="${{ env.MAKEFLAGS }}"
 #      continue-on-error: true
-    
+
 #    - name: Install PLN
 #      if: hashFiles('pln/CMakeLists.txt') != ''
 #      run: |
 #        cd pln/build
 #        sudo make install
 #        sudo ldconfig
- 
+

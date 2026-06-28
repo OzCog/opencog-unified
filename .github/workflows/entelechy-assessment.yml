@@ -34,16 +34,16 @@ jobs:
     permissions:
       contents: read
       issues: write
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-      
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: '3.11'
-      
+
       - name: Run Entelechy Tests
         id: tests
         run: |
@@ -51,23 +51,23 @@ jobs:
           echo "Running Entelechy framework tests..."
           python3 tests/test_entelechy_framework.py 2>&1 | tee test_output.txt
           TEST_EXIT_CODE=${PIPESTATUS[0]}
-          echo "test_exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
-          
-          if [ $TEST_EXIT_CODE -eq 0 ]; then
+          echo "test_exit_code=${TEST_EXIT_CODE}" >> "${GITHUB_OUTPUT}"
+
+          if [ "${TEST_EXIT_CODE}" -eq 0 ]; then
             echo "✅ All tests passed"
           else
             echo "❌ Tests failed"
           fi
-          
-          exit $TEST_EXIT_CODE
-      
+
+          exit "${TEST_EXIT_CODE}"
+
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v6
         with:
           name: entelechy-test-results
           path: test_output.txt
-  
+
   entelechy-introspection:
     name: Deep Introspection & Issue Generation
     runs-on: ubuntu-latest
@@ -76,199 +76,199 @@ jobs:
     permissions:
       contents: read
       issues: write
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-      
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: '3.11'
-      
+
       - name: Perform Deep Introspection
         id: introspection
         run: |
           set -eu
           echo "🧠 Performing deep entelechy introspection..."
           python3 entelechy_cli.py introspect -o entelechy_report.json
-          
+
           # Extract key metrics
           ACTUALIZATION=$(python3 -c "import json; data=json.load(open('entelechy_report.json')); print(f\"{data['entelechy_assessment']['actualization_score']:.1%}\")")
           STAGE=$(python3 -c "import json; data=json.load(open('entelechy_report.json')); print(data['entelechy_assessment']['development_stage'])")
           FITNESS=$(python3 -c "import json; data=json.load(open('entelechy_report.json')); print(f\"{data['entelechy_assessment']['fitness']:.2f}\")")
           FRAGMENTS=$(python3 -c "import json; data=json.load(open('entelechy_report.json')); print(data['fragmentation_analysis']['total_fragments'])")
-          
-          echo "actualization=$ACTUALIZATION" >> $GITHUB_OUTPUT
-          echo "stage=$STAGE" >> $GITHUB_OUTPUT
-          echo "fitness=$FITNESS" >> $GITHUB_OUTPUT
-          echo "fragments=$FRAGMENTS" >> $GITHUB_OUTPUT
-          
+
+          echo "actualization=$ACTUALIZATION" >> "${GITHUB_OUTPUT}"
+          echo "stage=$STAGE" >> "${GITHUB_OUTPUT}"
+          echo "fitness=$FITNESS" >> "${GITHUB_OUTPUT}"
+          echo "fragments=$FRAGMENTS" >> "${GITHUB_OUTPUT}"
+
           echo "📊 Actualization: $ACTUALIZATION"
           echo "🌟 Stage: $STAGE"
           echo "💪 Fitness: $FITNESS"
           echo "🔍 Fragments: $FRAGMENTS"
-      
+
       - name: Generate Next Steps Script
         run: |
           set -eu
           cat > generate_issues.py << 'EOF'
           #!/usr/bin/env python3
           """Generate GitHub issues from entelechy repair roadmap"""
-          
+
           import json
           import sys
           from datetime import datetime
-          
+
           def generate_issues_from_report(report_path):
               with open(report_path) as f:
                   report = json.load(f)
-              
+
               roadmap = report['repair_roadmap']
               assessment = report['entelechy_assessment']
-              
+
               issues = []
-              
+
               # Generate issue for immediate actions
               if roadmap['immediate_actions']:
                   issue = {
                       'title': '⚠️ Critical Entelechy Fragmentations - Immediate Action Required',
                       'body': f"""## 🧠 Entelechy Assessment
-          
-          **Actualization**: {assessment['actualization_score']:.1%}  
-          **Fitness**: {assessment['fitness']:.2f}  
+
+          **Actualization**: {assessment['actualization_score']:.1%}
+          **Fitness**: {assessment['fitness']:.2f}
           **Stage**: {assessment['development_stage']}
-          
+
           ## ⚠️ Critical Fragmentations
-          
+
           The following high-severity fragmentations require immediate attention:
-          
+
           """
                   }
-                  
+
                   for i, action in enumerate(roadmap['immediate_actions'], 1):
                       issue['body'] += f"""### {i}. {action['type']}
-          
-          **Location**: `{action['location']}`  
-          **Severity**: {action['severity']:.1%}  
+
+          **Location**: `{action['location']}`
+          **Severity**: {action['severity']:.1%}
           **Description**: {action['description']}
-          
+
           **Suggestions**:
           """
                       for suggestion in action['suggestions']:
                           issue['body'] += f"- {suggestion}\n"
                       issue['body'] += "\n"
-                  
+
                   issue['body'] += """
           ## 📋 Related
-          
+
           - See full report in workflow artifacts
           - Review dimensional insights for context
-          
+
           ---
           *Generated by Entelechy Framework on """ + datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC') + "*"
-                  
+
                   issues.append(issue)
-              
+
               # Generate issue for short-term actions
               if roadmap['short_term_actions']:
                   issue = {
                       'title': '📋 Entelechy Short-Term Improvements',
                       'body': f"""## 🧠 Entelechy Assessment
-          
-          **Actualization**: {assessment['actualization_score']:.1%}  
-          **Fitness**: {assessment['fitness']:.2f}  
+
+          **Actualization**: {assessment['actualization_score']:.1%}
+          **Fitness**: {assessment['fitness']:.2f}
           **Stage**: {assessment['development_stage']}
-          
+
           ## 📋 Short-Term Actions
-          
+
           The following medium-severity fragmentations should be addressed in the near term:
-          
+
           """
                   }
-                  
+
                   for i, action in enumerate(roadmap['short_term_actions'], 1):
                       issue['body'] += f"""### {i}. {action['type']}
-          
-          **Location**: `{action['location']}`  
-          **Severity**: {action['severity']:.1%}  
+
+          **Location**: `{action['location']}`
+          **Severity**: {action['severity']:.1%}
           **Description**: {action['description']}
-          
+
           **Suggestions**:
           """
                       for suggestion in action['suggestions']:
                           issue['body'] += f"- {suggestion}\n"
                       issue['body'] += "\n"
-                  
+
                   issue['body'] += """
           ## 📋 Related
-          
+
           - See full report in workflow artifacts
           - Review repair roadmap for additional context
-          
+
           ---
           *Generated by Entelechy Framework on """ + datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC') + "*"
-                  
+
                   issues.append(issue)
-              
+
               # Generate evolutionary tracking issue (only on schedule)
               if len(sys.argv) > 1 and sys.argv[1] == 'schedule':
                   issue = {
                       'title': '📈 Weekly Entelechy Evolution Report',
                       'body': f"""## 🧠 Current Entelechy State
-          
-          **Actualization**: {assessment['actualization_score']:.1%}  
-          **Completeness**: {assessment['completeness_score']:.1%}  
-          **Coherence**: {assessment['coherence_score']:.1%}  
-          **Vitality**: {assessment['vitality_score']:.1%}  
-          **Alignment**: {assessment['alignment_score']:.1%}  
-          **Fitness**: {assessment['fitness']:.2f}  
+
+          **Actualization**: {assessment['actualization_score']:.1%}
+          **Completeness**: {assessment['completeness_score']:.1%}
+          **Coherence**: {assessment['coherence_score']:.1%}
+          **Vitality**: {assessment['vitality_score']:.1%}
+          **Alignment**: {assessment['alignment_score']:.1%}
+          **Fitness**: {assessment['fitness']:.2f}
           **Stage**: {assessment['development_stage']}
-          
+
           ## 📊 Dimensional Analysis
-          
+
           ### 🏛️ Ontological (BEING)
           Architectural completeness and component health
-          
-          ### 🎯 Teleological (PURPOSE)  
+
+          ### 🎯 Teleological (PURPOSE)
           Actualization trajectory: {report['dimensional_insights']['teleological']['actualization_trajectory']:.1%}
-          
+
           ### 🧩 Cognitive (COGNITION)
           Cognitive completeness: {report['dimensional_insights']['cognitive']['cognitive_completeness']:.1%}
-          
+
           ### 🔗 Integrative (INTEGRATION)
           Integration health: {report['dimensional_insights']['integrative']['integration_health']:.1%}
-          
+
           ### 🌱 Evolutionary (GROWTH)
           Evolutionary potential: {report['dimensional_insights']['evolutionary']['evolutionary_potential']:.1%}
-          
+
           ## 🔍 Fragmentation Status
-          
+
           - **Total Fragments**: {report['fragmentation_analysis']['total_fragments']}
           - **Critical Fragments**: {len(report['fragmentation_analysis']['critical_fragments'])}
-          
+
           ## 📋 Recommended Actions
-          
+
           Review the repair roadmap in the workflow artifacts for detailed improvement suggestions.
-          
+
           ---
           *Generated by Entelechy Framework on """ + datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC') + "*"
                   }
-                  
+
                   issues.append(issue)
-              
+
               return issues
-          
+
           if __name__ == '__main__':
               issues = generate_issues_from_report('entelechy_report.json')
-              
+
               # Output as JSON for GitHub Actions
               output = {'issues': issues}
               print(json.dumps(output, indent=2))
           EOF
-          
+
           chmod +x generate_issues.py
-      
+
       - name: Generate Issues JSON
         id: generate_issues
         run: |
@@ -278,13 +278,13 @@ jobs:
           else
             python3 generate_issues.py > issues.json
           fi
-          
+
           # Check if we have issues to create
           ISSUE_COUNT=$(python3 -c "import json; data=json.load(open('issues.json')); print(len(data['issues']))")
-          echo "issue_count=$ISSUE_COUNT" >> $GITHUB_OUTPUT
-          
+          echo "issue_count=$ISSUE_COUNT" >> "${GITHUB_OUTPUT}"
+
           echo "📝 Generated $ISSUE_COUNT issue(s)"
-      
+
       - name: Create GitHub Issues
         if: steps.generate_issues.outputs.issue_count > 0 && github.event_name != 'pull_request'
         uses: actions/github-script@v8
@@ -292,7 +292,7 @@ jobs:
           script: |
             const fs = require('fs');
             const issuesData = JSON.parse(fs.readFileSync('issues.json', 'utf8'));
-            
+
             for (const issue of issuesData.issues) {
               // Check if similar issue already exists
               const existingIssues = await github.rest.issues.listForRepo({
@@ -301,11 +301,11 @@ jobs:
                 state: 'open',
                 labels: 'entelechy'
               });
-              
+
               const similarExists = existingIssues.data.some(
                 existing => existing.title === issue.title
               );
-              
+
               if (!similarExists) {
                 await github.rest.issues.create({
                   owner: context.repo.owner,
@@ -314,13 +314,13 @@ jobs:
                   body: issue.body,
                   labels: ['entelechy', 'enhancement', 'automated']
                 });
-                
+
                 console.log(`✅ Created issue: ${issue.title}`);
               } else {
                 console.log(`⏭️ Skipped duplicate issue: ${issue.title}`);
               }
             }
-      
+
       - name: Upload Introspection Report
         uses: actions/upload-artifact@v6
         with:
@@ -328,15 +328,15 @@ jobs:
           path: |
             entelechy_report.json
             issues.json
-      
+
       - name: Summary
         run: |
           set -eu
-          echo "## 🧠 Entelechy Assessment Complete" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Actualization**: ${{ steps.introspection.outputs.actualization }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Stage**: ${{ steps.introspection.outputs.stage }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Fitness**: ${{ steps.introspection.outputs.fitness }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Fragments**: ${{ steps.introspection.outputs.fragments }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Issues generated: ${{ steps.generate_issues.outputs.issue_count }}" >> $GITHUB_STEP_SUMMARY
+          echo "## 🧠 Entelechy Assessment Complete" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+          echo "**Actualization**: ${{ steps.introspection.outputs.actualization }}" >> "${GITHUB_STEP_SUMMARY}"
+          echo "**Stage**: ${{ steps.introspection.outputs.stage }}" >> "${GITHUB_STEP_SUMMARY}"
+          echo "**Fitness**: ${{ steps.introspection.outputs.fitness }}" >> "${GITHUB_STEP_SUMMARY}"
+          echo "**Fragments**: ${{ steps.introspection.outputs.fragments }}" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+          echo "Issues generated: ${{ steps.generate_issues.outputs.issue_count }}" >> "${GITHUB_STEP_SUMMARY}"

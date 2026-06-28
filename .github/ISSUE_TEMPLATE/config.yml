@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 OpenCog discussion
+    url: https://wiki.opencog.org/w/Main_Page
+    about: General OpenCog questions, design discussion, and community help.
+  - name: 🛡️ Security report
+    url: https://github.com/OzCog/opencog-unified/security/advisories/new
+    about: Privately report a vulnerability via GitHub Security Advisories.

@@ -40,7 +40,7 @@ jobs:
       tensor-shape: ${{ steps.tensor-config.outputs.shape }}
       membrane-state: ${{ steps.membrane-fold.outputs.state }}
       cognitive-index: ${{ steps.index-gen.outputs.index }}
-    
+
     steps:
       - name: Initialize Cognitive Membrane
         uses: actions/checkout@v6
@@ -52,13 +52,13 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.11'
-          
+
       - name: Install Cognitive Dependencies
         run: |
           set -eu
           pip install numpy torch transformers PyGithub pyyaml
           npm install -g @octokit/graphql
-          
+
       - name: Create Cognitive Membrane Scanner
         id: membrane-scanner
         run: |
@@ -73,12 +73,12 @@ jobs:
           from datetime import datetime
           from pathlib import Path
           from github import Github
-          
+
           # Enhanced JSON encoder for NumPy types (NumPy 2.0 compatible)
           class EnhancedJSONEncoder(json.JSONEncoder):
               def default(self, obj):
                   # Removed deprecated np.int_ and np.float_ for NumPy 2.0 compatibility
-                  if isinstance(obj, (np.integer, np.intc, np.intp, np.int8, 
+                  if isinstance(obj, (np.integer, np.intc, np.intp, np.int8,
                                      np.int16, np.int32, np.int64,
                                      np.uint8, np.uint16, np.uint32, np.uint64)):
                       return int(obj)
@@ -91,7 +91,7 @@ jobs:
                   if isinstance(obj, np.generic):
                       return obj.item()
                   return super().default(obj)
-          
+
           class CognitiveMembrane:
               def __init__(self, enterprise="cosmos"):
                   self.enterprise = enterprise
@@ -99,25 +99,25 @@ jobs:
                   self.attention_weights = {}
                   self.membrane_state = {}
                   self.topology = {}
-                  
+
               def fold_enterprise(self, level='enterprise'):
                   """Collapse higher dimensions into markdown representation"""
                   print(f"🌀 Folding enterprise '{self.enterprise}' at level: {level}")
-                  
+
                   # {cosmos} → (org) → [repo] → fold/ → file.md
                   membrane_state = self.scan_topology()
                   self.generate_markdown_projection(membrane_state)
                   return membrane_state
-                  
+
               def unfold_changes(self):
                   """Expand markdown changes back to enterprise topology"""
                   print("🌊 Unfolding changes across cognitive membrane layers")
-                  
+
                   # file.md → fold/ → [repo] → (org) → {cosmos}
                   changes = self.detect_membrane_mutations()
                   self.propagate_through_layers(changes)
                   return changes
-                  
+
               def scan_topology(self):
                   """Scan the current cognitive topology"""
                   topology = {
@@ -127,7 +127,7 @@ jobs:
                       'tensor_dimensions': self.calculate_tensor_dimensions(),
                       'cognitive_state': 'scanning'
                   }
-                  
+
                   # Simulate organization scanning for now
                   # In full implementation, would use GitHub GraphQL API
                   orgs = ['cogpilot', 'OzCog', 'cosmos']
@@ -137,15 +137,15 @@ jobs:
                           'repositories': self.scan_org_repos(org),
                           'cognitive_weight': np.random.random()
                       }
-                  
+
                   self.topology = topology
                   return topology
-                  
+
               def get_org_prime(self, org):
                   """Assign prime numbers to organizations for tensor factorization"""
                   primes = {'cogpilot': 2, 'OzCog': 3, 'cosmos': 5}
                   return primes.get(org, 7)
-                  
+
               def scan_org_repos(self, org):
                   """Scan repositories within an organization"""
                   # Simulate repository scanning
@@ -154,7 +154,7 @@ jobs:
                       'OzCog': ['opencog-unified', 'opencog-bridge'],
                       'cosmos': ['membrane-sync', 'cognitive-grammar']
                   }
-                  
+
                   repos = {}
                   for repo_name in repo_configs.get(org, []):
                       repos[repo_name] = {
@@ -163,21 +163,21 @@ jobs:
                           'membrane_permeability': 'bidirectional'
                       }
                   return repos
-                  
+
               def calculate_repo_shape(self, repo_name):
                   """Calculate tensor shape for repository based on cognitive complexity"""
                   # Simple heuristic based on repo characteristics
                   base_shape = [3, 3, 3]  # Default cognitive shape
-                  
+
                   if 'cognitive' in repo_name:
                       base_shape = [5, 3, 2]
                   elif 'opencog' in repo_name:
                       base_shape = [7, 2, 1]
                   elif 'kernel' in repo_name:
                       base_shape = [2, 2, 2]
-                      
+
                   return base_shape
-                  
+
               def identify_cognitive_fragments(self, repo_name):
                   """Identify fundamental cognitive grammar fragments"""
                   fragments = {
@@ -186,7 +186,7 @@ jobs:
                       'governance': [2, 2, 2],
                       'protocol_design': [7, 1, 1]
                   }
-                  
+
                   # Select fragments based on repo characteristics
                   if 'cognitive' in repo_name:
                       return {'neural_transport': fragments['neural_transport'],
@@ -196,40 +196,40 @@ jobs:
                              'protocol_design': fragments['protocol_design']}
                   else:
                       return {'governance': fragments['governance']}
-                      
+
               def calculate_tensor_dimensions(self):
                   """Calculate tensor dimensions for the enterprise"""
                   # [attention, orgs, repos, concepts, implementations]
                   dimensions = [7, 3, 10, 50, 100]
                   return dimensions
-                  
+
               def generate_markdown_projection(self, membrane_state):
                   """Generate markdown projection of the cognitive membrane"""
                   markdown_content = f"""# 🌌 {self.enterprise.title()} Enterprise Cognitive Map
-          
+
           ## Tensor Dimensions: {membrane_state['tensor_dimensions']}
-          
+
           Generated: {membrane_state['timestamp']}
-          
+
           """
-                  
+
                   for org_name, org_data in membrane_state['organizations'].items():
                       markdown_content += f"### ({org_name}) - Prime: {org_data['prime']}\n"
-                      
+
                       for repo_name, repo_data in org_data['repositories'].items():
                           shape_str = "×".join(map(str, repo_data['shape']))
                           markdown_content += f"#### [{repo_name}] - Shape: [{shape_str}]\n"
-                          
+
                           for fragment_name, fragment_shape in repo_data['cognitive_fragments'].items():
                               fragment_str = "×".join(map(str, fragment_shape))
                               markdown_content += f"- {fragment_name}.md - Tensor: [{fragment_str}]\n"
-                          
+
                       markdown_content += "\n"
-                  
+
                   # Save markdown projection
                   Path('cosmos-cognitive-index.md').write_text(markdown_content)
                   print(f"📝 Generated cognitive index: cosmos-cognitive-index.md")
-                  
+
               def detect_membrane_mutations(self):
                   """Detect changes in the cognitive membrane"""
                   return {
@@ -237,11 +237,11 @@ jobs:
                       'propagation_paths': [],
                       'timestamp': datetime.utcnow().isoformat()
                   }
-                  
+
               def propagate_through_layers(self, changes):
                   """Propagate changes through cognitive layers"""
                   print(f"🌊 Propagating {changes['mutations_detected']} mutations")
-                  
+
               def generate_ggml_tensor_config(self):
                   """Generate ggml tensor configuration"""
                   config = {
@@ -250,20 +250,20 @@ jobs:
                       'memory_layout': 'cognitive_hierarchy',
                       'attention_weights': self.attention_weights
                   }
-                  
+
                   with open('cognitive-grammar.ggml', 'w') as f:
                       json.dump(config, f, indent=2, cls=EnhancedJSONEncoder)
-                  
+
                   return config
-          
+
           # Execute cognitive membrane operations
           if __name__ == "__main__":
               enterprise = os.getenv('INPUT_ENTERPRISE', 'cosmos')
               cognitive_mode = os.getenv('INPUT_COGNITIVE_MODE', 'fold')
-              
+
               print(f"🧠 Initializing Cognitive Membrane for {enterprise}")
               membrane = CognitiveMembrane(enterprise)
-              
+
               if cognitive_mode == 'fold':
                   membrane_state = membrane.fold_enterprise()
               elif cognitive_mode == 'unfold':
@@ -272,15 +272,15 @@ jobs:
                   membrane_state = membrane.fold_enterprise('projection')
               elif cognitive_mode == 'embed':
                   membrane_state = membrane.fold_enterprise('embedding')
-              
+
               # Generate ggml configuration
               ggml_config = membrane.generate_ggml_tensor_config()
-              
+
               print("✅ Cognitive membrane synchronization completed")
           EOF
-          
+
           python cognitive_membrane_scanner.py
-          
+
       - name: Fold Enterprise → Org → Repo
         id: membrane-fold
         env:
@@ -290,14 +290,14 @@ jobs:
           set -eu
           echo "🌀 Executing membrane folding operation..."
           python cognitive_membrane_scanner.py
-          
+
           # Set output
           if [ -f "cognitive-grammar.ggml" ]; then
-            echo "state=folded" >> $GITHUB_OUTPUT
+            echo "state=folded" >> "${GITHUB_OUTPUT}"
           else
-            echo "state=error" >> $GITHUB_OUTPUT
+            echo "state=error" >> "${GITHUB_OUTPUT}"
           fi
-          
+
       - name: Generate Cognitive Index
         id: index-gen
         run: |
@@ -305,32 +305,32 @@ jobs:
           # Enhance the generated cognitive index with tensor information
           if [ -f "cosmos-cognitive-index.md" ]; then
             echo "📊 Enhancing cognitive index with tensor analytics..."
-            
+
             cat >> cosmos-cognitive-index.md << 'EOF'
-          
+
           ## Cognitive Tensor Analytics
-          
+
           ### Memory Efficiency
           - **Cognitive Load**: Distributed across prime factorization
           - **Attention Allocation**: Dynamic weight distribution
           - **Membrane Permeability**: Bidirectional information flow
-          
+
           ### Synchronization Status
           - **Last Sync**: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
           - **Coherence Level**: Quantum-stabilized
           - **Tensor Optimization**: Prime factorization active
-          
+
           ### Next Synchronization
           - **Scheduled**: +15 minutes (quantum coherence interval)
           - **Mode**: Adaptive based on membrane mutations
           - **Priority**: Enterprise-wide cognitive visibility
           EOF
-          
-            echo "index=generated" >> $GITHUB_OUTPUT
+
+            echo "index=generated" >> "${GITHUB_OUTPUT}"
           else
-            echo "index=failed" >> $GITHUB_OUTPUT
+            echo "index=failed" >> "${GITHUB_OUTPUT}"
           fi
-          
+
       - name: Configure Tensor Shape
         id: tensor-config
         run: |
@@ -338,21 +338,21 @@ jobs:
           # Parse tensor dimensions from input
           IFS=',' read -ra DIMS <<< "${{ inputs.tensor_dimensions || '7,3,10,50,100' }}"
           SHAPE=$(printf "[%s]" "$(IFS=,; echo "${DIMS[*]}")")
-          
+
           echo "🔢 Configured tensor shape: $SHAPE"
-          echo "shape=$SHAPE" >> $GITHUB_OUTPUT
-          
+          echo "shape=$SHAPE" >> "${GITHUB_OUTPUT}"
+
       - name: Commit Cognitive Membrane State
         if: steps.membrane-fold.outputs.state == 'folded'
         run: |
           set -eu
           git config --global user.name "Cognitive Membrane Sync"
           git config --global user.email "cognitive-sync@opencog.org"
-          
+
           git add cosmos-cognitive-index.md cognitive-grammar.ggml cognitive_membrane_scanner.py
           git commit -m "🔮 Cognitive membrane synchronization - $(date -u +"%Y-%m-%dT%H:%M:%SZ")" || echo "No changes to commit"
           git push || echo "Nothing to push"
-          
+
       - name: Generate Membrane Status
         run: |
           set -eu
@@ -374,7 +374,7 @@ jobs:
             }
           }
           EOF
-          
+
           echo "📊 Cognitive membrane synchronization completed"
           cat cognitive-membrane-status.json
 
@@ -382,16 +382,16 @@ jobs:
     needs: hypergraph-sync
     runs-on: ubuntu-latest
     if: needs.hypergraph-sync.outputs.membrane-state == 'folded'
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
-        
+
       - name: Setup Python Environment
         uses: actions/setup-python@v6
         with:
           python-version: '3.11'
-          
+
       - name: Install Python Dependencies
         run: |
           set -eu
@@ -400,7 +400,7 @@ jobs:
           else
             pip install numpy torch transformers PyGithub pyyaml
           fi
-        
+
       - name: Generate Cognitive Grammar
         run: |
           set -eu
@@ -408,12 +408,12 @@ jobs:
           import json
           import numpy as np
           from pathlib import Path
-          
+
           # Enhanced JSON encoder for NumPy types (NumPy 2.0 compatible)
           class EnhancedJSONEncoder(json.JSONEncoder):
               def default(self, obj):
                   # Removed deprecated np.int_ and np.float_ for NumPy 2.0 compatibility
-                  if isinstance(obj, (np.integer, np.intc, np.intp, np.int8, 
+                  if isinstance(obj, (np.integer, np.intc, np.intp, np.int8,
                                      np.int16, np.int32, np.int64,
                                      np.uint8, np.uint16, np.uint32, np.uint64)):
                       return int(obj)
@@ -426,12 +426,12 @@ jobs:
                   if isinstance(obj, np.generic):
                       return obj.item()
                   return super().default(obj)
-          
+
           class CognitiveGrammarGenerator:
               def __init__(self):
                   self.enterprise = "cosmos"
                   self.grammar_fragments = {}
-                  
+
               def discover_fragments(self):
                   """Discover fundamental cognitive grammar fragments"""
                   fragments = {
@@ -456,14 +456,14 @@ jobs:
                           'role': 'interface'
                       }
                   }
-                  
+
                   self.grammar_fragments = fragments
                   return fragments
-                  
+
               def embed_as_membrane(self, fragments):
                   """Embed tensor shapes as nested P-System membranes"""
                   membranes = []
-                  
+
                   for name, fragment in fragments.items():
                       tensor_shape = np.array(fragment['tensor']).shape
                       membrane = {
@@ -476,9 +476,9 @@ jobs:
                           'membrane_type': 'cognitive_primitive'
                       }
                       membranes.append(membrane)
-                      
+
                   return membranes
-                  
+
               def factorize_shape(self, shape):
                   """Prime factorization of tensor dimensions"""
                   factorizations = {}
@@ -495,7 +495,7 @@ jobs:
                           factors.append(n)
                       factorizations[f'dim_{i}'] = factors
                   return factorizations
-                  
+
               def generate_ggml_config(self, membranes):
                   """Generate ggml-compatible configuration"""
                   config = {
@@ -508,26 +508,26 @@ jobs:
                           'ggml_compatibility': True
                       }
                   }
-                  
+
                   return config
-          
+
           # Generate cognitive grammar
           generator = CognitiveGrammarGenerator()
           fragments = generator.discover_fragments()
           membranes = generator.embed_as_membrane(fragments)
           ggml_config = generator.generate_ggml_config(membranes)
-          
+
           # Save configuration with EnhancedJSONEncoder
           with open('cognitive-grammar-enhanced.ggml', 'w') as f:
               json.dump(ggml_config, f, indent=2, cls=EnhancedJSONEncoder)
-              
+
           print("✅ Enhanced cognitive grammar generated")
           print(f"📊 Total membranes: {len(membranes)}")
           print(f"🧮 Total complexity: {ggml_config['cognitive_grammar']['total_complexity']}")
           EOF
-          
+
           python cognitive_grammar_generator.py
-          
+
       - name: Archive Cognitive Grammar
         uses: actions/upload-artifact@v6
         with:

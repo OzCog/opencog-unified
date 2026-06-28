@@ -25,11 +25,11 @@ env:
   TENSOR_OPTIMIZATION: "true"
   HYPERGRAPH_PERSISTENCE: "enabled"
   MAX_RECURSION_DEPTH: "7"
-  
+
   # Self-Healing Configuration
   AUTO_FIX_ENABLED: "true"
   MAX_FIX_ATTEMPTS: "3"
-  
+
   # CircleCI Compatibility Layer
   CIRCLE_PROJECT_USERNAME: "opencog"
   CCACHE_DIR: "/ws/ccache"
@@ -39,30 +39,30 @@ jobs:
   # =================================================================
   # FOUNDATION LAYER (Tensor Shape: [512, 128, 8])
   # =================================================================
-  
+
   cogutil:
     name: "🧬 CogUtil Foundation"
     runs-on: ubuntu-latest
     container:
       image: opencog/opencog-deps:latest
       options: --user root
-    
+
     outputs:
       tensor-shape: ${{ steps.tensor-config.outputs.shape }}
       cognitive-state: ${{ steps.tensor-config.outputs.state }}
-    
+
     steps:
       - name: "🌀 Initialize Cognitive State"
         run: |
           set -eu
-          echo "COGNITIVE_LAYER=FOUNDATION" >> $GITHUB_ENV
-          echo "TENSOR_SHAPE=[512,128,8]" >> $GITHUB_ENV
+          echo "COGNITIVE_LAYER=FOUNDATION" >> "${GITHUB_ENV}"
+          echo "TENSOR_SHAPE=[512,128,8]" >> "${GITHUB_ENV}"
           date +%d-%m-%Y > /tmp/date
-          
+
           # Initialize tensor field
           mkdir -p /ws/cognitive-state/foundation
           echo "Cognitive Foundation Layer initialized at $(date)" > /ws/cognitive-state/foundation/genesis.log
-      
+
       - name: "🔮 Restore Hypergraph State"
         uses: actions/cache@v5
         with:
@@ -73,85 +73,85 @@ jobs:
           restore-keys: |
             cognitive-foundation-${{ runner.os }}-
             cognitive-foundation-
-      
+
       - uses: actions/checkout@v6
         with:
           path: cogutil
           repository: opencog/cogutil
           ref: master
-      
+
       - name: "🧪 Cognitive Build with Self-Healing"
         id: build
         run: |
           set -eu
           cd cogutil
           mkdir -p build && cd build
-          
+
           echo "🧬 Configuring CogUtil with cognitive enhancement..."
           if cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local; then
             echo "✅ CMake configuration successful!"
           else
             echo "🤖 Activating self-healing for CMake configuration..."
-            cd $GITHUB_WORKSPACE
+            cd "${GITHUB_WORKSPACE}"
             python3 scripts/auto_fix.py \
               --build-cmd "cd cogutil/build && cmake .. -DCMAKE_BUILD_TYPE=Release" \
               --max-attempts 2 \
               --repo-root .
             cd cogutil/build
           fi
-          
+
           echo "🧬 Building CogUtil with tensor optimization..."
-          if make $MAKEFLAGS; then
+          if make "${MAKEFLAGS}"; then
             echo "✅ Build successful!"
           else
             echo "🤖 Activating self-healing for build..."
-            cd $GITHUB_WORKSPACE
+            cd "${GITHUB_WORKSPACE}"
             python3 scripts/auto_fix.py \
-              --build-cmd "cd cogutil/build && make $MAKEFLAGS" \
-              --max-attempts $MAX_FIX_ATTEMPTS \
+              --build-cmd "cd cogutil/build && make ${MAKEFLAGS}" \
+              --max-attempts "${MAX_FIX_ATTEMPTS}" \
               --repo-root .
           fi
-      
+
       - name: "🧬 Execute Cognitive Tests"
         run: |
           set -eu
           cd cogutil/build
           echo "🧪 Building test suite..."
           make tests || echo "⚠️  Test build had issues, continuing..."
-          
+
           echo "🧬 Running cognitive validation..."
           make check ARGS="$MAKEFLAGS" || echo "⚠️  Some tests failed, analyzing..."
-      
+
       - name: "📦 Install & Persist State"
         run: |
           set -eu
           cd cogutil/build
           make install
           ldconfig
-          
+
           # Persist cognitive state with tensor annotations
           mkdir -p /ws/cognitive-state/foundation
           echo "COGUTIL_INSTALLED=$(date)" > /ws/cognitive-state/foundation/state.txt
           echo "TENSOR_SHAPE=[512,128,8]" >> /ws/cognitive-state/foundation/state.txt
           echo "DEGREES_OF_FREEDOM=$((512 * 128 * 8))" >> /ws/cognitive-state/foundation/state.txt
-          
+
           # Generate cognitive artifacts
           echo "{" > /ws/cognitive-state/foundation/tensor-metrics.json
           echo '  "layer": "foundation",' >> /ws/cognitive-state/foundation/tensor-metrics.json
           echo '  "component": "cogutil",' >> /ws/cognitive-state/foundation/tensor-metrics.json
           echo '  "tensor_shape": [512, 128, 8],' >> /ws/cognitive-state/foundation/tensor-metrics.json
           echo '  "degrees_of_freedom": '$((512 * 128 * 8))',' >> /ws/cognitive-state/foundation/tensor-metrics.json
-          echo '  "build_timestamp": "'$(date -Iseconds)'",' >> /ws/cognitive-state/foundation/tensor-metrics.json
+          printf '  "build_timestamp": "%s",\n' "$(date -Iseconds)" >> /ws/cognitive-state/foundation/tensor-metrics.json
           echo '  "cognitive_status": "active"' >> /ws/cognitive-state/foundation/tensor-metrics.json
           echo "}" >> /ws/cognitive-state/foundation/tensor-metrics.json
-      
+
       - name: "🎯 Configure Tensor Output"
         id: tensor-config
         run: |
           set -eu
-          echo "shape=[512,128,8]" >> $GITHUB_OUTPUT
-          echo "state=foundation-active" >> $GITHUB_OUTPUT
-      
+          echo "shape=[512,128,8]" >> "${GITHUB_OUTPUT}"
+          echo "state=foundation-active" >> "${GITHUB_OUTPUT}"
+
       - name: "💾 Save Hypergraph State"
         uses: actions/cache@v5
         with:
@@ -160,7 +160,7 @@ jobs:
             /ws/cognitive-state
             cogutil
           key: cognitive-foundation-${{ runner.os }}-${{ github.sha }}
-      
+
       - name: "📊 Generate Cognitive Metrics"
         if: always()
         run: |
@@ -171,7 +171,7 @@ jobs:
           echo "Degrees of Freedom: $((512 * 128 * 8))"
           echo "Cognitive Layer: FOUNDATION"
           echo "Build Status: ${{ steps.build.outcome }}"
-          
+
           # Output test results if available
           if [ -f "cogutil/build/tests/Testing/Temporary/LastTest.log" ]; then
             echo "=== Test Results ==="
@@ -181,7 +181,7 @@ jobs:
   # =================================================================
   # CORE LAYER (Tensor Shape: [1024, 256, 16, 4])
   # =================================================================
-  
+
   atomspace:
     name: "⚛️ AtomSpace Hypergraph"
     needs: [cogutil]
@@ -200,7 +200,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    
+
     strategy:
       fail-fast: false
       matrix:
@@ -211,21 +211,21 @@ jobs:
           - variant: "haskell"
             flags: "-DHASKELL_STACK_INSTALL=ON"
             tensor_mod: "2"
-    
+
     steps:
       - name: "🌀 Initialize Hypergraph Substrate"
         run: |
           set -eu
-          echo "COGNITIVE_LAYER=CORE" >> $GITHUB_ENV
-          echo "TENSOR_SHAPE=[1024,256,16,4]" >> $GITHUB_ENV
-          echo "VARIANT=${{ matrix.variant }}" >> $GITHUB_ENV
-          echo "PGHOST=postgres" >> $GITHUB_ENV
-          echo "PGUSER=opencog_test" >> $GITHUB_ENV  
-          echo "PGPASSWORD=cheese" >> $GITHUB_ENV
-          
+          echo "COGNITIVE_LAYER=CORE" >> "${GITHUB_ENV}"
+          echo "TENSOR_SHAPE=[1024,256,16,4]" >> "${GITHUB_ENV}"
+          echo "VARIANT=${{ matrix.variant }}" >> "${GITHUB_ENV}"
+          echo "PGHOST=postgres" >> "${GITHUB_ENV}"
+          echo "PGUSER=opencog_test" >> "${GITHUB_ENV}"
+          echo "PGPASSWORD=cheese" >> "${GITHUB_ENV}"
+
           mkdir -p /ws/cognitive-state/core
           echo "Hypergraph substrate ${{ matrix.variant }} initialized at $(date)" > /ws/cognitive-state/core/genesis-${{ matrix.variant }}.log
-      
+
       - name: "🔮 Restore Cognitive State"
         uses: actions/cache@v5
         with:
@@ -234,13 +234,13 @@ jobs:
             /ws/cognitive-state
             cogutil
           key: cognitive-foundation-${{ runner.os }}-${{ github.sha }}
-      
+
       - uses: actions/checkout@v6
         with:
           path: atomspace
           repository: opencog/atomspace
           ref: master
-      
+
       - name: "🧬 Install Foundation Layer"
         run: |
           set -eu
@@ -249,8 +249,8 @@ jobs:
           make install
           ldconfig
           echo "✅ Foundation layer integrated into hypergraph substrate"
-      
-      - name: "🔮 Restore Haskell State" 
+
+      - name: "🔮 Restore Haskell State"
         if: matrix.variant == 'haskell'
         uses: actions/cache@v5
         with:
@@ -260,65 +260,65 @@ jobs:
           key: haskell-${{ runner.os }}-${{ hashFiles('atomspace/opencog/haskell/stack.yaml') }}
           restore-keys: |
             haskell-${{ runner.os }}-
-      
+
       - name: "🧪 Build AtomSpace with Cognitive Enhancement"
         run: |
           set -eu
           cd atomspace
           mkdir -p build && cd build
-          
+
           echo "🧬 Configuring AtomSpace hypergraph with tensor optimization..."
           if cmake .. -DCMAKE_BUILD_TYPE=Release ${{ matrix.flags }} -DCMAKE_INSTALL_PREFIX=/usr/local; then
             echo "✅ Hypergraph configuration successful!"
           else
             echo "🤖 Activating cognitive repair for configuration..."
-            cd $GITHUB_WORKSPACE
+            cd "${GITHUB_WORKSPACE}"
             python3 scripts/auto_fix.py \
               --build-cmd "cd atomspace/build && cmake .. -DCMAKE_BUILD_TYPE=Release ${{ matrix.flags }}" \
               --context "atomspace-${{ matrix.variant }}" \
               --max-attempts 2
             cd atomspace/build
           fi
-          
+
           echo "🧬 Materializing AtomSpace hypergraph..."
-          if make $MAKEFLAGS; then
+          if make "${MAKEFLAGS}"; then
             echo "✅ AtomSpace materialized successfully!"
           else
             echo "🤖 Invoking cognitive repair mechanisms..."
-            cd $GITHUB_WORKSPACE
+            cd "${GITHUB_WORKSPACE}"
             python3 scripts/auto_fix.py \
-              --build-cmd "cd atomspace/build && make $MAKEFLAGS" \
+              --build-cmd "cd atomspace/build && make ${MAKEFLAGS}" \
               --context "atomspace-${{ matrix.variant }}" \
-              --max-attempts $MAX_FIX_ATTEMPTS
+              --max-attempts "${MAX_FIX_ATTEMPTS}"
           fi
-      
+
       - name: "🧬 Cognitive Test Execution"
         run: |
           set -eu
           cd atomspace/build
           echo "🧪 Building hypergraph test suite..."
           make tests || echo "⚠️  Test build encountered quantum fluctuations"
-          
+
           echo "🧬 Executing hypergraph validation..."
           make check ARGS="$MAKEFLAGS" || echo "⚠️  Hypergraph tests show tensor instabilities"
-          
+
           echo "🧬 Building cognitive examples..."
           make examples || echo "⚠️  Example manifestation incomplete"
-      
+
       - name: "💾 Persist Hypergraph State"
         run: |
           set -eu
           cd atomspace/build
           make install
           ldconfig
-          
+
           # Save hypergraph configuration with tensor annotations
           mkdir -p /ws/cognitive-state/core
           echo "ATOMSPACE_${{ matrix.variant }}=$(date)" > /ws/cognitive-state/core/state-${{ matrix.variant }}.txt
           echo "TENSOR_SHAPE=[1024,256,16,4]" >> /ws/cognitive-state/core/state-${{ matrix.variant }}.txt
           echo "TENSOR_MODULATION=${{ matrix.tensor_mod }}" >> /ws/cognitive-state/core/state-${{ matrix.variant }}.txt
           echo "DEGREES_OF_FREEDOM=$((1024 * 256 * 16 * 4))" >> /ws/cognitive-state/core/state-${{ matrix.variant }}.txt
-          
+
           # Generate tensor field metrics
           echo "{" > /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
           echo '  "layer": "core",' >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
@@ -327,10 +327,10 @@ jobs:
           echo '  "tensor_shape": [1024, 256, 16, 4],' >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
           echo '  "degrees_of_freedom": '$((1024 * 256 * 16 * 4))',' >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
           echo '  "tensor_modulation": '${{ matrix.tensor_mod }}',' >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
-          echo '  "build_timestamp": "'$(date -Iseconds)'",' >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
+          printf '  "build_timestamp": "%s",\n' "$(date -Iseconds)" >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
           echo '  "hypergraph_status": "materialized"' >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
           echo "}" >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
-      
+
       - name: "📊 Generate Cognitive Metrics"
         if: always()
         run: |
@@ -342,7 +342,7 @@ jobs:
           echo "Degrees of Freedom: $((1024 * 256 * 16 * 4))"
           echo "Tensor Modulation: ${{ matrix.tensor_mod }}"
           echo "Hypergraph Status: Materialized"
-          
+
           # Output test results if available
           if [ -f "atomspace/build/tests/Testing/Temporary/LastTest.log" ]; then
             echo "=== Hypergraph Validation Results ==="
@@ -352,7 +352,7 @@ jobs:
   # =================================================================
   # CORE LAYER: ATOMSPACE-STORAGE (Tensor Shape: [896, 224, 14, 4])
   # =================================================================
-  
+
   atomspace-storage:
     name: "💾 AtomSpace Storage Layer"
     needs: [atomspace]
@@ -360,17 +360,17 @@ jobs:
     container:
       image: opencog/opencog-deps:latest
       options: --user root
-    
+
     steps:
       - name: "🌀 Initialize Storage Substrate"
         run: |
           set -eu
-          echo "COGNITIVE_LAYER=CORE_STORAGE" >> $GITHUB_ENV
-          echo "TENSOR_SHAPE=[896,224,14,4]" >> $GITHUB_ENV
-          
+          echo "COGNITIVE_LAYER=CORE_STORAGE" >> "${GITHUB_ENV}"
+          echo "TENSOR_SHAPE=[896,224,14,4]" >> "${GITHUB_ENV}"
+
           mkdir -p /ws/cognitive-state/core-storage
           echo "Storage substrate initialized at $(date)" > /ws/cognitive-state/core-storage/genesis.log
-      
+
       - name: "🔮 Restore Build Cache"
         uses: actions/cache@v5
         with:
@@ -379,23 +379,23 @@ jobs:
           restore-keys: |
             ccache-storage-${{ runner.os }}-
             ccache-core-${{ runner.os }}-
-      
+
       - uses: actions/checkout@v6
-      
+
       - name: "🧬 Clone Prerequisites"
         run: |
           set -eu
           echo "📦 Cloning CogUtil..."
           git clone --depth 1 https://github.com/opencog/cogutil.git
-          
+
           echo "📦 Cloning AtomSpace..."
           git clone --depth 1 https://github.com/opencog/atomspace.git
-          
+
           echo "📦 Cloning AtomSpace-Storage..."
           git clone --depth 1 https://github.com/opencog/atomspace-storage.git
-          
+
           echo "✅ All prerequisites cloned"
-      
+
       - name: "🧬 Build & Install CogUtil"
         run: |
           set -eu
@@ -407,7 +407,7 @@ jobs:
           make install
           ldconfig
           echo "✅ CogUtil installed"
-      
+
       - name: "🧬 Build & Install AtomSpace"
         run: |
           set -eu
@@ -419,71 +419,71 @@ jobs:
           make install
           ldconfig
           echo "✅ AtomSpace installed"
-      
+
       - name: "🧪 Build AtomSpace-Storage"
         run: |
           set -eu
           cd atomspace-storage
           mkdir -p build && cd build
-          
+
           echo "🧬 Configuring AtomSpace-Storage with tensor optimization..."
           if cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local; then
             echo "✅ Storage configuration successful!"
           else
             echo "🤖 Activating cognitive repair for configuration..."
-            cd $GITHUB_WORKSPACE
+            cd "${GITHUB_WORKSPACE}"
             python3 scripts/auto_fix.py \
               --build-cmd "cd atomspace-storage/build && cmake .. -DCMAKE_BUILD_TYPE=Release" \
               --context "atomspace-storage" \
               --max-attempts 2
             cd atomspace-storage/build
           fi
-          
+
           echo "🧬 Building AtomSpace-Storage persistence layer..."
-          if make $MAKEFLAGS; then
+          if make "${MAKEFLAGS}"; then
             echo "✅ Storage layer materialized successfully!"
           else
             echo "🤖 Invoking cognitive repair mechanisms..."
-            cd $GITHUB_WORKSPACE
+            cd "${GITHUB_WORKSPACE}"
             python3 scripts/auto_fix.py \
-              --build-cmd "cd atomspace-storage/build && make $MAKEFLAGS" \
+              --build-cmd "cd atomspace-storage/build && make ${MAKEFLAGS}" \
               --context "atomspace-storage" \
-              --max-attempts $MAX_FIX_ATTEMPTS
+              --max-attempts "${MAX_FIX_ATTEMPTS}"
           fi
-      
+
       - name: "🧬 Execute Storage Tests"
         run: |
           set -eu
           cd atomspace-storage/build
           echo "🧪 Building storage test suite..."
           make tests || echo "⚠️  Test build encountered issues"
-          
+
           echo "🧬 Running storage validation..."
           make check ARGS="$MAKEFLAGS" || echo "⚠️  Some storage tests show instabilities"
-      
+
       - name: "💾 Persist Storage State"
         run: |
           set -eu
           cd atomspace-storage/build
           make install
           ldconfig
-          
+
           # Save storage configuration with tensor annotations
           mkdir -p /ws/cognitive-state/core-storage
           echo "ATOMSPACE_STORAGE=$(date)" > /ws/cognitive-state/core-storage/state.txt
           echo "TENSOR_SHAPE=[896,224,14,4]" >> /ws/cognitive-state/core-storage/state.txt
           echo "DEGREES_OF_FREEDOM=$((896 * 224 * 14 * 4))" >> /ws/cognitive-state/core-storage/state.txt
-          
+
           # Generate tensor field metrics
           echo "{" > /ws/cognitive-state/core-storage/tensor-metrics.json
           echo '  "layer": "core-storage",' >> /ws/cognitive-state/core-storage/tensor-metrics.json
           echo '  "component": "atomspace-storage",' >> /ws/cognitive-state/core-storage/tensor-metrics.json
           echo '  "tensor_shape": [896, 224, 14, 4],' >> /ws/cognitive-state/core-storage/tensor-metrics.json
           echo '  "degrees_of_freedom": '$((896 * 224 * 14 * 4))',' >> /ws/cognitive-state/core-storage/tensor-metrics.json
-          echo '  "build_timestamp": "'$(date -Iseconds)'",' >> /ws/cognitive-state/core-storage/tensor-metrics.json
+          printf '  "build_timestamp": "%s",\n' "$(date -Iseconds)" >> /ws/cognitive-state/core-storage/tensor-metrics.json
           echo '  "storage_status": "materialized"' >> /ws/cognitive-state/core-storage/tensor-metrics.json
           echo "}" >> /ws/cognitive-state/core-storage/tensor-metrics.json
-      
+
       - name: "📊 Generate Storage Metrics"
         if: always()
         run: |
@@ -497,7 +497,7 @@ jobs:
   # =================================================================
   # CORE LAYER: ATOMSPACE-ROCKS (Tensor Shape: [768, 192, 12])
   # =================================================================
-  
+
   atomspace-rocks:
     name: "🪨 AtomSpace RocksDB Persistence"
     needs: [atomspace-storage]
@@ -505,17 +505,17 @@ jobs:
     container:
       image: opencog/opencog-deps:latest
       options: --user root
-    
+
     steps:
       - name: "🌀 Initialize RocksDB Substrate"
         run: |
           set -eu
-          echo "COGNITIVE_LAYER=CORE_ROCKS" >> $GITHUB_ENV
-          echo "TENSOR_SHAPE=[768,192,12]" >> $GITHUB_ENV
-          
+          echo "COGNITIVE_LAYER=CORE_ROCKS" >> "${GITHUB_ENV}"
+          echo "TENSOR_SHAPE=[768,192,12]" >> "${GITHUB_ENV}"
+
           mkdir -p /ws/cognitive-state/core-rocks
           echo "RocksDB substrate initialized at $(date)" > /ws/cognitive-state/core-rocks/genesis.log
-      
+
       - name: "🔮 Restore Build Cache"
         uses: actions/cache@v5
         with:
@@ -524,26 +524,26 @@ jobs:
           restore-keys: |
             ccache-rocks-${{ runner.os }}-
             ccache-storage-${{ runner.os }}-
-      
+
       - uses: actions/checkout@v6
-      
+
       - name: "🧬 Clone All Prerequisites"
         run: |
           set -eu
           echo "📦 Cloning CogUtil..."
           git clone --depth 1 https://github.com/opencog/cogutil.git
-          
+
           echo "📦 Cloning AtomSpace..."
           git clone --depth 1 https://github.com/opencog/atomspace.git
-          
+
           echo "📦 Cloning AtomSpace-Storage..."
           git clone --depth 1 https://github.com/opencog/atomspace-storage.git
-          
+
           echo "📦 Cloning AtomSpace-Rocks..."
           git clone --depth 1 https://github.com/opencog/atomspace-rocks.git
-          
+
           echo "✅ All prerequisites cloned"
-      
+
       - name: "🧬 Build & Install CogUtil"
         run: |
           set -eu
@@ -555,7 +555,7 @@ jobs:
           make install
           ldconfig
           echo "✅ CogUtil installed"
-      
+
       - name: "🧬 Build & Install AtomSpace"
         run: |
           set -eu
@@ -567,7 +567,7 @@ jobs:
           make install
           ldconfig
           echo "✅ AtomSpace installed"
-      
+
       - name: "🧬 Build & Install AtomSpace-Storage"
         run: |
           set -eu
@@ -579,71 +579,71 @@ jobs:
           make install
           ldconfig
           echo "✅ AtomSpace-Storage installed"
-      
+
       - name: "🧪 Build AtomSpace-Rocks"
         run: |
           set -eu
           cd atomspace-rocks
           mkdir -p build && cd build
-          
+
           echo "🧬 Configuring AtomSpace-Rocks with tensor optimization..."
           if cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local; then
             echo "✅ RocksDB configuration successful!"
           else
             echo "🤖 Activating cognitive repair for configuration..."
-            cd $GITHUB_WORKSPACE
+            cd "${GITHUB_WORKSPACE}"
             python3 scripts/auto_fix.py \
               --build-cmd "cd atomspace-rocks/build && cmake .. -DCMAKE_BUILD_TYPE=Release" \
               --context "atomspace-rocks" \
               --max-attempts 2
             cd atomspace-rocks/build
           fi
-          
+
           echo "🧬 Building AtomSpace-Rocks persistence layer..."
-          if make $MAKEFLAGS; then
+          if make "${MAKEFLAGS}"; then
             echo "✅ RocksDB layer materialized successfully!"
           else
             echo "🤖 Invoking cognitive repair mechanisms..."
-            cd $GITHUB_WORKSPACE
+            cd "${GITHUB_WORKSPACE}"
             python3 scripts/auto_fix.py \
-              --build-cmd "cd atomspace-rocks/build && make $MAKEFLAGS" \
+              --build-cmd "cd atomspace-rocks/build && make ${MAKEFLAGS}" \
               --context "atomspace-rocks" \
-              --max-attempts $MAX_FIX_ATTEMPTS
+              --max-attempts "${MAX_FIX_ATTEMPTS}"
           fi
-      
+
       - name: "🧬 Execute RocksDB Tests"
         run: |
           set -eu
           cd atomspace-rocks/build
           echo "🧪 Building RocksDB test suite..."
           make tests || echo "⚠️  Test build encountered issues"
-          
+
           echo "🧬 Running RocksDB validation..."
           make check ARGS="$MAKEFLAGS" || echo "⚠️  Some RocksDB tests show instabilities"
-      
+
       - name: "💾 Persist RocksDB State"
         run: |
           set -eu
           cd atomspace-rocks/build
           make install
           ldconfig
-          
+
           # Save RocksDB configuration with tensor annotations
           mkdir -p /ws/cognitive-state/core-rocks
           echo "ATOMSPACE_ROCKS=$(date)" > /ws/cognitive-state/core-rocks/state.txt
           echo "TENSOR_SHAPE=[768,192,12]" >> /ws/cognitive-state/core-rocks/state.txt
           echo "DEGREES_OF_FREEDOM=$((768 * 192 * 12))" >> /ws/cognitive-state/core-rocks/state.txt
-          
+
           # Generate tensor field metrics
           echo "{" > /ws/cognitive-state/core-rocks/tensor-metrics.json
           echo '  "layer": "core-rocks",' >> /ws/cognitive-state/core-rocks/tensor-metrics.json
           echo '  "component": "atomspace-rocks",' >> /ws/cognitive-state/core-rocks/tensor-metrics.json
           echo '  "tensor_shape": [768, 192, 12],' >> /ws/cognitive-state/core-rocks/tensor-metrics.json
           echo '  "degrees_of_freedom": '$((768 * 192 * 12))',' >> /ws/cognitive-state/core-rocks/tensor-metrics.json
-          echo '  "build_timestamp": "'$(date -Iseconds)'",' >> /ws/cognitive-state/core-rocks/tensor-metrics.json
+          printf '  "build_timestamp": "%s",\n' "$(date -Iseconds)" >> /ws/cognitive-state/core-rocks/tensor-metrics.json
           echo '  "rocks_status": "materialized"' >> /ws/cognitive-state/core-rocks/tensor-metrics.json
           echo "}" >> /ws/cognitive-state/core-rocks/tensor-metrics.json
-      
+
       - name: "📊 Generate RocksDB Metrics"
         if: always()
         run: |
@@ -657,26 +657,26 @@ jobs:
   # =================================================================
   # COGNITIVE SYNTHESIS ORCHESTRATION
   # =================================================================
-  
+
   cognitive-synthesis:
     name: "🎭 Cognitive Pipeline Synthesis"
     needs: [atomspace-rocks]
     runs-on: ubuntu-latest
     if: always()
-    
+
     steps:
       - uses: actions/checkout@v6
-      
+
       - name: "🧬 Generate Unified Orchestration Analysis"
         run: |
           set -eu
           mkdir -p cognitive-artifacts
-          
+
           cat > cognitive-artifacts/orchestration-synthesis.md << 'EOF'
           # 🧬 Unified Cognitive Build Orchestration Analysis
-          
+
           ## Layer Mapping Results (CircleCI → GitHub Actions Synthesis)
-          
+
           | CircleCI Job | GitHub Actions Job | Tensor Shape | Status | Cognitive Function |
           |--------------|-------------------|--------------|---------|-------------------|
           | cogutil | cogutil | [512,128,8] | ✅ Implemented | Foundation utilities |
@@ -696,43 +696,43 @@ jobs:
           | learn | learn | [1024,256,16,8] | 🚧 Next Phase | Learning system |
           | language-learning | language-learning | [768,192,12,6] | 🚧 Next Phase | NLP learning |
           | opencog | opencog | [2048,512,32,16,8] | 🚧 Next Phase | Integration layer |
-          
+
           ## Self-Healing Integration Points
-          
+
           1. **Build Failure Detection**: ✅ Tensor field disruption analysis active
           2. **Auto-Fix Invocation**: ✅ Cognitive repair mechanisms integrated
           3. **State Persistence**: ✅ Hypergraph checkpoint/restore implemented
           4. **Matrix Strategies**: ✅ Parallel universe builds for variants
-          
+
           ## Current Implementation Status
-          
+
           ### ✅ Phase 1 Complete: Foundation Synthesis
           - CogUtil foundation layer with tensor annotations
           - AtomSpace hypergraph with matrix strategy
           - Self-healing mechanisms integrated
           - Cognitive state persistence active
-          
+
           ### 🚧 Next: Logic & Cognitive Layers
-          - Unification and URE engines  
+          - Unification and URE engines
           - CogServer network substrate
           - Attention allocation systems
           - SpaceTime temporal reasoning
-          
+
           ## Tensor Field Coherence Analysis
-          
+
           Total active degrees of freedom: $((512 * 128 * 8 + 1024 * 256 * 16 * 4))
           Foundation-Core coupling strength: OPTIMAL
           Hypergraph substrate stability: MATERIALIZED
           Cognitive synthesis progress: 25% (4/16 layers active)
           EOF
-      
+
       - name: "📊 Generate GGML Kernel Definitions"
         run: |
           set -eu
           cat > cognitive-artifacts/ggml-kernels.scm << 'EOF'
           ;; GGML Kernel Definitions for Cognitive CI/CD
           ;; Generated by unified orchestration synthesis
-          
+
           (define-ggml-kernel 'foundation-cogutil
             '((tensor-shape . (512 128 8))
               (dtype . f32)
@@ -740,15 +740,15 @@ jobs:
               (cognitive-function . 'utility-primitives)
               (memory-requirement . 2048)
               (compute-complexity . O(n^2))))
-          
-          (define-ggml-kernel 'core-atomspace-standard  
+
+          (define-ggml-kernel 'core-atomspace-standard
             '((tensor-shape . (1024 256 16 4))
               (dtype . f16)
               (ops . (hypergraph-materialize validate persist))
               (cognitive-function . 'knowledge-representation)
-              (memory-requirement . 16384)  
+              (memory-requirement . 16384)
               (compute-complexity . O(n^3))))
-              
+
           (define-ggml-kernel 'core-atomspace-haskell
             '((tensor-shape . (1024 256 16 4))
               (dtype . f16)
@@ -756,32 +756,32 @@ jobs:
               (cognitive-function . 'functional-knowledge-representation)
               (memory-requirement . 20480)
               (compute-complexity . O(n^3))))
-          
+
           (define-ggml-kernel 'build-orchestration
             '((tensor-shape . (2048 512 64 8))
               (dtype . f16)
               (ops . (compile test deploy monitor evolve))
               (cognitive-function . 'meta-build-consciousness)
               (attention-mechanism . 'economic-attention-allocation)))
-          
+
           (define-ggml-kernel 'self-healing
             '((tensor-shape . (1024 256 32))
               (dtype . f32)
               (ops . (detect diagnose repair validate recurse))
               (cognitive-function . 'autonomous-error-correction)
               (recursion-depth . 3)))
-          
+
           ;; Unified tensor field configuration
           (define-tensor-field 'cognitive-ci-cd-phase1
             (list
-              (make-membrane 'foundation 
+              (make-membrane 'foundation
                 (list (make-kernel 'cogutil '(512 128 8))))
               (make-membrane 'core
                 (list (make-kernel 'atomspace-std '(1024 256 16 4))
                       (make-kernel 'atomspace-haskell '(1024 256 16 4))))
               (make-membrane 'synthesis
                 (list (make-kernel 'orchestration '(2048 512 64 8))))))
-                      
+
           ;; Phase 2 tensor field extension (placeholder)
           (define-tensor-field-expansion 'cognitive-ci-cd-phase2
             '((logic-layer . ((unify . (640 160 10))
@@ -790,7 +790,7 @@ jobs:
                                  (attention . (512 128 8 2))
                                  (spacetime . (896 224 14))))))
           EOF
-      
+
       - name: "🎭 Upload Cognitive Synthesis Artifacts"
         uses: actions/upload-artifact@v6
         if: always()
@@ -799,9 +799,9 @@ jobs:
           path: |
             cognitive-artifacts/
           retention-days: 30
-      
+
       - name: "📊 Tensor Field Status Report"
-        if: always()  
+        if: always()
         run: |
           set -eu
           echo "🧬 COGNITIVE ORCHESTRATION TENSOR FIELD REPORT"
@@ -809,12 +809,12 @@ jobs:
           echo ""
           echo "Phase 1 Implementation Status: ✅ COMPLETE"
           echo "Foundation Layer: CogUtil [512,128,8] - ACTIVE"
-          echo "Core Layer: AtomSpace [1024,256,16,4] - MATERIALIZED"  
+          echo "Core Layer: AtomSpace [1024,256,16,4] - MATERIALIZED"
           echo ""
           echo "Total Active Tensor Degrees of Freedom:"
           echo "Foundation: $((512 * 128 * 8)) DOF"
           echo "Core (std): $((1024 * 256 * 16 * 4)) DOF"
-          echo "Core (haskell): $((1024 * 256 * 16 * 4)) DOF" 
+          echo "Core (haskell): $((1024 * 256 * 16 * 4)) DOF"
           echo "Total System: $(( (512 * 128 * 8) + 2 * (1024 * 256 * 16 * 4) )) DOF"
           echo ""
           echo "Hypergraph Coherence: OPTIMAL"
@@ -826,79 +826,79 @@ jobs:
   # =================================================================
   # META-COGNITIVE EVOLUTION (Weekly scheduled)
   # =================================================================
-  
+
   meta-cognitive-evolution:
     name: "🧠 Meta-Cognitive Pipeline Evolution"
     needs: [cognitive-synthesis]
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule' || contains(github.event.head_commit.message, '[evolve]')
-    
+
     steps:
       - uses: actions/checkout@v6
-      
+
       - name: "🔬 Analyze Build Performance Metrics"
         run: |
           set -eu
           echo "🧬 Analyzing cognitive performance across tensor fields..."
           echo "Meta-cognitive evolution system activated"
-          
+
           # Create performance analysis
           mkdir -p evolution-artifacts
           echo "{" > evolution-artifacts/performance-metrics.json
-          echo '  "analysis_timestamp": "'$(date -Iseconds)'",' >> evolution-artifacts/performance-metrics.json
+          printf '  "analysis_timestamp": "%s",\n' "$(date -Iseconds)" >> evolution-artifacts/performance-metrics.json
           echo '  "foundation_efficiency": 0.92,' >> evolution-artifacts/performance-metrics.json
           echo '  "core_hypergraph_stability": 0.88,' >> evolution-artifacts/performance-metrics.json
           echo '  "tensor_field_coherence": 0.95,' >> evolution-artifacts/performance-metrics.json
           echo '  "self_healing_success_rate": 0.89,' >> evolution-artifacts/performance-metrics.json
           echo '  "recommended_optimizations": [' >> evolution-artifacts/performance-metrics.json
-          echo '    "increase_parallel_factor_by_1.2",' >> evolution-artifacts/performance-metrics.json  
+          echo '    "increase_parallel_factor_by_1.2",' >> evolution-artifacts/performance-metrics.json
           echo '    "optimize_cache_hit_rate_to_0.95",' >> evolution-artifacts/performance-metrics.json
           echo '    "compress_tensor_shapes_by_0.8",' >> evolution-artifacts/performance-metrics.json
           echo '    "expand_matrix_strategies"' >> evolution-artifacts/performance-metrics.json
           echo '  ]' >> evolution-artifacts/performance-metrics.json
           echo "}" >> evolution-artifacts/performance-metrics.json
-      
+
       - name: "🧬 Generate Evolved Pipeline Configuration"
         run: |
           set -eu
           echo "🧬 Generating next-generation pipeline evolution..."
-          
+
           cat > evolution-artifacts/evolution-plan.md << 'EOF'
           # 🧬 Cognitive Pipeline Evolution Plan
-          
+
           ## Performance Analysis Results
-          
+
           Current system shows 89% self-healing success rate and 95% tensor field coherence.
           Meta-cognitive analysis suggests the following optimizations:
-          
+
           ### Recommended Mutations
           1. **Expand Matrix Strategies**: Add quantum coherence variants
-          2. **Optimize Parallel Execution**: Increase factor by 1.2x  
+          2. **Optimize Parallel Execution**: Increase factor by 1.2x
           3. **Enhance Cache Coherence**: Target 95% hit rate
           4. **Compress Tensor Allocations**: 20% efficiency gain
-          
+
           ### Next Evolution Cycle
           - Add Logic Layer (Phase 2): Unify [640,160,10], URE [768,192,12]
           - Implement Cognitive Layer: CogServer, Attention, SpaceTime
           - Expand self-healing patterns for new components
           - Add quantum coherence build variants
-          
+
           ### Tensor Field Evolution
           Total system complexity will grow from current 67M DOF to ~150M DOF
           Requires enhanced hypergraph state management and persistence
           EOF
-      
-      - name: "🚀 Propose Evolution PR" 
+
+      - name: "🚀 Propose Evolution PR"
         if: github.event_name == 'schedule'
         run: |
           set -eu
           echo "🧬 Meta-cognitive evolution complete!"
           echo "Performance metrics analyzed and optimization strategies generated"
           echo "Evolution artifacts created for next development cycle"
-          
+
           # In a real implementation, this would create a PR with evolved configuration
           echo "Note: Autonomous PR creation would require additional permissions and implementation"
-      
+
       - name: "📦 Archive Evolution Artifacts"
         uses: actions/upload-artifact@v6
         if: always()
