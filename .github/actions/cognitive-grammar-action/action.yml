@@ -47,7 +47,7 @@ runs:
         IFS=',' read -ra DIMS <<< "${{ inputs.tensor-dimensions }}"
         SHAPE=$(printf "[%s]" "$(IFS=,; echo "${DIMS[*]}")")
 
-        echo "ðŸ”¢ Calculated tensor shape: $SHAPE"
+        echo "🔢 Calculated tensor shape: $SHAPE"
         echo "shape=$SHAPE" >> $GITHUB_OUTPUT
 
     - name: Generate Enterprise Scanner
@@ -66,7 +66,7 @@ runs:
 
             def scan_cognitive_topology(self):
                 """Scan the cognitive topology across the enterprise"""
-                print(f"ðŸŒ Scanning cognitive topology for enterprise: {self.enterprise}")
+                print(f"🌐 Scanning cognitive topology for enterprise: {self.enterprise}")
 
                 organizations = ['cogpilot', 'OzCog', 'cosmos']
                 topology = {
@@ -126,7 +126,7 @@ runs:
             def fold_to_markdown(self):
                 """Generate markdown representation"""
                 markdown = (
-                    f"# ðŸŒŒ {self.enterprise.title()} Enterprise Cognitive Topology\n\n"
+                    f"# 🌌 {self.enterprise.title()} Enterprise Cognitive Topology\n\n"
                     f"**Scan Timestamp**: {self.topology['scan_timestamp']}\n"
                     f"**Enterprise Tensor Shape**: {self.topology['tensor_mapping']['enterprise_tensor_shape']}\n"
                     f"**Total Complexity**: {self.topology['tensor_mapping']['total_complexity']:.2f}\n\n"
@@ -136,7 +136,7 @@ runs:
                 for org_name, org_data in self.topology['organizations'].items():
                     markdown += f"### ({org_name}) - Prime: {org_data['prime_factor']}\n"
                     for repo_name, repo_data in org_data['repositories'].items():
-                        shape_str = "Ã—".join(map(str, repo_data['tensor_shape']))
+                        shape_str = "×".join(map(str, repo_data['tensor_shape']))
                         markdown += f"#### [{repo_name}] - Shape: [{shape_str}]\n"
                     markdown += "\n"
 
@@ -174,7 +174,7 @@ runs:
             with open('cognitive-grammar-enterprise.ggml', 'w') as f:
                 json.dump(grammar, f, indent=2)
 
-            print("âœ… Enterprise cognitive scanning completed")
+            print("✅ Enterprise cognitive scanning completed")
         EOF
 
     - name: Scan Cognitive Topology
@@ -183,7 +183,7 @@ runs:
       env:
         INPUT_ENTERPRISE: ${{ inputs.enterprise }}
       run: |
-        echo "ðŸŒ Executing enterprise cognitive topology scan..."
+        echo "🌐 Executing enterprise cognitive topology scan..."
         python enterprise_cognitive_scanner.py
 
         if [ -f "enterprise-topology.json" ]; then
@@ -234,7 +234,7 @@ runs:
         with open('cognitive-grammar-enhanced.ggml', 'w') as f:
             json.dump(enhanced_grammar, f, indent=2)
 
-        print("âœ… Enhanced cognitive grammar generated")
+        print("✅ Enhanced cognitive grammar generated")
         EOF
 
         python grammar_enhancer.py
@@ -248,7 +248,7 @@ runs:
     - name: Summary Report
       shell: bash
       run: |
-        echo "ðŸ“Š Cognitive Grammar Generation Summary"
+        echo "📊 Cognitive Grammar Generation Summary"
         echo "======================================"
         echo "Enterprise: ${{ inputs.enterprise }}"
         echo "Mode: ${{ inputs.cognitive-mode }}"
