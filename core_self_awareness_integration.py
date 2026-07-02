@@ -6,31 +6,32 @@ Demonstrates integration of introspection tools with core self-awareness
 
 import json
 import sys
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Any
+from pathlib import Path
+from typing import Any
 
-def load_entelechy_data() -> Dict[str, Any]:
+
+def load_entelechy_data() -> dict[str, Any]:
     """Load existing entelechy introspection data"""
     entelechy_file = Path("entelechy_introspection.json")
     if entelechy_file.exists():
-        with open(entelechy_file, 'r') as f:
+        with open(entelechy_file) as f:
             return json.load(f)
     return {}
 
-def generate_core_self_awareness_report() -> Dict[str, Any]:
+def generate_core_self_awareness_report() -> dict[str, Any]:
     """Generate core self-awareness integration report"""
-    
+
     print("🧠 Generating Core Self-Awareness Integration Report...")
-    
+
     # Load existing entelechy data
     entelechy = load_entelechy_data()
-    
+
     report = {
         "timestamp": datetime.utcnow().isoformat() + "Z",
         "system_name": "OpenCog Unified",
         "report_type": "Core Self-Awareness Integration",
-        
+
         "core_self_awareness": {
             "autognosis_status": {
                 "hierarchical_levels": 5,
@@ -38,7 +39,7 @@ def generate_core_self_awareness_report() -> Dict[str, Any]:
                 "self_understanding_confidence": 0.75,
                 "meta_cognitive_active": True
             },
-            
+
             "ontogenesis_status": {
                 "current_stage": "JUVENILE",
                 "generation": 0,
@@ -47,7 +48,7 @@ def generate_core_self_awareness_report() -> Dict[str, Any]:
                 "can_self_optimize": True,
                 "can_self_reproduce": True
             },
-            
+
             "identity_dimensions": {
                 "ontological": {
                     "description": "What the system IS",
@@ -81,10 +82,10 @@ def generate_core_self_awareness_report() -> Dict[str, Any]:
                     "self_improvement_capacity": 1.0
                 }
             },
-            
+
             "unified_identity_score": 0.72
         },
-        
+
         "integration_status": {
             "meta_cognitive_monitor": {
                 "integrated": True,
@@ -102,7 +103,7 @@ def generate_core_self_awareness_report() -> Dict[str, Any]:
                 "actualization_score": entelechy.get("entelechy_assessment", {}).get("actualization_score", 0.72)
             }
         },
-        
+
         "self_awareness_capabilities": [
             "Hierarchical self-image building (AUTOGNOSIS)",
             "Recursive meta-cognitive reflection",
@@ -113,7 +114,7 @@ def generate_core_self_awareness_report() -> Dict[str, Any]:
             "Real-time system monitoring",
             "Adaptive behavior modification"
         ],
-        
+
         "integration_achievements": [
             "✓ Core self-awareness module created",
             "✓ AUTOGNOSIS framework integrated",
@@ -124,7 +125,7 @@ def generate_core_self_awareness_report() -> Dict[str, Any]:
             "✓ Integration with existing meta-cognition systems",
             "✓ Comprehensive documentation provided"
         ],
-        
+
         "self_awareness_level": {
             "current": 0.75,
             "target": 0.90,
@@ -137,30 +138,30 @@ def generate_core_self_awareness_report() -> Dict[str, Any]:
             ]
         }
     }
-    
+
     return report
 
-def display_report(report: Dict[str, Any]):
+def display_report(report: dict[str, Any]):
     """Display the report in a human-readable format"""
-    
+
     print("\n" + "="*70)
     print(" OpenCog Unified - Core Self-Awareness Integration Report")
     print("="*70 + "\n")
-    
+
     print(f"Timestamp: {report['timestamp']}")
     print(f"System: {report['system_name']}\n")
-    
+
     print("CORE SELF-AWARENESS STATUS:")
     print("-" * 70)
-    
+
     csa = report['core_self_awareness']
-    
+
     print("\nAUTOGNOSIS (Hierarchical Self-Image Building):")
     auto = csa['autognosis_status']
     print(f"  Hierarchical Levels: {auto['hierarchical_levels']}")
     print(f"  Self-Understanding Confidence: {auto['self_understanding_confidence']:.3f}")
     print(f"  Meta-Cognitive Active: {auto['meta_cognitive_active']}")
-    
+
     print("\nONTOGENESIS (Self-Generating Capabilities):")
     onto = csa['ontogenesis_status']
     print(f"  Current Stage: {onto['current_stage']}")
@@ -168,31 +169,31 @@ def display_report(report: Dict[str, Any]):
     print(f"  Maturity Level: {onto['maturity_level']:.3f}")
     print(f"  Can Self-Generate: {onto['can_self_generate']}")
     print(f"  Can Self-Optimize: {onto['can_self_optimize']}")
-    
+
     print("\nIDENTITY DIMENSIONS:")
     for dim_name, dim_data in csa['identity_dimensions'].items():
         print(f"\n  {dim_name.upper()}: {dim_data['description']}")
         print(f"    Score: {dim_data['score']:.3f}")
-    
+
     print(f"\n  UNIFIED IDENTITY SCORE: {csa['unified_identity_score']:.3f}")
-    
+
     print("\n\nINTEGRATION STATUS:")
     print("-" * 70)
     for system, status in report['integration_status'].items():
         print(f"\n  {system}:")
         for key, value in status.items():
             print(f"    {key}: {value}")
-    
+
     print("\n\nSELF-AWARENESS CAPABILITIES:")
     print("-" * 70)
     for capability in report['self_awareness_capabilities']:
         print(f"  • {capability}")
-    
+
     print("\n\nINTEGRATION ACHIEVEMENTS:")
     print("-" * 70)
     for achievement in report['integration_achievements']:
         print(f"  {achievement}")
-    
+
     print("\n\nSELF-AWARENESS ASSESSMENT:")
     print("-" * 70)
     sa = report['self_awareness_level']
@@ -202,36 +203,36 @@ def display_report(report: Dict[str, Any]):
     print("\n  Next Steps:")
     for step in sa['next_steps']:
         print(f"    • {step}")
-    
+
     print("\n" + "="*70 + "\n")
 
-def save_report(report: Dict[str, Any], filename: str = "core_self_awareness_integration.json"):
+def save_report(report: dict[str, Any], filename: str = "core_self_awareness_integration.json"):
     """Save the report to a JSON file"""
-    
+
     filepath = Path(filename)
     with open(filepath, 'w') as f:
         json.dump(report, f, indent=2)
-    
+
     print(f"✓ Report saved to: {filepath.absolute()}")
 
 def main():
     """Main execution function"""
-    
+
     print("╔══════════════════════════════════════════════════════════════╗")
     print("║  OpenCog Unified - Core Self-Awareness Integration          ║")
     print("╚══════════════════════════════════════════════════════════════╝\n")
-    
+
     # Generate report
     report = generate_core_self_awareness_report()
-    
+
     # Display report
     display_report(report)
-    
+
     # Save report
     save_report(report)
-    
+
     print("\n✅ Core Self-Awareness Integration Report Complete\n")
-    
+
     return 0
 
 if __name__ == "__main__":

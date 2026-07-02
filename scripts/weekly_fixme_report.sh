@@ -1,7 +1,7 @@
 #!/bin/bash
 # Weekly FIXME progress report generator
 
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 
 echo "📊 Generating weekly FIXME progress report..."
 

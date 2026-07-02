@@ -281,10 +281,19 @@ calculate_priority_score() {
     echo ""
     echo "⚖️  Calculating Cognitive Priority Scores..."
     
-    local urgency_score=$((SYSTEM_URGENCY / 10))
-    local completeness_deficit=$((100 - OVERALL_COMPLETENESS))
-    local integration_deficit=$((100 - INTEGRATION_SUCCESS_RATE))
-    local synthesis_need=$((500 - SYNTHESIS_ENERGY))
+    local urgency_score
+
+    
+    urgency_score=$((SYSTEM_URGENCY / 10))
+    local completeness_deficit
+
+    completeness_deficit=$((100 - OVERALL_COMPLETENESS))
+    local integration_deficit
+
+    integration_deficit=$((100 - INTEGRATION_SUCCESS_RATE))
+    local synthesis_need
+
+    synthesis_need=$((500 - SYNTHESIS_ENERGY))
     
     # Normalize scores
     urgency_score=$((urgency_score > 10 ? 10 : urgency_score))
@@ -292,7 +301,10 @@ calculate_priority_score() {
     integration_deficit=$((integration_deficit > 40 ? 40 : integration_deficit))
     synthesis_need=$((synthesis_need > 300 ? 30 : synthesis_need / 10))
     
-    local total_priority=$((urgency_score + completeness_deficit + integration_deficit + synthesis_need))
+    local total_priority
+
+    
+    total_priority=$((urgency_score + completeness_deficit + integration_deficit + synthesis_need))
     
     local priority_level="medium"
     if [[ $total_priority -gt 80 ]]; then

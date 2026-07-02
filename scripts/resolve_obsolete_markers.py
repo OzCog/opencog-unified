@@ -8,11 +8,8 @@ It adds proper deprecation notices and documentation rather than just removing f
 Part of the Entelechy Framework repair process - Phase 3.
 """
 
-import re
-import os
-from pathlib import Path
 from datetime import datetime
-from typing import List, Dict, Tuple
+from pathlib import Path
 
 
 class ObsoleteMarkerResolver:
@@ -69,7 +66,7 @@ Date: {date}
         self.repo_root = Path(repo_root).resolve()
         self.changes_made = []
 
-    def add_deprecation_notice(self, file_info: Dict, dry_run: bool = True) -> bool:
+    def add_deprecation_notice(self, file_info: dict, dry_run: bool = True) -> bool:
         """Add a deprecation notice to a file."""
         file_path = self.repo_root / file_info['file']
 
@@ -85,7 +82,7 @@ Date: {date}
             return False
 
         # Read current content
-        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(file_path, encoding='utf-8', errors='ignore') as f:
             content = f.read()
 
         # Check if already deprecated
@@ -111,7 +108,7 @@ Date: {date}
                     insert_pos = i
                     break
             # Insert after initial comments
-            new_lines = lines[:insert_pos] + [notice] + lines[insert_pos:]
+            new_lines = [*lines[:insert_pos], notice, *lines[insert_pos:]]
             new_content = '\n'.join(new_lines)
         else:
             new_content = notice + content
@@ -155,7 +152,7 @@ Date: {date}
 
         return resolved
 
-    def get_summary(self) -> Dict:
+    def get_summary(self) -> dict:
         """Get summary of changes made."""
         return {
             'total_changes': len(self.changes_made),

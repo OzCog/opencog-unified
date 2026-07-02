@@ -5,15 +5,16 @@ Generate a comprehensive analysis report for actionable TODOs
 import json
 from datetime import datetime
 
+
 def generate_report():
     """Generate the final Markdown report"""
-    
-    with open('actionable_todos_analysis.json', 'r') as f:
+
+    with open('actionable_todos_analysis.json') as f:
         analysis = json.load(f)
-    
-    stats = analysis['statistics']
+
+    analysis['statistics']
     items = analysis['analyzed_items']
-    
+
     # --- Report Header ---
     report = f"""
 # Analysis of Actionable TODO Items in opencog-unified
@@ -23,7 +24,7 @@ def generate_report():
 
 ## 1. Executive Summary
 
-This report provides a detailed analysis of the **98 actionable TODO and FIXME items** identified in the `opencog-unified` repository. These items represent tasks that are suitable for immediate implementation, ranging from simple bug fixes to more involved feature additions. 
+This report provides a detailed analysis of the **98 actionable TODO and FIXME items** identified in the `opencog-unified` repository. These items represent tasks that are suitable for immediate implementation, ranging from simple bug fixes to more involved feature additions.
 
 The analysis categorizes each item by its parent **component**, **implementation complexity**, **estimated time**, and **type of work**. The majority of items are concentrated in the **Moses (33)** and **NLP (23)** components. Most tasks are of **medium complexity (85 items)** and are classified as **bug fixes (56 items)**, with a typical implementation time of **2-4 hours**.
 
@@ -126,19 +127,19 @@ The following table provides the complete list of 98 actionable items, categoriz
 | Component | File | Line | Complexity | Time Estimate | Work Type | Description |
 |---|---|---|---|---|---|---|
 """
-    
+
     # Add the full list of items to the report
     sorted_items = sorted(items, key=lambda x: (x['component'], x['complexity']))
-    
+
     for item in sorted_items:
         desc = item['content'][:60].strip().replace('|', '\\|')
         work_type = item['work_type'].replace('_', ' ').title()
         report += f"| {item['component']} | `{item['file']}` | {item['line']} | {item['complexity']} | {item['time_estimate']} | {work_type} | {desc}... |\n"
-    
+
     # Save the final report
     with open('actionable_todos_report.md', 'w') as f:
         f.write(report)
-    
+
     print("Analysis report generated successfully: actionable_todos_report.md")
 
 if __name__ == '__main__':

@@ -2,8 +2,8 @@
 """
 Generate a report on the work done for incomplete implementations.
 """
-import json
 from datetime import datetime
+
 
 def generate_report():
     """Generate the final Markdown report"""

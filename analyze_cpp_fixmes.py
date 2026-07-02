@@ -2,39 +2,39 @@
 """
 Analyze C++ FIXME/TODO comments to identify which ones can be addressed
 """
-import os
-import re
 import json
+import os
+
 
 fixmes = []
 
 # Scan C++ files
 for root, dirs, files in os.walk('.'):
     dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ['build', '__pycache__']]
-    
+
     for file in files:
         if not (file.endswith('.cc') or file.endswith('.h') or file.endswith('.cpp')):
             continue
-        
+
         filepath = os.path.join(root, file)
         try:
-            with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(filepath, encoding='utf-8', errors='ignore') as f:
                 lines = f.readlines()
-            
+
             for i, line in enumerate(lines, 1):
                 if 'XXX FIXME' in line or 'TODO FIXME' in line:
                     # Get context
                     start = max(0, i-3)
                     end = min(len(lines), i+3)
                     context = ''.join(lines[start:end])
-                    
+
                     fixmes.append({
                         'file': filepath,
                         'line': i,
                         'content': line.strip(),
                         'context': context
                     })
-        except Exception as e:
+        except Exception:
             pass
 
 print(f"Found {len(fixmes)} C++ FIXME/TODO comments")
@@ -52,7 +52,7 @@ categories = {
 
 for fixme in fixmes:
     content_lower = fixme['content'].lower()
-    
+
     if 'thread' in content_lower or 'lock' in content_lower or 'race' in content_lower:
         categories['thread_safety'].append(fixme)
     elif 'optim' in content_lower or 'performance' in content_lower or 'slow' in content_lower:

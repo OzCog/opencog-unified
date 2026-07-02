@@ -4,9 +4,9 @@ Entelechy Framework Types
 Core type definitions for the entelechy framework.
 """
 
-from enum import Enum
 from dataclasses import dataclass, field
-from typing import Dict, List, Any, Optional
+from enum import Enum
+from typing import Any
 
 
 class EntelechyDimension(Enum):
@@ -57,9 +57,9 @@ class FragmentationSignature:
     location: str
     severity: float  # 0.0-1.0, where 1.0 is critical
     description: str
-    context: Dict[str, Any] = field(default_factory=dict)
+    context: dict[str, Any] = field(default_factory=dict)
     repair_priority: int = 0
-    repair_suggestions: List[str] = field(default_factory=list)
+    repair_suggestions: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -70,36 +70,36 @@ class EntelechyMetrics:
     vitality_score: float  # 0.0-1.0, self-organizing capacity
     completeness_score: float  # 0.0-1.0, implementation completeness
     alignment_score: float  # 0.0-1.0, teleological alignment
-    
+
     # Component metrics
     total_components: int = 0
     integrated_components: int = 0
     fragmented_components: int = 0
-    
+
     # Code health metrics
     total_code_markers: int = 0
     todo_count: int = 0
     fixme_count: int = 0
     stub_count: int = 0
-    
+
     # Cognitive architecture metrics
     cognitive_layers_complete: int = 0
     cognitive_layers_total: int = 0
-    
+
     # Integration metrics
     dependency_satisfaction: float = 0.0
     cmake_integration_health: float = 0.0
     test_coverage_health: float = 0.0
-    
+
     # Development stage
     development_stage: DevelopmentStage = DevelopmentStage.EMBRYONIC
-    
+
     def fitness(self) -> float:
         """
         Calculate overall fitness score
-        
+
         Fitness is a weighted combination of dimensional scores:
-        fitness = ontological*0.2 + teleological*0.25 + cognitive*0.25 + 
+        fitness = ontological*0.2 + teleological*0.25 + cognitive*0.25 +
                   integrative*0.15 + evolutionary*0.15
         """
         ontological = self.completeness_score
@@ -107,7 +107,7 @@ class EntelechyMetrics:
         cognitive = self.actualization_score
         integrative = self.coherence_score
         evolutionary = self.vitality_score
-        
+
         return (
             ontological * 0.2 +
             teleological * 0.25 +
@@ -115,7 +115,7 @@ class EntelechyMetrics:
             integrative * 0.15 +
             evolutionary * 0.15
         )
-    
+
     def determine_stage(self) -> DevelopmentStage:
         """Determine development stage based on actualization"""
         if self.actualization_score < 0.3:

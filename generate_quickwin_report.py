@@ -5,10 +5,11 @@ Generate a report on the implemented quick wins.
 import json
 from datetime import datetime
 
+
 def generate_report():
     """Generate the final Markdown report"""
 
-    with open('quick_wins.json', 'r') as f:
+    with open('quick_wins.json') as f:
         quick_wins = json.load(f)
 
     implemented_files = [

@@ -4,10 +4,9 @@ Automated TODO/FIXME Resolution System
 Intelligently resolves placeholder implementations and TODO markers
 """
 
-import os
 import re
 from pathlib import Path
-from typing import List, Dict, Tuple
+
 
 class TodoResolver:
     def __init__(self, repo_path: str):
@@ -18,15 +17,14 @@ class TodoResolver:
 
     def resolve_placeholder_functions(self, file_path: Path) -> int:
         """Resolve placeholder function implementations"""
-        if not file_path.suffix in ['.cpp', '.h', '.py']:
+        if file_path.suffix not in ['.cpp', '.h', '.py']:
             return 0
 
         try:
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding='utf-8', errors='ignore') as f:
                 content = f.read()
 
             original_content = content
-            changes = 0
 
             # C++ placeholder patterns
             if file_path.suffix in ['.cpp', '.h']:
@@ -95,7 +93,7 @@ class TodoResolver:
             return 0
 
         try:
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding='utf-8', errors='ignore') as f:
                 lines = f.readlines()
 
             modified = False
@@ -131,7 +129,7 @@ class TodoResolver:
     def fix_code_style(self, file_path: Path) -> int:
         """Fix common code style issues"""
         try:
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding='utf-8', errors='ignore') as f:
                 content = f.read()
 
             original_content = content
@@ -158,7 +156,7 @@ class TodoResolver:
     def resolve_simple_todos(self, file_path: Path) -> int:
         """Resolve simple, actionable TODOs"""
         try:
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding='utf-8', errors='ignore') as f:
                 content = f.read()
 
             original_content = content
@@ -190,7 +188,7 @@ class TodoResolver:
                     f.write(content)
                 return 1
 
-        except Exception as e:
+        except Exception:
             pass
 
         return 0

@@ -36,7 +36,9 @@ test_cpp_neural_components() {
                 ((cpp_success++)) || true
                 
                 # Extract tensor dimensions from output
-                local tensor_info=$(grep -i "tensor\|dimension\|shape" "$TEST_DIR/tensor_output.log" 2>/dev/null || echo "default: [2x2]")
+                local tensor_info
+
+                tensor_info=$(grep -i "tensor\|dimension\|shape" "$TEST_DIR/tensor_output.log" 2>/dev/null || echo "default: [2x2]")
                 tensor_shapes+=("tensor_kernel:$tensor_info")
             else
                 echo "  ❌ Tensor kernel execution: FAILED"
@@ -93,7 +95,10 @@ EOF
                 echo "  ✅ Hypergraph pattern extraction: SUCCESS"
                 ((cpp_success++)) || true
                 
-                local shape_info=$(grep "tensor shape" "$TEST_DIR/hypergraph_output.log" 2>/dev/null || echo "[4x2]")
+                local shape_info
+
+                
+                shape_info=$(grep "tensor shape" "$TEST_DIR/hypergraph_output.log" 2>/dev/null || echo "[4x2]")
                 tensor_shapes+=("hypergraph_patterns:$shape_info")
             else
                 echo "  ❌ Hypergraph pattern execution: FAILED"
@@ -108,7 +113,10 @@ EOF
     export CPP_TOTAL="$cpp_total"
     export CPP_TENSOR_SHAPES="${tensor_shapes[*]}"
     
-    local cpp_success_rate=$((cpp_total > 0 ? cpp_success * 100 / cpp_total : 0))
+    local cpp_success_rate
+
+    
+    cpp_success_rate=$((cpp_total > 0 ? cpp_success * 100 / cpp_total : 0))
     echo "  📊 C++ Neural Component Success Rate: ${cpp_success_rate}% ($cpp_success/$cpp_total)"
 }
 
@@ -180,7 +188,9 @@ EOF
                 ((scheme_success++)) || true
                 
                 # Extract tensor shape information
-                local shapes=$(grep "tensor shape\|tensor dimensions" "$TEST_DIR/scheme_output.log" 2>/dev/null || echo "[4x1]")
+                local shapes
+
+                shapes=$(grep "tensor shape\|tensor dimensions" "$TEST_DIR/scheme_output.log" 2>/dev/null || echo "[4x1]")
                 symbolic_structures+=("neural_symbolic:$shapes")
             else
                 echo "  ❌ Scheme neural-symbolic integration: FAILED (no success marker)"
@@ -204,7 +214,9 @@ EOF
                 ((scheme_success++)) || true
                 
                 # Estimate symbolic complexity
-                local line_count=$(wc -l < "$scheme_file")
+                local line_count
+
+                line_count=$(wc -l < "$scheme_file")
                 symbolic_structures+=("$(basename "$scheme_file"):symbolic_complexity_${line_count}")
             else
                 echo "    ❌ No symbolic content in $(basename "$scheme_file")"
@@ -217,7 +229,10 @@ EOF
     export SCHEME_TOTAL="$scheme_total"
     export SYMBOLIC_STRUCTURES="${symbolic_structures[*]}"
     
-    local scheme_success_rate=$((scheme_total > 0 ? scheme_success * 100 / scheme_total : 0))
+    local scheme_success_rate
+
+    
+    scheme_success_rate=$((scheme_total > 0 ? scheme_success * 100 / scheme_total : 0))
     echo "  📊 Scheme Symbolic Component Success Rate: ${scheme_success_rate}% ($scheme_success/$scheme_total)"
 }
 
@@ -333,7 +348,9 @@ EOF
                     ((ggml_success++)) || true
                     
                     # Extract tensor operation information
-                    local tensor_ops=$(grep "tensor shape\|tensor operations" "$TEST_DIR/ggml_output.log" 2>/dev/null || echo "matmul:[2x4], activation:[2x4]")
+                    local tensor_ops
+
+                    tensor_ops=$(grep "tensor shape\|tensor operations" "$TEST_DIR/ggml_output.log" 2>/dev/null || echo "matmul:[2x4], activation:[2x4]")
                     tensor_operations+=("ggml_integration:$tensor_ops")
                 else
                     echo "  ❌ GGML tensor integration: FAILED (no success marker)"
@@ -351,7 +368,10 @@ EOF
     export GGML_TOTAL="$ggml_total"
     export TENSOR_OPERATIONS="${tensor_operations[*]}"
     
-    local ggml_success_rate=$((ggml_total > 0 ? ggml_success * 100 / ggml_total : 0))
+    local ggml_success_rate
+
+    
+    ggml_success_rate=$((ggml_total > 0 ? ggml_success * 100 / ggml_total : 0))
     echo "  📊 GGML Tensor Integration Success Rate: ${ggml_success_rate}% ($ggml_success/$ggml_total)"
 }
 
@@ -367,8 +387,13 @@ test_cross_language_interop() {
     echo "  Scanning for C++/Scheme integration points..."
     ((interop_total++)) || true
     
-    local cpp_scheme_bridges=$(find . \( -name "*.cc" -o -name "*.cpp" \) -print0 | xargs -0 grep -l -i "scheme\|scm\|guile" 2>/dev/null | wc -l)
-    local scheme_cpp_bridges=$(find . -name "*.scm" -print0 | xargs -0 grep -l -i "ffi\|c\+\+\|native" 2>/dev/null | wc -l)
+    local cpp_scheme_bridges
+
+    
+    cpp_scheme_bridges=$(find . \( -name "*.cc" -o -name "*.cpp" \) -print0 | xargs -0 grep -l -i "scheme\|scm\|guile" 2>/dev/null | wc -l)
+    local scheme_cpp_bridges
+
+    scheme_cpp_bridges=$(find . -name "*.scm" -print0 | xargs -0 grep -l -i "ffi\|c\+\+\|native" 2>/dev/null | wc -l)
     
     if [[ $((cpp_scheme_bridges + scheme_cpp_bridges)) -gt 0 ]]; then
         echo "    ✅ C++/Scheme integration points found: $((cpp_scheme_bridges + scheme_cpp_bridges))"
@@ -381,7 +406,10 @@ test_cross_language_interop() {
     echo "  Scanning for neural-symbolic integration..."
     ((interop_total++)) || true
     
-    local neural_files=$(find . \( -name "*.cc" -o -name "*.scm" \) -print0 | xargs -0 grep -l -i "neural\|tensor" 2>/dev/null | wc -l)
+    local neural_files
+
+    
+    neural_files=$(find . \( -name "*.cc" -o -name "*.scm" \) -print0 | xargs -0 grep -l -i "neural\|tensor" 2>/dev/null | wc -l)
     
     if [[ $neural_files -gt 2 ]]; then
         echo "    ✅ Neural-symbolic integration detected across $neural_files files"
@@ -394,7 +422,10 @@ test_cross_language_interop() {
     export INTEROP_SUCCESS="$interop_success"
     export INTEROP_TOTAL="$interop_total"
     
-    local interop_success_rate=$((interop_total > 0 ? interop_success * 100 / interop_total : 0))
+    local interop_success_rate
+
+    
+    interop_success_rate=$((interop_total > 0 ? interop_success * 100 / interop_total : 0))
     echo "  📊 Cross-Language Interoperability Success Rate: ${interop_success_rate}% ($interop_success/$interop_total)"
 }
 
@@ -403,9 +434,16 @@ generate_integration_report() {
     echo ""
     echo "📋 Generating Neural-Symbolic Integration Report..."
     
-    local total_success=$((CPP_SUCCESS + SCHEME_SUCCESS + GGML_SUCCESS + INTEROP_SUCCESS))
-    local total_tests=$((CPP_TOTAL + SCHEME_TOTAL + GGML_TOTAL + INTEROP_TOTAL))
-    local overall_success_rate=$((total_tests > 0 ? total_success * 100 / total_tests : 0))
+    local total_success
+
+    
+    total_success=$((CPP_SUCCESS + SCHEME_SUCCESS + GGML_SUCCESS + INTEROP_SUCCESS))
+    local total_tests
+
+    total_tests=$((CPP_TOTAL + SCHEME_TOTAL + GGML_TOTAL + INTEROP_TOTAL))
+    local overall_success_rate
+
+    overall_success_rate=$((total_tests > 0 ? total_success * 100 / total_tests : 0))
     
     cat > "$INTEGRATION_REPORT" << EOF
 {
@@ -486,9 +524,16 @@ main() {
     echo "   - GGML Tensor Integration: $GGML_SUCCESS/$GGML_TOTAL tests passed"
     echo "   - Cross-Language Interop: $INTEROP_SUCCESS/$INTEROP_TOTAL tests passed"
     
-    local total_success=$((CPP_SUCCESS + SCHEME_SUCCESS + GGML_SUCCESS + INTEROP_SUCCESS))
-    local total_tests=$((CPP_TOTAL + SCHEME_TOTAL + GGML_TOTAL + INTEROP_TOTAL))
-    local overall_rate=$((total_tests > 0 ? total_success * 100 / total_tests : 0))
+    local total_success
+
+    
+    total_success=$((CPP_SUCCESS + SCHEME_SUCCESS + GGML_SUCCESS + INTEROP_SUCCESS))
+    local total_tests
+
+    total_tests=$((CPP_TOTAL + SCHEME_TOTAL + GGML_TOTAL + INTEROP_TOTAL))
+    local overall_rate
+
+    overall_rate=$((total_tests > 0 ? total_success * 100 / total_tests : 0))
     echo "   - Overall Success Rate: ${overall_rate}% ($total_success/$total_tests)"
     echo "   - Integration Report: $INTEGRATION_REPORT"
     echo ""

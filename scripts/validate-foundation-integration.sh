@@ -186,8 +186,12 @@ main() {
         TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
         
         # Basic syntax check: balanced parentheses
-        local open_count=$(grep -o "(" "${scm_file}" | wc -l)
-        local close_count=$(grep -o ")" "${scm_file}" | wc -l)
+        local open_count
+
+        open_count=$(grep -o "(" "${scm_file}" | wc -l)
+        local close_count
+
+        close_count=$(grep -o ")" "${scm_file}" | wc -l)
         
         if [ "$open_count" -eq "$close_count" ]; then
             print_success "$(basename ${scm_file}) - Balanced parentheses"

@@ -3,14 +3,13 @@
 Analyze and categorize the 98 actionable TODO items
 """
 import json
-import re
-from pathlib import Path
 from collections import defaultdict
+
 
 def extract_component(filepath):
     """Extract component name from file path"""
-    parts = filepath.split('/')
-    
+    filepath.split('/')
+
     # Identify main components
     if 'atomspace-storage' in filepath:
         return 'atomspace-storage'
@@ -37,39 +36,39 @@ def estimate_complexity(item):
     """Estimate implementation complexity based on content"""
     content_lower = item['content'].lower()
     context_lower = item.get('context', '').lower()
-    
+
     # Keywords indicating complexity
     simple_keywords = ['add', 'update', 'fix typo', 'clarify', 'document', 'comment', 'remove']
     medium_keywords = ['implement', 'support', 'extend', 'replace', 'refactor', 'improve']
     complex_keywords = ['algorithm', 'optimize', 'performance', 'thread', 'distributed', 'cache']
-    
+
     # Check for simple tasks
     if any(kw in content_lower for kw in simple_keywords):
         if 'hack' in content_lower or 'temporary' in content_lower:
             return 'medium'
         return 'simple'
-    
+
     # Check for complex tasks
     if any(kw in content_lower or kw in context_lower for kw in complex_keywords):
         return 'complex'
-    
+
     # Check for medium tasks
     if any(kw in content_lower for kw in medium_keywords):
         return 'medium'
-    
+
     # Default to medium
     return 'medium'
 
 def estimate_time(complexity, item):
     """Estimate implementation time based on complexity"""
     content = item['content'].lower()
-    
+
     if complexity == 'simple':
         # Simple documentation, comment fixes, or small additions
         if 'document' in content or 'comment' in content or 'clarify' in content:
             return '30min-1hr'
         return '1-2hrs'
-    
+
     elif complexity == 'medium':
         # Feature additions, refactoring, replacements
         if 'support' in content or 'extend' in content:
@@ -77,7 +76,7 @@ def estimate_time(complexity, item):
         elif 'replace' in content or 'refactor' in content:
             return '8-16hrs'
         return '2-4hrs'
-    
+
     else:  # complex
         # Algorithm improvements, performance optimization, caching
         if 'algorithm' in content or 'search' in content:
@@ -89,7 +88,7 @@ def estimate_time(complexity, item):
 def categorize_by_type(item):
     """Categorize TODO by type of work"""
     content_lower = item['content'].lower()
-    
+
     if 'hack' in content_lower or 'temporary' in content_lower:
         return 'technical_debt'
     elif 'support' in content_lower or 'add' in content_lower:
@@ -107,19 +106,19 @@ def categorize_by_type(item):
 
 def analyze_actionable_items():
     """Main analysis function"""
-    
+
     # Load actionable items
-    with open('actionable_items.json', 'r') as f:
+    with open('actionable_items.json') as f:
         items = json.load(f)
-    
+
     print(f"Analyzing {len(items)} actionable TODO items...\n")
-    
+
     # Categorize by component
     by_component = defaultdict(list)
     by_complexity = defaultdict(list)
     by_type = defaultdict(list)
     by_time = defaultdict(list)
-    
+
     # Analyze each item
     analyzed_items = []
     for item in items:
@@ -127,7 +126,7 @@ def analyze_actionable_items():
         complexity = estimate_complexity(item)
         work_type = categorize_by_type(item)
         time_estimate = estimate_time(complexity, item)
-        
+
         analyzed = {
             **item,
             'component': component,
@@ -135,13 +134,13 @@ def analyze_actionable_items():
             'work_type': work_type,
             'time_estimate': time_estimate
         }
-        
+
         analyzed_items.append(analyzed)
         by_component[component].append(analyzed)
         by_complexity[complexity].append(analyzed)
         by_type[work_type].append(analyzed)
         by_time[time_estimate].append(analyzed)
-    
+
     # Generate statistics
     stats = {
         'total_items': len(items),
@@ -150,41 +149,41 @@ def analyze_actionable_items():
         'by_type': {k: len(v) for k, v in by_type.items()},
         'by_time': {k: len(v) for k, v in by_time.items()}
     }
-    
+
     # Print summary
     print("=== Component Distribution ===")
     for component, count in sorted(stats['by_component'].items(), key=lambda x: x[1], reverse=True):
         print(f"{component:20s}: {count:3d} items")
-    
+
     print("\n=== Complexity Distribution ===")
     for complexity, count in sorted(stats['by_complexity'].items(), key=lambda x: x[1], reverse=True):
         print(f"{complexity:20s}: {count:3d} items")
-    
+
     print("\n=== Work Type Distribution ===")
     for work_type, count in sorted(stats['by_type'].items(), key=lambda x: x[1], reverse=True):
         print(f"{work_type:30s}: {count:3d} items")
-    
+
     print("\n=== Time Estimate Distribution ===")
     time_order = ['30min-1hr', '1-2hrs', '2-4hrs', '4-8hrs', '8-16hrs', '1-3days', '2-5days', '3-7days']
     for time_est in time_order:
         if time_est in stats['by_time']:
             print(f"{time_est:20s}: {stats['by_time'][time_est]:3d} items")
-    
+
     # Save detailed analysis
     output = {
         'statistics': stats,
         'analyzed_items': analyzed_items,
-        'by_component': {k: v for k, v in by_component.items()},
-        'by_complexity': {k: v for k, v in by_complexity.items()},
-        'by_type': {k: v for k, v in by_type.items()},
-        'by_time': {k: v for k, v in by_time.items()}
+        'by_component': dict(by_component.items()),
+        'by_complexity': dict(by_complexity.items()),
+        'by_type': dict(by_type.items()),
+        'by_time': dict(by_time.items())
     }
-    
+
     with open('actionable_todos_analysis.json', 'w') as f:
         json.dump(output, f, indent=2)
-    
+
     print("\n\nDetailed analysis saved to actionable_todos_analysis.json")
-    
+
     return output
 
 if __name__ == '__main__':

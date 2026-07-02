@@ -150,8 +150,12 @@ detect_hardware_capabilities() {
     
     # Memory detection
     if [ -f /proc/meminfo ]; then
-        local mem_total=$(grep MemTotal /proc/meminfo | awk '{print $2}')
-        local mem_gb=$((mem_total / 1024 / 1024))
+        local mem_total
+
+        mem_total=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+        local mem_gb
+
+        mem_gb=$((mem_total / 1024 / 1024))
         print_info "Total Memory: ${mem_gb} GB"
         export OPENCOG_MEMORY_GB="${mem_gb}"
     fi
@@ -177,7 +181,9 @@ configure_tensor_parameters() {
     export TENSOR_${component}_TESTS="${tests}"
     
     # Calculate tensor degrees of freedom
-    local dof=$((modules * build_steps * tests))
+    local dof
+
+    dof=$((modules * build_steps * tests))
     print_tensor "Degrees of Freedom: ${dof}"
     export TENSOR_${component}_DOF="${dof}"
     

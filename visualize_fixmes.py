@@ -4,11 +4,13 @@ Create visualizations for C++ FIXME analysis
 """
 
 import json
-import matplotlib.pyplot as plt
+
 import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+
 
 # Load the detailed analysis
-with open('cpp_fixme_detailed_analysis.json', 'r') as f:
+with open('cpp_fixme_detailed_analysis.json') as f:
     data = json.load(f)
 
 # Create a figure with multiple subplots
@@ -32,8 +34,8 @@ modules = list(data['module_summary'].keys())
 module_counts = [sum(data['module_summary'][m].values()) for m in modules]
 
 # Sort by count
-sorted_data = sorted(zip(modules, module_counts), key=lambda x: x[1], reverse=True)
-modules_sorted, counts_sorted = zip(*sorted_data)
+sorted_data = sorted(zip(modules, module_counts, strict=False), key=lambda x: x[1], reverse=True)
+modules_sorted, counts_sorted = zip(*sorted_data, strict=False)
 
 y_pos = range(len(modules_sorted))
 ax2.barh(y_pos, counts_sorted, color='#1976d2')
@@ -54,8 +56,8 @@ categories = list(data['category_summary'].keys())
 cat_counts = [data['category_summary'][c] for c in categories]
 
 # Sort by count
-sorted_cat = sorted(zip(categories, cat_counts), key=lambda x: x[1], reverse=True)
-categories_sorted, cat_counts_sorted = zip(*sorted_cat)
+sorted_cat = sorted(zip(categories, cat_counts, strict=False), key=lambda x: x[1], reverse=True)
+categories_sorted, cat_counts_sorted = zip(*sorted_cat, strict=False)
 
 ax3.bar(range(len(categories_sorted)), cat_counts_sorted, color='#7b1fa2')
 ax3.set_xticks(range(len(categories_sorted)))
@@ -77,11 +79,11 @@ width = 0.6
 
 p1 = ax4.bar(x_pos, critical_counts, width, label='Critical', color='#d32f2f')
 p2 = ax4.bar(x_pos, high_counts, width, bottom=critical_counts, label='High', color='#f57c00')
-p3 = ax4.bar(x_pos, medium_counts, width, 
-             bottom=[i+j for i,j in zip(critical_counts, high_counts)],
+p3 = ax4.bar(x_pos, medium_counts, width,
+             bottom=[i+j for i,j in zip(critical_counts, high_counts, strict=False)],
              label='Medium', color='#fbc02d')
 p4 = ax4.bar(x_pos, low_counts, width,
-             bottom=[i+j+k for i,j,k in zip(critical_counts, high_counts, medium_counts)],
+             bottom=[i+j+k for i,j,k in zip(critical_counts, high_counts, medium_counts, strict=False)],
              label='Low', color='#388e3c')
 
 ax4.set_xticks(x_pos)
@@ -122,7 +124,7 @@ LOW: {data['summary']['low']}
 
 ax5.text(0.1, 0.9, summary_text, transform=ax5.transAxes,
          fontsize=10, verticalalignment='top', fontfamily='monospace',
-         bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.3))
+         bbox={'boxstyle': 'round', 'facecolor': 'wheat', 'alpha': 0.3})
 
 # 6. Top Issues Table
 ax6 = plt.subplot(2, 3, 6)
@@ -149,7 +151,7 @@ TOP PRIORITY ITEMS
 
 ax6.text(0.1, 0.9, top_issues_text, transform=ax6.transAxes,
          fontsize=10, verticalalignment='top', fontfamily='monospace',
-         bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.3))
+         bbox={'boxstyle': 'round', 'facecolor': 'lightblue', 'alpha': 0.3})
 
 plt.tight_layout()
 plt.savefig('cpp_fixme_analysis_dashboard.png', dpi=300, bbox_inches='tight')
@@ -174,9 +176,9 @@ phases = [
 for i, phase in enumerate(phases):
     ax.barh(i, phase['duration'], left=phase['start'], height=0.6,
             color=phase['color'], alpha=0.7, edgecolor='black', linewidth=1.5)
-    
+
     # Add phase name
-    ax.text(phase['start'] + phase['duration']/2, i, 
+    ax.text(phase['start'] + phase['duration']/2, i,
             f"{phase['name']}\n({phase['items']} items)",
             ha='center', va='center', fontsize=9, fontweight='bold', color='white')
 

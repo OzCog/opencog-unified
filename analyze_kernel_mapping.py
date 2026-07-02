@@ -6,16 +6,16 @@ Maps cognitive components to kernel service architecture
 
 import json
 from pathlib import Path
-from collections import defaultdict
+
 
 class CognitiveKernelMapper:
     def __init__(self, repo_path):
         self.repo_path = Path(repo_path)
         self.component_analysis = {}
-        
+
     def analyze_components(self):
         """Analyze OpenCog components and map to kernel services"""
-        
+
         # Define component categories for kernel integration
         components = {
             # Core Cognitive Infrastructure (Kernel Layer 0)
@@ -25,7 +25,7 @@ class CognitiveKernelMapper:
                 'atomspace-storage': 'Persistence layer - kernel storage subsystem',
                 'atomspace-rocks': 'RocksDB backend - kernel block device',
             },
-            
+
             # Cognitive Process Managers (Kernel Layer 1)
             'cognitive_managers': {
                 'attention': 'Attention allocation - kernel scheduler for cognitive resources',
@@ -33,7 +33,7 @@ class CognitiveKernelMapper:
                 'pln': 'Probabilistic Logic Networks - kernel reasoning service',
                 'moses': 'Evolutionary optimization - kernel learning service',
             },
-            
+
             # Cognitive Devices (Kernel Layer 2)
             'cognitive_devices': {
                 'cogserver': 'Network cognitive server - kernel network stack',
@@ -41,7 +41,7 @@ class CognitiveKernelMapper:
                 'miner': 'Pattern mining - kernel analytics device',
                 'spacetime': 'Spatiotemporal reasoning - kernel time device',
             },
-            
+
             # High-Level Cognitive Services (Kernel Layer 3)
             'cognitive_services': {
                 'opencog': 'OpenPsi motivational system - kernel behavior service',
@@ -49,21 +49,21 @@ class CognitiveKernelMapper:
                 'learn': 'Language learning - kernel NLP service',
                 'lg-atomese': 'Link Grammar integration - kernel linguistic service',
             },
-            
+
             # Distributed Cognitive Infrastructure (Kernel Layer 4)
             'distributed_cognition': {
                 'distributed-cognition': 'Distributed cognitive mesh - kernel cluster manager',
                 'agentic-kernels-catalog': 'Cognitive agents - kernel process manager',
                 'cognitive-patterns': 'Reusable patterns - kernel library',
             },
-            
+
             # Neural-Symbolic Integration (Kernel Layer 5)
             'neural_symbolic': {
                 'neural-symbolic-integration': 'Neural-symbolic bridge - kernel ML accelerator',
                 'ggml-tensor-kernel': 'Tensor operations - kernel compute device',
             },
         }
-        
+
         for category, comps in components.items():
             self.component_analysis[category] = {}
             for comp_name, description in comps.items():
@@ -71,21 +71,21 @@ class CognitiveKernelMapper:
                 if comp_path.exists():
                     analysis = self.analyze_component_structure(comp_path, description)
                     self.component_analysis[category][comp_name] = analysis
-        
+
         return self.component_analysis
-    
+
     def analyze_component_structure(self, path, description):
         """Analyze individual component structure"""
         source_files = len(list(path.rglob('*.cc'))) + len(list(path.rglob('*.h')))
         has_tests = (path / 'tests').exists()
-        
+
         return {
             'description': description,
             'source_files': source_files,
             'has_tests': has_tests,
             'kernel_integration_ready': source_files > 0 and has_tests,
         }
-    
+
     def generate_kernel_architecture(self):
         """Generate kernel architecture mapping"""
         architecture = {
@@ -101,7 +101,7 @@ class CognitiveKernelMapper:
             'kernel_services': self.define_kernel_services(),
         }
         return architecture
-    
+
     def define_kernel_services(self):
         """Define new kernel services for cognitive OS"""
         return {
@@ -140,14 +140,14 @@ class CognitiveKernelMapper:
 if __name__ == '__main__':
     mapper = CognitiveKernelMapper('/home/ubuntu/opencog-unified')
     print("🧠 Analyzing OpenCog components for kernel integration...")
-    
+
     mapper.analyze_components()
     architecture = mapper.generate_kernel_architecture()
-    
+
     # Save analysis
     with open('/home/ubuntu/opencog-unified/cognitive_kernel_mapping.json', 'w') as f:
         json.dump(architecture, f, indent=2)
-    
+
     print("\n✅ Kernel Architecture Mapping Complete!")
     print(f"   Layers defined: {len(architecture['layers'])}")
     print(f"   Kernel services: {len(architecture['kernel_services'])}")

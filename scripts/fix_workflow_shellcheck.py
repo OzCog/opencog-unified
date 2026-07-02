@@ -29,6 +29,7 @@ import re
 import sys
 from pathlib import Path
 
+
 GH_VARS = (
     "GITHUB_ENV",
     "GITHUB_OUTPUT",

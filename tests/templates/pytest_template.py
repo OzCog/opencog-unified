@@ -15,9 +15,9 @@ Copyright (C) 2025-2026 OpenCog Foundation
 SPDX-License-Identifier: AGPL-3.0-or-later
 """
 
+
 import pytest
-import unittest
-from unittest.mock import Mock, patch
+
 
 # Import component modules
 # from opencog.atomspace import AtomSpace, TruthValue

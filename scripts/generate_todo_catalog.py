@@ -16,13 +16,14 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
+
 class TODOEnumerator:
     def __init__(self, repo_path):
         self.repo_path = Path(repo_path)
         self.todos = []
         self.subsystem_map = {
             'atomspace': 'Memory System',
-            'atomspace-storage': 'Persistence Subsystem', 
+            'atomspace-storage': 'Persistence Subsystem',
             'atomspace-rocks': 'Persistence Subsystem',
             'atomspace-restful': 'Persistence Subsystem',
             'cogserver': 'Task System',
@@ -40,11 +41,11 @@ class TODOEnumerator:
             'scripts': 'Build System',
             '.github': 'CI/CD System'
         }
-        
+
         # Pattern to match TODO/FIXME and similar items
         self.todo_patterns = [
             r'TODO\s*:?\s*(.*)',
-            r'FIXME\s*:?\s*(.*)', 
+            r'FIXME\s*:?\s*(.*)',
             r'XXX\s*:?\s*(.*)',
             r'HACK\s*:?\s*(.*)',
             r'@todo\s*:?\s*(.*)',
@@ -57,20 +58,20 @@ class TODOEnumerator:
             r'OC_ASSERT\s*\(\s*false\s*,\s*"[^"]*not implemented[^"]*"',
             r'Ensemble scoring not implemented',
         ]
-        
+
         # File extensions to scan
         self.file_extensions = {'.h', '.cc', '.cpp', '.c', '.py', '.scm', '.cmake'}
 
     def scan_repository(self):
         """Scan the entire repository for TODO items"""
         print(f"🔍 Scanning repository: {self.repo_path}")
-        
+
         for file_path in self.repo_path.rglob('*'):
-            if (file_path.is_file() and 
+            if (file_path.is_file() and
                 file_path.suffix in self.file_extensions and
                 not self._should_skip_path(file_path)):
                 self._scan_file(file_path)
-        
+
         print(f"📊 Found {len(self.todos)} TODO/FIXME items")
         return self.todos
 
@@ -79,7 +80,7 @@ class TODOEnumerator:
         path_str = str(file_path)
         # Skip paths that are in build directories or other temp directories
         skip_patterns = ['.git/', '__pycache__', '.pytest_cache', 'deps/']
-        # Skip build directories specifically  
+        # Skip build directories specifically
         if '/build/' in path_str or path_str.startswith('build/'):
             return True
         return any(skip in path_str for skip in skip_patterns)
@@ -87,14 +88,14 @@ class TODOEnumerator:
     def _scan_file(self, file_path):
         """Scan a single file for TODO items"""
         try:
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding='utf-8', errors='ignore') as f:
                 lines = f.readlines()
-                
+
             for line_num, line in enumerate(lines, 1):
                 line_clean = line.strip()
-                if not line_clean or line_clean.startswith('//') and 'TODO' not in line_clean:
+                if not line_clean or (line_clean.startswith('//') and 'TODO' not in line_clean):
                     continue
-                    
+
                 for pattern in self.todo_patterns:
                     match = re.search(pattern, line, re.IGNORECASE)
                     if match:
@@ -109,7 +110,7 @@ class TODOEnumerator:
                         }
                         self.todos.append(todo_item)
                         break
-                        
+
         except Exception as e:
             print(f"⚠️  Error scanning {file_path}: {e}")
 
@@ -127,7 +128,7 @@ class TODOEnumerator:
         if any(word in line_lower for word in ['critical', 'urgent', 'blocking', 'crash', 'security']):
             return 'CRITICAL'
         elif any(word in line_lower for word in ['important', 'performance', 'thread', 'race', 'deadlock']):
-            return 'HIGH'  
+            return 'HIGH'
         elif any(word in line_lower for word in ['should', 'could', 'nice', 'optimization']):
             return 'MEDIUM'
         else:
@@ -137,7 +138,7 @@ class TODOEnumerator:
         """Categorize the type of TODO"""
         line_lower = line.lower()
         file_str = str(file_path).lower()
-        
+
         if 'thread' in line_lower or 'race' in line_lower or 'sync' in line_lower:
             return 'Thread Safety'
         elif 'performance' in line_lower or 'optimize' in line_lower or 'cache' in line_lower:
@@ -157,19 +158,19 @@ class TODOEnumerator:
 
     def generate_catalog(self, output_path):
         """Generate the comprehensive TODO catalog"""
-        
+
         # Group TODOs by subsystem
         by_subsystem = defaultdict(list)
         for todo in self.todos:
             by_subsystem[todo['subsystem']].append(todo)
-        
+
         # Generate markdown content
         content = self._generate_markdown_content(by_subsystem)
-        
+
         # Write to file
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(content)
-        
+
         print(f"📝 Generated catalog: {output_path}")
 
     def _generate_markdown_content(self, by_subsystem):
@@ -179,8 +180,8 @@ class TODOEnumerator:
 **Problem Identification**
 The OpenCog Unified codebase contains distributed TODOs, FIXMEs, stubs, and "not implemented" fragments that block full cognitive realization. These are detected by CI and halt verification (see job: https://github.com/OzCog/opencog-unified/actions/runs/16539657246/job/46779076096, ref: 25d11bfe332cd501a967d9ab3a6957a22504249f).
 
-**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}  
-**Total Items**: {len(self.todos)}  
+**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
+**Total Items**: {len(self.todos)}
 **Commit Reference**: 25d11bfe332cd501a967d9ab3a6957a22504249f
 
 ---
@@ -218,23 +219,23 @@ A section for emergent TODOs.
             todos_in_subsystem = by_subsystem[subsystem_name]
             content += f"### {subsystem_name}\n"
             content += f"*Total items: {len(todos_in_subsystem)}*\n\n"
-            
+
             # Sort by priority and file
-            todos_sorted = sorted(todos_in_subsystem, 
+            todos_sorted = sorted(todos_in_subsystem,
                                 key=lambda x: (self._priority_order(x['priority']), x['file'], x['line']))
-            
+
             for todo in todos_sorted:
                 # Create GitHub link
                 github_link = f"https://github.com/OzCog/opencog-unified/blob/25d11bfe332cd501a967d9ab3a6957a22504249f/{todo['file']}#L{todo['line']}"
-                
+
                 content += f"- [ ] **{todo['file']}:{todo['line']}** ({todo['priority']}, {todo['category']})\n"
                 content += f"  - `{todo['content'][:100]}{'...' if len(todo['content']) > 100 else ''}`\n"
                 content += f"  - [Code reference]({github_link})\n\n"
-        
+
         content += self._generate_summary_stats(by_subsystem)
         content += self._generate_meta_cognitive_section()
         content += self._generate_theatrical_finale()
-        
+
         return content
 
     def _priority_order(self, priority):
@@ -244,16 +245,16 @@ A section for emergent TODOs.
 
     def _generate_summary_stats(self, by_subsystem):
         """Generate summary statistics"""
-        
+
         # Count by category and priority
         by_category = defaultdict(int)
         by_priority = defaultdict(int)
-        
+
         for subsystem_todos in by_subsystem.values():
             for todo in subsystem_todos:
                 by_category[todo['category']] += 1
                 by_priority[todo['priority']] += 1
-        
+
         content = """
 ---
 
@@ -315,15 +316,13 @@ In the grand symphony of cognitive architecture, each TODO represents not a mere
 
 The enumeration above represents our cognitive debt, but also our potential. Each checked box brings us closer to the realization of the OpenCog Unified vision: a complete, robust, and elegant implementation of artificial general intelligence.
 
-**Status**: 🔄 **ACTIVE TRACKING**  
-**Next Milestone**: Begin systematic resolution of Critical and High priority items  
+**Status**: 🔄 **ACTIVE TRACKING**
+**Next Milestone**: Begin systematic resolution of Critical and High priority items
 **Vision**: Complete cognitive architecture with zero placeholders
 
 ---
 
 *This document is automatically generated and should be updated regularly as the codebase evolves. Last updated: """ + datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC') + "*"
-        
-        return content
 
 def main():
     """Main execution function"""
@@ -331,14 +330,14 @@ def main():
         repo_path = sys.argv[1]
     else:
         repo_path = os.getcwd()
-    
+
     output_path = os.path.join(repo_path, 'COMPREHENSIVE-TODO-CATALOG.md')
-    
+
     enumerator = TODOEnumerator(repo_path)
     enumerator.scan_repository()
     enumerator.generate_catalog(output_path)
-    
-    print(f"✅ Comprehensive TODO catalog generated successfully!")
+
+    print("✅ Comprehensive TODO catalog generated successfully!")
     print(f"📄 Output: {output_path}")
     print(f"📊 Total items cataloged: {len(enumerator.todos)}")
 

@@ -14,8 +14,12 @@ TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 # Function to calculate attention values based on code complexity and activity
 calculate_attention_value() {
     local file_path="$1"
-    local file_size=$(stat -c%s "$file_path" 2>/dev/null || echo "0")
-    local lines=$(wc -l < "$file_path" 2>/dev/null || echo "0")
+    local file_size
+
+    file_size=$(stat -c%s "$file_path" 2>/dev/null || echo "0")
+    local lines
+
+    lines=$(wc -l < "$file_path" 2>/dev/null || echo "0")
     
     # Basic attention calculation: normalized by size and complexity indicators
     local complexity_score=0
@@ -36,11 +40,17 @@ calculate_attention_value() {
     fi
     
     # Base attention from file activity (size + lines)
-    local base_attention=$((file_size / 100 + lines))
-    local total_attention=$((base_attention + complexity_score))
+    local base_attention
+
+    base_attention=$((file_size / 100 + lines))
+    local total_attention
+
+    total_attention=$((base_attention + complexity_score))
     
     # Normalize to 0-100 scale
-    local normalized_attention=$((total_attention > 100 ? 100 : total_attention))
+    local normalized_attention
+
+    normalized_attention=$((total_attention > 100 ? 100 : total_attention))
     
     echo "$normalized_attention"
 }
@@ -56,7 +66,9 @@ extract_cognitive_workload() {
     
     # Process C++ files
     while IFS= read -r -d '' file; do
-        local attention=$(calculate_attention_value "$file")
+        local attention
+
+        attention=$(calculate_attention_value "$file")
         cpp_attention=$((cpp_attention + attention))
         total_files=$((total_files + 1))
         echo "  C++ File: $(basename "$file") -> Attention: $attention"
@@ -64,7 +76,9 @@ extract_cognitive_workload() {
     
     # Process Scheme files
     while IFS= read -r -d '' file; do
-        local attention=$(calculate_attention_value "$file")
+        local attention
+
+        attention=$(calculate_attention_value "$file")
         scheme_attention=$((scheme_attention + attention))
         total_files=$((total_files + 1))
         echo "  Scheme File: $(basename "$file") -> Attention: $attention"
@@ -72,19 +86,29 @@ extract_cognitive_workload() {
     
     # Process GGML/tensor files
     while IFS= read -r -d '' file; do
-        local attention=$(calculate_attention_value "$file")
+        local attention
+
+        attention=$(calculate_attention_value "$file")
         ggml_attention=$((ggml_attention + attention))
         total_files=$((total_files + 1))
         echo "  GGML/Tensor File: $(basename "$file") -> Attention: $attention"
     done < <(find . -path "*/ggml-tensor-kernel/*" \( -name "*.cc" -o -name "*.h" \) -print0 2>/dev/null)
     
     # Calculate distribution percentages
-    local total_attention=$((cpp_attention + scheme_attention + ggml_attention))
+    local total_attention
+
+    total_attention=$((cpp_attention + scheme_attention + ggml_attention))
     
     if [[ $total_attention -gt 0 ]]; then
-        local cpp_percent=$((cpp_attention * 100 / total_attention))
-        local scheme_percent=$((scheme_attention * 100 / total_attention))
-        local ggml_percent=$((ggml_attention * 100 / total_attention))
+        local cpp_percent
+
+        cpp_percent=$((cpp_attention * 100 / total_attention))
+        local scheme_percent
+
+        scheme_percent=$((scheme_attention * 100 / total_attention))
+        local ggml_percent
+
+        ggml_percent=$((ggml_attention * 100 / total_attention))
         
         echo "📈 Cognitive Workload Distribution:"
         echo "  - C++/Native Processing: ${cpp_percent}% (${cpp_attention} units)"
@@ -113,7 +137,9 @@ detect_attention_hotspots() {
     
     # Find files with high attention values
     while IFS= read -r -d '' file; do
-        local attention=$(calculate_attention_value "$file")
+        local attention
+
+        attention=$(calculate_attention_value "$file")
         if [[ $attention -gt 70 ]]; then
             hotspots+=("$(basename "$file"):$attention")
             echo "  🌟 High-attention file: $(basename "$file") (attention: $attention)"
@@ -140,11 +166,15 @@ calculate_ecan_urgency() {
     # Check recent modifications (simulate urgency from activity)
     if command -v git >/dev/null 2>&1; then
         # Files modified in last day (high urgency)
-        local recent_files=$(git diff --name-only HEAD~1 2>/dev/null | wc -l || echo "0")
+        local recent_files
+
+        recent_files=$(git diff --name-only HEAD~1 2>/dev/null | wc -l || echo "0")
         high_urgency=$((recent_files * 10))
         
         # Files in staging (medium urgency)
-        local staged_files=$(git diff --cached --name-only 2>/dev/null | wc -l || echo "0")
+        local staged_files
+
+        staged_files=$(git diff --cached --name-only 2>/dev/null | wc -l || echo "0")
         medium_urgency=$((staged_files * 5))
         
         echo "  ⚡ High Urgency (recent changes): $high_urgency units"
@@ -152,11 +182,16 @@ calculate_ecan_urgency() {
     fi
     
     # Base urgency from system complexity
-    local complexity_files=$(find . \( -name "*.cc" -o -name "*.scm" \) | wc -l)
+    local complexity_files
+
+    complexity_files=$(find . \( -name "*.cc" -o -name "*.scm" \) | wc -l)
     low_urgency=$((complexity_files * 2))
     echo "  📊 Low Urgency (base complexity): $low_urgency units"
     
-    local total_urgency=$((high_urgency + medium_urgency + low_urgency))
+    local total_urgency
+
+    
+    total_urgency=$((high_urgency + medium_urgency + low_urgency))
     echo "  🎯 Total System Urgency: $total_urgency units"
     
     # Export urgency metrics

@@ -5,38 +5,37 @@ Generates optimal build sequences with critical paths and parallelization opport
 Based on the complete dependency diagram from issue #85
 """
 
-import sys
-import json
 import argparse
-from typing import Dict, List, Set, Tuple, Optional
-from collections import defaultdict, deque
-import networkx as nx
-import matplotlib.pyplot as plt
+import json
+from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
+
+import networkx as nx
+
 
 @dataclass
 class Component:
     name: str
     category: str
-    dependencies: Set[str]
-    external_deps: Set[str]
+    dependencies: set[str]
+    external_deps: set[str]
 
 class DependencyAnalyzer:
     """Analyzes OpenCog component dependencies and generates optimal build sequences"""
-    
+
     def __init__(self):
         self.components = {}
         self.dependency_graph = nx.DiGraph()
         self.external_deps = set()
         self._initialize_dependencies()
-    
+
     def _initialize_dependencies(self):
         """Initialize the complete dependency graph from the issue description"""
-        
+
         # Component categories for styling and organization
         categories = {
-            'foundation': ['cogutil', 'blender_api_msgs', 'blender_api', 'asmoses', 'moses', 
+            'foundation': ['cogutil', 'blender_api_msgs', 'blender_api', 'asmoses', 'moses',
                           'ocpkg', 'rust_crates', 'external_tools', 'cogprotolab', 'src',
                           'integrated_output', 'guile_dbi', 'test_datasets', 'node_modules'],
             'core': ['atomspace_agents', 'atomspace_dht', 'atomspace', 'atomspace_storage', 'atomspace_rocks',
@@ -61,13 +60,13 @@ class DependencyAnalyzer:
                            'opencog_neo4j', 'opencog_debian', 'opencog_org', 'rest_api_documentation',
                            'python_client', 'python_destin', 'python_attic']
         }
-        
+
         # OpenCog component dependencies (cleaned names for Python identifiers)
         component_deps = {
             # Foundation layer
             'cogutil': set(),
-            
-            # Core layer  
+
+            # Core layer
             'atomspace': {'cogutil'},
             'atomspace_storage': {'cogutil', 'atomspace'},
             'cogserver': {'cogutil', 'atomspace', 'atomspace_storage'},
@@ -81,33 +80,33 @@ class DependencyAnalyzer:
             'atomspace_metta': {'cogutil', 'atomspace'},
             'atomspace_rpc': {'cogutil', 'atomspace'},
             'atomspace_cog': {'cogutil', 'atomspace', 'cogserver'},
-            
+
             # Logic layer
             'unify': {'cogutil', 'atomspace'},
             'ure': {'cogutil', 'atomspace', 'unify', 'cogserver'},
             'pattern_index': {'cogutil', 'atomspace'},
-            
+
             # Cognitive layer
             'attention': {'cogutil', 'atomspace', 'cogserver'},
             'spacetime': {'cogutil', 'atomspace'},
             'dimensional_embedding': {'cogutil', 'atomspace'},
-            
+
             # Advanced systems
             'pln': {'cogutil', 'atomspace', 'ure', 'unify', 'spacetime'},
             'miner': {'cogutil', 'atomspace', 'ure', 'unify'},
             'benchmark': {'cogutil', 'atomspace', 'ure'},
-            
+
             # Learning systems
             'moses': {'cogutil'},
             'asmoses': {'cogutil', 'atomspace', 'ure'},
             'learn': {'cogutil', 'atomspace', 'cogserver', 'unify'},
             'language_learning': {'cogutil'},
             'generate': {'cogutil', 'atomspace'},
-            
+
             # Language processing
             'lg_atomese': {'cogutil', 'atomspace'},
             'relex': {'cogutil'},
-            
+
             # Specialized components
             'cheminformatics': {'cogutil', 'atomspace'},
             'agi_bio': {'cogutil', 'atomspace'},
@@ -115,14 +114,14 @@ class DependencyAnalyzer:
             'sensory': {'cogutil', 'atomspace'},
             'visualization': {'cogutil', 'atomspace'},
             'TinyCog': {'atomspace'},
-            
-            # Integration layer  
+
+            # Integration layer
             'opencog': {'cogutil', 'atomspace', 'cogserver', 'attention', 'ure', 'lg_atomese', 'pln'},
-            
+
             # External dependencies tracked for reference
             'python_attic': {'cogutil', 'atomspace', 'cogserver', 'ure', 'pln'},
         }
-        
+
         # External/system dependencies
         external_deps_map = {
             'cogutil': {'boost', 'doxygen', 'gnubacktrace', 'iberty', 'parallelstl', 'cxxtest', 'pthreads', 'bfd', 'stlport'},
@@ -144,7 +143,7 @@ class DependencyAnalyzer:
             'TinyCog': {'festival', 'openmp', 'est', 'opencv', 'wiringpi', 'raspicam', 'alsa', 'guile', 'pkgconfig', 'pocketsphinx', 'dlib', 'protobuf'},
             'opencog': {'doxygen', 'attentionbank', 'valgrind', 'cxxtest', 'ghc', 'stack', 'lgatomese', 'boost'},
         }
-        
+
         # Initialize components
         for comp_name, deps in component_deps.items():
             category = 'other'
@@ -152,89 +151,89 @@ class DependencyAnalyzer:
                 if comp_name in comps:
                     category = cat
                     break
-            
+
             external_deps = external_deps_map.get(comp_name, set())
             self.external_deps.update(external_deps)
-            
+
             self.components[comp_name] = Component(
                 name=comp_name,
-                category=category, 
+                category=category,
                 dependencies=deps,
                 external_deps=external_deps
             )
-            
+
             # Add to graph
             self.dependency_graph.add_node(comp_name, category=category)
-            
+
         # Add dependency edges
         for comp_name, component in self.components.items():
             for dep in component.dependencies:
                 if dep in self.components:
                     self.dependency_graph.add_edge(dep, comp_name)
-    
-    def topological_sort(self) -> List[str]:
+
+    def topological_sort(self) -> list[str]:
         """Generate topological sort order for build sequence"""
         try:
             return list(nx.topological_sort(self.dependency_graph))
         except nx.NetworkXError as e:
             print(f"Error: Circular dependency detected: {e}")
             return []
-    
-    def find_critical_path(self) -> Tuple[List[str], int]:
+
+    def find_critical_path(self) -> tuple[list[str], int]:
         """Find the critical path (longest dependency chain)"""
         # For DAG, we need to find longest path
         # Since networkx doesn't have longest_path for DAG directly, we'll compute it
-        
+
         # Get all nodes with no dependencies (sources)
         sources = [n for n in self.dependency_graph.nodes() if self.dependency_graph.in_degree(n) == 0]
-        
+
         # Compute longest paths from each source
         longest_path = []
         max_length = 0
-        
+
         for source in sources:
             # Use DFS to find longest path from this source
             path, length = self._longest_path_from_node(source)
             if length > max_length:
                 max_length = length
                 longest_path = path
-                
+
         return longest_path, max_length
-    
-    def _longest_path_from_node(self, start_node: str) -> Tuple[List[str], int]:
+
+    def _longest_path_from_node(self, start_node: str) -> tuple[list[str], int]:
         """Find longest path from a given node using DFS"""
         visited = set()
         path = []
         max_path = []
         max_length = 0
-        
+
         def dfs(node):
             nonlocal max_path, max_length
             visited.add(node)
             path.append(node)
-            
+
             # Check if this is a longer path
             if len(path) > max_length:
                 max_length = len(path)
                 max_path = path.copy()
-            
+
             # Visit all successors
             for successor in self.dependency_graph.successors(node):
                 if successor not in visited:
                     dfs(successor)
-            
+
             path.pop()
             visited.remove(node)
-        
+
         dfs(start_node)
         return max_path, max_length
-    
-    def find_parallel_builds(self) -> Dict[int, List[str]]:
+
+    def find_parallel_builds(self) -> dict[int, list[str]]:
         """Find components that can be built in parallel at each level"""
         topo_order = self.topological_sort()
         if not topo_order:
             return {}
-        
+
         # Assign levels based on maximum dependency depth
         levels = {}
         for node in topo_order:
@@ -242,28 +241,28 @@ class DependencyAnalyzer:
                 levels[node] = 0
             else:
                 levels[node] = max(levels[pred] for pred in self.dependency_graph.predecessors(node)) + 1
-        
+
         # Group by level
         parallel_groups = defaultdict(list)
         for node, level in levels.items():
             parallel_groups[level].append(node)
-        
+
         return dict(parallel_groups)
-    
-    def analyze_component_complexity(self) -> Dict[str, Dict]:
+
+    def analyze_component_complexity(self) -> dict[str, dict]:
         """Analyze build complexity for each component"""
         complexity = {}
-        
+
         for comp_name, component in self.components.items():
             # Complexity metrics
             dep_count = len(component.dependencies)
             external_dep_count = len(component.external_deps)
-            in_degree = self.dependency_graph.in_degree(comp_name)
+            self.dependency_graph.in_degree(comp_name)
             out_degree = self.dependency_graph.out_degree(comp_name)
-            
+
             # Simple complexity score
             complexity_score = dep_count * 2 + external_dep_count + out_degree
-            
+
             complexity[comp_name] = {
                 'internal_dependencies': dep_count,
                 'external_dependencies': external_dep_count,
@@ -272,13 +271,13 @@ class DependencyAnalyzer:
                 'category': component.category,
                 'external_deps': list(component.external_deps)
             }
-        
+
         return complexity
-    
-    def generate_build_phases(self) -> Dict[str, List[str]]:
+
+    def generate_build_phases(self) -> dict[str, list[str]]:
         """Generate logical build phases based on dependency layers"""
         parallel_groups = self.find_parallel_builds()
-        
+
         phases = {
             'Phase 1 - Foundation': [],
             'Phase 2 - Core Systems': [],
@@ -289,12 +288,12 @@ class DependencyAnalyzer:
             'Phase 7 - Specialized Components': [],
             'Phase 8 - Integration Layer': []
         }
-        
+
         # Map levels to phases based on component categories
-        for level, components in parallel_groups.items():
+        for _level, components in parallel_groups.items():
             for comp in components:
                 category = self.components[comp].category
-                
+
                 if category == 'foundation' or comp == 'cogutil':
                     phases['Phase 1 - Foundation'].append(comp)
                 elif category == 'core' or comp in ['atomspace', 'cogserver']:
@@ -311,15 +310,15 @@ class DependencyAnalyzer:
                     phases['Phase 7 - Specialized Components'].append(comp)
                 else:
                     phases['Phase 8 - Integration Layer'].append(comp)
-        
+
         # Remove empty phases
         return {k: v for k, v in phases.items() if v}
-    
+
     def generate_cmake_sequence(self) -> str:
         """Generate optimized CMake build sequence"""
-        topo_order = self.topological_sort()
+        self.topological_sort()
         parallel_groups = self.find_parallel_builds()
-        
+
         cmake_content = """# OpenCog Unified - Optimized Build Sequence
 # Generated by dependency_analyzer.py
 
@@ -331,17 +330,17 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Add cmake directory to module path
-set(CMAKE_MODULE_PATH 
+set(CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake
     ${CMAKE_CURRENT_SOURCE_DIR}/cogutil/cmake
     ${CMAKE_MODULE_PATH}
 )
 
 """
-        
+
         # Add components in dependency order
         cmake_content += "# Optimized build sequence based on dependency analysis\n"
-        
+
         for level, components in parallel_groups.items():
             cmake_content += f"\n# Level {level} - Parallel builds possible\n"
             for comp in components:
@@ -350,7 +349,7 @@ set(CMAKE_MODULE_PATH
     add_subdirectory({comp_dir})
 endif()
 """
-        
+
         # Add dependency relationships
         cmake_content += "\n# Explicit dependency relationships\n"
         for comp_name, component in self.components.items():
@@ -360,18 +359,18 @@ endif()
                     dep_dir = dep.replace('_', '-')
                     cmake_content += f"if(TARGET {comp_dir} AND TARGET {dep_dir})\n"
                     cmake_content += f"    add_dependencies({comp_dir} {dep_dir})\n"
-                    cmake_content += f"endif()\n"
-        
+                    cmake_content += "endif()\n"
+
         return cmake_content
-    
-    def generate_report(self) -> Dict:
+
+    def generate_report(self) -> dict:
         """Generate comprehensive dependency analysis report"""
         topo_order = self.topological_sort()
         critical_path, critical_length = self.find_critical_path()
         parallel_groups = self.find_parallel_builds()
         complexity = self.analyze_component_complexity()
         phases = self.generate_build_phases()
-        
+
         report = {
             'analysis_summary': {
                 'total_components': len(self.components),
@@ -387,70 +386,70 @@ endif()
                 'build_phases': phases
             },
             'component_analysis': complexity,
-            'external_dependencies': sorted(list(self.external_deps)),
+            'external_dependencies': sorted(self.external_deps),
             'recommendations': self._generate_recommendations(critical_path, parallel_groups, complexity)
         }
-        
+
         return report
-    
-    def _generate_recommendations(self, critical_path: List[str], 
-                                parallel_groups: Dict[int, List[str]], 
-                                complexity: Dict[str, Dict]) -> List[str]:
+
+    def _generate_recommendations(self, critical_path: list[str],
+                                parallel_groups: dict[int, list[str]],
+                                complexity: dict[str, dict]) -> list[str]:
         """Generate build optimization recommendations"""
         recommendations = []
-        
+
         # Critical path recommendations
         if critical_path:
             recommendations.append(f"Critical path: {' -> '.join(critical_path)}")
-            recommendations.append(f"Focus optimization efforts on critical path components")
-        
+            recommendations.append("Focus optimization efforts on critical path components")
+
         # Parallelization opportunities
         max_parallel = max(len(group) for group in parallel_groups.values())
         recommendations.append(f"Maximum parallelization: {max_parallel} components simultaneously")
-        
+
         # High complexity components
-        high_complexity = sorted(complexity.items(), 
+        high_complexity = sorted(complexity.items(),
                                key=lambda x: x[1]['complexity_score'], reverse=True)[:5]
         recommendations.append("Highest complexity components:")
         for comp, data in high_complexity:
             recommendations.append(f"  - {comp}: score {data['complexity_score']}")
-        
+
         # External dependency analysis
-        high_external_deps = [comp for comp, data in complexity.items() 
+        high_external_deps = [comp for comp, data in complexity.items()
                             if data['external_dependencies'] > 3]
         if high_external_deps:
             recommendations.append(f"Components with many external deps: {', '.join(high_external_deps)}")
-        
+
         return recommendations
-    
+
     def save_report(self, filename: str = "dependency_analysis_report.json"):
         """Save analysis report to JSON file"""
         report = self.generate_report()
         with open(filename, 'w') as f:
             json.dump(report, f, indent=2)
         print(f"Report saved to {filename}")
-    
+
     def save_cmake_file(self, filename: str = "CMakeLists_optimized.txt"):
         """Save optimized CMake file"""
         cmake_content = self.generate_cmake_sequence()
         with open(filename, 'w') as f:
             f.write(cmake_content)
         print(f"Optimized CMake file saved to {filename}")
-    
+
     def visualize_dependencies(self, output_file: str = "dependency_graph.png"):
         """Generate dependency graph visualization"""
         try:
             import matplotlib.pyplot as plt
-            
+
             plt.figure(figsize=(20, 16))
-            
+
             # Create layout
             pos = nx.spring_layout(self.dependency_graph, k=3, iterations=50)
-            
+
             # Color nodes by category
             category_colors = {
                 'foundation': '#e8f5e8',
-                'core': '#e3f2fd', 
+                'core': '#e3f2fd',
                 'logic': '#fff3e0',
                 'cognitive': '#f3e5f5',
                 'advanced': '#ffebee',
@@ -459,12 +458,12 @@ endif()
                 'integration': '#fce4ec',
                 'other': '#f5f5f5'
             }
-            
-            node_colors = [category_colors.get(self.components[node].category, '#f5f5f5') 
+
+            node_colors = [category_colors.get(self.components[node].category, '#f5f5f5')
                           for node in self.dependency_graph.nodes()]
-            
+
             # Draw graph
-            nx.draw(self.dependency_graph, pos, 
+            nx.draw(self.dependency_graph, pos,
                    node_color=node_colors,
                    node_size=1000,
                    font_size=8,
@@ -473,22 +472,22 @@ endif()
                    arrowsize=20,
                    edge_color='gray',
                    alpha=0.8)
-            
+
             # Add labels
             nx.draw_networkx_labels(self.dependency_graph, pos, font_size=6)
-            
+
             plt.title("OpenCog Complete Dependency Graph", size=16)
             plt.axis('off')
             plt.tight_layout()
             plt.savefig(output_file, dpi=300, bbox_inches='tight')
             print(f"Dependency graph saved to {output_file}")
-            
+
         except ImportError:
             print("matplotlib not available for visualization")
 
 def main():
     parser = argparse.ArgumentParser(description='OpenCog Dependency Analyzer')
-    parser.add_argument('--report', action='store_true', 
+    parser.add_argument('--report', action='store_true',
                        help='Generate comprehensive analysis report')
     parser.add_argument('--cmake', action='store_true',
                        help='Generate optimized CMake file')
@@ -496,49 +495,49 @@ def main():
                        help='Generate dependency graph visualization')
     parser.add_argument('--output-dir', default='.',
                        help='Output directory for generated files')
-    
+
     args = parser.parse_args()
-    
+
     analyzer = DependencyAnalyzer()
-    
+
     # Set output directory
     output_dir = Path(args.output_dir)
     output_dir.mkdir(exist_ok=True)
-    
+
     if args.report or not any([args.cmake, args.visualize]):
         # Generate and display report
         report = analyzer.generate_report()
-        
+
         print("=== OpenCog Complete Dependency Analysis ===\n")
-        
+
         print("SUMMARY:")
         for key, value in report['analysis_summary'].items():
             print(f"  {key}: {value}")
-        
+
         print(f"\nCRITICAL PATH ({len(report['build_sequence']['critical_path'])} components):")
         print(f"  {' -> '.join(report['build_sequence']['critical_path'])}")
-        
-        print(f"\nBUILD PHASES:")
+
+        print("\nBUILD PHASES:")
         for phase, components in report['build_sequence']['build_phases'].items():
             print(f"  {phase}: {len(components)} components")
             print(f"    {', '.join(components)}")
-        
-        print(f"\nPARALLELIZATION OPPORTUNITIES:")
+
+        print("\nPARALLELIZATION OPPORTUNITIES:")
         for level, components in report['build_sequence']['parallel_groups'].items():
             if len(components) > 1:
                 print(f"  Level {level}: {len(components)} parallel builds")
                 print(f"    {', '.join(components)}")
-        
-        print(f"\nRECOMMENDATIONS:")
+
+        print("\nRECOMMENDATIONS:")
         for rec in report['recommendations']:
             print(f"  • {rec}")
-        
+
         # Save detailed report
         analyzer.save_report(output_dir / "dependency_analysis_report.json")
-    
+
     if args.cmake:
         analyzer.save_cmake_file(output_dir / "CMakeLists_optimized.txt")
-    
+
     if args.visualize:
         analyzer.visualize_dependencies(output_dir / "dependency_graph.png")
 

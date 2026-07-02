@@ -1,23 +1,24 @@
 #!/usr/bin/env python3
 """Generate a progress report on placeholder implementation"""
 import json
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 
 def generate_report():
     """Generate a comprehensive progress report"""
     repo_root = Path("/home/ubuntu/opencog-unified")
-    
+
     # Load all data
-    with open(repo_root / 'placeholder_analysis.json', 'r') as f:
+    with open(repo_root / 'placeholder_analysis.json') as f:
         analysis = json.load(f)
-    with open(repo_root / 'stub_implementations.json', 'r') as f:
+    with open(repo_root / 'stub_implementations.json') as f:
         stubs = json.load(f)
-    with open(repo_root / 'implementation_report.json', 'r') as f:
+    with open(repo_root / 'implementation_report.json') as f:
         impl_report = json.load(f)
-    with open(repo_root / 'feature_implementation_report.json', 'r') as f:
+    with open(repo_root / 'feature_implementation_report.json') as f:
         feature_report = json.load(f)
-    with open(repo_root / 'actionable_items.json', 'r') as f:
+    with open(repo_root / 'actionable_items.json') as f:
         actionable = json.load(f)
 
     # --- Define variables for the report ---
@@ -34,7 +35,7 @@ def generate_report():
     clarification_fixes_count=impl_report['summary']['by_type'].get('clarification_added', 0)
     clarification_examples='\n'.join([f"- `{fix['file']}:{fix['line']}`" for fix in impl_report.get('by_type', {}).get('clarification_added', [])[:3]])
     actionable_count=len(actionable)
-    
+
     # --- Report Content ---
     report = f"""
 # Progress Report: Placeholder Implementation in opencog-unified
@@ -44,7 +45,7 @@ def generate_report():
 
 ## 1. Executive Summary
 
-This report details the progress made in identifying and resolving placeholder implementations within the `opencog-unified` repository. The initial analysis uncovered **{total_placeholders}** placeholders, including `FIXME`, `TODO`, and stub functions. 
+This report details the progress made in identifying and resolving placeholder implementations within the `opencog-unified` repository. The initial analysis uncovered **{total_placeholders}** placeholders, including `FIXME`, `TODO`, and stub functions.
 
 A total of **{total_fixes}** placeholders have been successfully addressed, primarily focusing on documentation improvements, removal of obsolete comments, and implementation of minor features. This work improves code clarity and maintainability. The next priorities are to tackle more complex implementation tasks and continue with systematic code cleanup.
 
@@ -74,7 +75,7 @@ The following fixes have been implemented and verified:
 
 ### 3.2. Documentation and Comment Cleanup
 
-{obsolete_fixes_count} `FIXME` and `TODO` comments referring to obsolete or deprecated code were updated to `NOTE` to reduce noise and improve clarity. 
+{obsolete_fixes_count} `FIXME` and `TODO` comments referring to obsolete or deprecated code were updated to `NOTE` to reduce noise and improve clarity.
 
 **Examples:**
 {obsolete_examples}
@@ -117,11 +118,11 @@ This initial phase of work has successfully addressed a number of low-hanging fr
 *This report was automatically generated based on analysis of the repository.*
 
 """
-    
+
     # Save the report
     with open(repo_root / 'progress_report.md', 'w') as f:
         f.write(report)
-    
+
     print("Progress report generated successfully: progress_report.md")
 
 if __name__ == '__main__':

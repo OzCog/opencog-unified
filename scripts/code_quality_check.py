@@ -4,13 +4,11 @@ Comprehensive Code Quality Checker for OpenCog Unified
 Analyzes code quality metrics and generates actionable reports
 """
 
-import os
-import re
 import json
-import subprocess
-from pathlib import Path
-from typing import Dict, List, Tuple
+import re
 from collections import defaultdict
+from pathlib import Path
+
 
 class CodeQualityChecker:
     def __init__(self, repo_path: str):
@@ -19,7 +17,7 @@ class CodeQualityChecker:
         self.metrics = defaultdict(dict)
         self.issues = []
 
-    def check_todo_fixme(self) -> Dict[str, int]:
+    def check_todo_fixme(self) -> dict[str, int]:
         """Count TODO, FIXME, and similar markers"""
         patterns = {
             'TODO': r'TODO|@todo',
@@ -40,7 +38,7 @@ class CodeQualityChecker:
                     continue
 
                 try:
-                    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    with open(file_path, encoding='utf-8', errors='ignore') as f:
                         content = f.read()
 
                     for marker, pattern in patterns.items():
@@ -49,7 +47,7 @@ class CodeQualityChecker:
                             counts[marker] += len(matches)
                             rel_path = file_path.relative_to(self.repo_path)
                             files_with_markers[marker].append(str(rel_path))
-                except Exception as e:
+                except Exception:
                     pass
 
         self.metrics['markers'] = dict(counts)
@@ -57,7 +55,7 @@ class CodeQualityChecker:
 
         return dict(counts)
 
-    def check_code_complexity(self) -> Dict[str, any]:
+    def check_code_complexity(self) -> dict[str, any]:
         """Analyze code complexity metrics"""
         complexity = {
             'total_files': 0,
@@ -73,7 +71,7 @@ class CodeQualityChecker:
                     continue
 
                 try:
-                    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    with open(file_path, encoding='utf-8', errors='ignore') as f:
                         lines = f.readlines()
 
                     complexity['total_files'] += 1
@@ -87,7 +85,7 @@ class CodeQualityChecker:
                             complexity['comment_lines'] += 1
                         else:
                             complexity['code_lines'] += 1
-                except Exception as e:
+                except Exception:
                     pass
 
         if complexity['total_lines'] > 0:
@@ -96,7 +94,7 @@ class CodeQualityChecker:
         self.metrics['complexity'] = complexity
         return complexity
 
-    def check_documentation(self) -> Dict[str, List[str]]:
+    def check_documentation(self) -> dict[str, list[str]]:
         """Check for missing or incomplete documentation"""
         missing_docs = []
 
@@ -120,14 +118,14 @@ class CodeQualityChecker:
                 continue
 
             try:
-                with open(header, 'r', encoding='utf-8', errors='ignore') as f:
+                with open(header, encoding='utf-8', errors='ignore') as f:
                     content = f.read()
 
                 # Check for Doxygen-style comments
                 if not re.search(r'/\*\*|\*\s*@brief|///\s*@brief', content):
                     rel_path = header.relative_to(self.repo_path)
                     undocumented_headers.append(str(rel_path))
-            except Exception as e:
+            except Exception:
                 pass
 
         self.metrics['documentation'] = {
@@ -138,7 +136,7 @@ class CodeQualityChecker:
 
         return self.metrics['documentation']
 
-    def check_code_style(self) -> Dict[str, any]:
+    def check_code_style(self) -> dict[str, any]:
         """Check code style consistency"""
         style_issues = {
             'long_lines': 0,
@@ -153,10 +151,10 @@ class CodeQualityChecker:
                     continue
 
                 try:
-                    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    with open(file_path, encoding='utf-8', errors='ignore') as f:
                         lines = f.readlines()
 
-                    for i, line in enumerate(lines):
+                    for _i, line in enumerate(lines):
                         # Check line length (120 chars)
                         if len(line.rstrip()) > 120:
                             style_issues['long_lines'] += 1
@@ -173,13 +171,13 @@ class CodeQualityChecker:
                     if lines and not lines[-1].endswith('\n'):
                         style_issues['missing_newline_eof'] += 1
 
-                except Exception as e:
+                except Exception:
                     pass
 
         self.metrics['style'] = style_issues
         return style_issues
 
-    def check_security_patterns(self) -> List[Dict[str, str]]:
+    def check_security_patterns(self) -> list[dict[str, str]]:
         """Check for common security anti-patterns"""
         security_issues = []
 
@@ -196,7 +194,7 @@ class CodeQualityChecker:
                     continue
 
                 try:
-                    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    with open(file_path, encoding='utf-8', errors='ignore') as f:
                         content = f.read()
 
                     for issue_type, pattern in patterns.items():
@@ -208,13 +206,13 @@ class CodeQualityChecker:
                                 'file': str(rel_path),
                                 'snippet': match.group(0)
                             })
-                except Exception as e:
+                except Exception:
                     pass
 
         self.metrics['security'] = security_issues[:20]
         return security_issues
 
-    def generate_report(self) -> Dict:
+    def generate_report(self) -> dict:
         """Generate comprehensive quality report"""
         print("🔍 Analyzing code quality...")
 
@@ -249,7 +247,7 @@ class CodeQualityChecker:
 
         return report
 
-    def _generate_recommendations(self) -> List[str]:
+    def _generate_recommendations(self) -> list[str]:
         """Generate actionable recommendations"""
         recommendations = []
 

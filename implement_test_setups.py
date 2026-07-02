@@ -2,6 +2,7 @@
 import os
 import re
 
+
 test_files = [
     'tests/integration/test_atomspace-restful.py',
     'tests/integration/test_atomspace-rocks.py',
@@ -16,10 +17,10 @@ results = []
 for filepath in test_files:
     if not os.path.exists(filepath):
         continue
-    
-    with open(filepath, 'r') as f:
+
+    with open(filepath) as f:
         content = f.read()
-    
+
     # Replace pass-only setUp with proper implementation
     new_content = re.sub(
         r'def setUp\(self\):\s+"""Set up test environment"""\s+pass',
@@ -30,7 +31,7 @@ for filepath in test_files:
         self.temp_files = []''',
         content
     )
-    
+
     if new_content != content:
         with open(filepath, 'w') as f:
             f.write(new_content)

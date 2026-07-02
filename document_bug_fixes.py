@@ -5,10 +5,11 @@ Convert bug fix TODOs into well-documented NOTEs with context
 import json
 import re
 
+
 def read_file_lines(filepath):
     """Read file and return lines"""
     try:
-        with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(filepath, encoding='utf-8', errors='ignore') as f:
             return f.readlines()
     except Exception as e:
         print(f"Error reading {filepath}: {e}")
@@ -26,10 +27,10 @@ def write_file_lines(filepath, lines):
 
 def convert_bug_comment(content, context):
     """Convert a bug fix comment to a well-documented NOTE"""
-    
+
     # Extract the core issue
     content_clean = re.sub(r'^[/;#]*\s*(XXX|TODO|FIXME)\s*', '', content).strip()
-    
+
     # Determine the comment style
     if content.strip().startswith('//'):
         prefix = '// '
@@ -37,15 +38,15 @@ def convert_bug_comment(content, context):
         prefix = '; '
     else:
         prefix = '// '
-    
+
     # Create improved documentation
     note = f"{prefix}NOTE: {content_clean}\n"
     note += f"{prefix}This requires further investigation and testing before implementation.\n"
-    
+
     return note
 
 # Load bug fixes
-with open('categorized_bug_fixes.json', 'r') as f:
+with open('categorized_bug_fixes.json') as f:
     data = json.load(f)
 
 documentation_fixes = data['documentation_fixes']
@@ -59,23 +60,23 @@ processed = []
 for item in selected_fixes:
     filepath = item['file']
     line_num = item['line']
-    
+
     print(f"\nProcessing: {filepath}:{line_num}")
     print(f"  Content: {item['content'][:60]}...")
-    
+
     lines = read_file_lines(filepath)
     if lines is None:
-        print(f"  Skipped (file not found)")
+        print("  Skipped (file not found)")
         continue
-    
+
     # Find and update the line
     if line_num <= len(lines):
         original_line = lines[line_num - 1]
         new_comment = convert_bug_comment(item['content'], item['context'])
-        
+
         # Replace the line
         lines[line_num - 1] = new_comment
-        
+
         if write_file_lines(filepath, lines):
             processed.append({
                 'file': filepath,
@@ -83,15 +84,15 @@ for item in selected_fixes:
                 'original': original_line.strip(),
                 'updated': new_comment.strip()
             })
-            print(f"  Updated successfully")
+            print("  Updated successfully")
         else:
-            print(f"  Failed to write")
+            print("  Failed to write")
     else:
-        print(f"  Skipped (line number out of range)")
+        print("  Skipped (line number out of range)")
 
 # Save report
 with open('bug_fix_documentation_report.json', 'w') as f:
     json.dump(processed, f, indent=2)
 
 print(f"\n\nProcessed {len(processed)} bug fix documentation updates")
-print(f"Report saved to bug_fix_documentation_report.json")
+print("Report saved to bug_fix_documentation_report.json")

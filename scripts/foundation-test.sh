@@ -109,7 +109,10 @@ verify_implementation_depth() {
         small_files=$(find "${component_dir}/opencog" \( -name "*.cc" -o -name "*.c" \) -size -${min_size}c | wc -l)
     fi
 
-    local substantial_files=$((total_impl_files - small_files))
+    local substantial_files
+
+
+    substantial_files=$((total_impl_files - small_files))
     local percentage=0
     if [ "$total_impl_files" -gt 0 ]; then
         percentage=$((substantial_files * 100 / total_impl_files))
@@ -381,7 +384,9 @@ print_summary() {
     echo -e "${YELLOW}Skipped:       ${NC}${SKIPPED_TESTS}"
 
     if [ "$TOTAL_TESTS" -gt 0 ]; then
-        local success_rate=$((PASSED_TESTS * 100 / TOTAL_TESTS))
+        local success_rate
+
+        success_rate=$((PASSED_TESTS * 100 / TOTAL_TESTS))
         echo -e "${MAGENTA}Success Rate:  ${NC}${success_rate}%"
     fi
 

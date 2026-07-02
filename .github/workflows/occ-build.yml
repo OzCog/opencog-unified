@@ -174,7 +174,7 @@ jobs:
           libboost-regex-dev \
           guile-3.0-dev \
           libgmp-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           python3-pip \
@@ -197,7 +197,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF -DBUILD_CYTHON=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
 
     - name: Build AtomSpace
       run: |
@@ -277,7 +277,7 @@ jobs:
           libboost-system-dev \
           libboost-thread-dev \
           guile-3.0-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
@@ -298,7 +298,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF -DBUILD_CYTHON=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -382,7 +382,7 @@ jobs:
           libboost-thread-dev \
           guile-3.0-dev \
           librocksdb-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
@@ -403,7 +403,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF -DBUILD_CYTHON=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -509,7 +509,7 @@ jobs:
           libboost-thread-dev \
           guile-3.0-dev \
           libasio-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
@@ -539,7 +539,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF -DBUILD_CYTHON=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -635,7 +635,7 @@ jobs:
           libboost-thread-dev \
           guile-3.0-dev \
           libasio-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
@@ -665,7 +665,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF -DBUILD_CYTHON=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -771,7 +771,7 @@ jobs:
           libboost-system-dev \
           libboost-thread-dev \
           guile-3.0-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
@@ -792,7 +792,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF -DBUILD_CYTHON=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -875,7 +875,7 @@ jobs:
           libboost-system-dev \
           libboost-thread-dev \
           guile-3.0-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
@@ -896,7 +896,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF -DBUILD_CYTHON=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -998,7 +998,7 @@ jobs:
           libboost-system-dev \
           libboost-thread-dev \
           guile-3.0-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
@@ -1019,7 +1019,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF -DBUILD_CYTHON=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1125,7 +1125,7 @@ jobs:
           libboost-thread-dev \
           guile-3.0-dev \
           libasio-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
@@ -1155,7 +1155,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF -DBUILD_CYTHON=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1262,7 +1262,7 @@ jobs:
           libboost-thread-dev \
           libboost-regex-dev \
           guile-3.0-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
@@ -1283,7 +1283,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF -DBUILD_CYTHON=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1393,7 +1393,7 @@ jobs:
           libboost-system-dev \
           libboost-thread-dev \
           guile-3.0-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
@@ -1414,7 +1414,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF -DBUILD_CYTHON=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1498,7 +1498,7 @@ jobs:
           libboost-thread-dev \
           guile-3.0-dev \
           libasio-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
@@ -1520,7 +1520,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF -DBUILD_CYTHON=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1627,7 +1627,7 @@ jobs:
           libboost-thread-dev \
           guile-3.0-dev \
           libasio-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
@@ -1649,7 +1649,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF -DBUILD_CYTHON=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1789,7 +1789,7 @@ jobs:
           libboost-thread-dev \
           guile-3.0-dev \
           libasio-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
@@ -1819,7 +1819,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF -DBUILD_CYTHON=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig

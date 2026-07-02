@@ -10,9 +10,8 @@ Date: 2026-01-02
 """
 
 import re
-import os
 from pathlib import Path
-from typing import Dict, List, Set, Tuple
+
 
 # Mapping of CMake variables to their target names
 KNOWN_DEPENDENCIES = {
@@ -209,14 +208,14 @@ BUILD_ORDER = {
 }
 
 
-def find_add_library(content: str) -> List[str]:
+def find_add_library(content: str) -> list[str]:
     """Find all ADD_LIBRARY target names in content."""
     pattern = r'ADD_LIBRARY\s*\(\s*(\w+[-\w]*)'
     matches = re.findall(pattern, content, re.IGNORECASE)
     return matches
 
 
-def find_target_link_libraries(content: str, target: str) -> List[str]:
+def find_target_link_libraries(content: str, target: str) -> list[str]:
     """Find all libraries linked to a target."""
     # Pattern to match TARGET_LINK_LIBRARIES(target ...)
     pattern = rf'TARGET_LINK_LIBRARIES\s*\(\s*{re.escape(target)}[\s\n]+([^)]+)\)'
@@ -231,7 +230,7 @@ def find_target_link_libraries(content: str, target: str) -> List[str]:
     return links
 
 
-def find_existing_dependencies(content: str, target: str) -> Set[str]:
+def find_existing_dependencies(content: str, target: str) -> set[str]:
     """Find existing ADD_DEPENDENCIES for a target."""
     pattern = rf'ADD_DEPENDENCIES\s*\(\s*{re.escape(target)}[\s\n]+([^)]+)\)'
     match = re.search(pattern, content, re.IGNORECASE | re.DOTALL)
@@ -244,7 +243,7 @@ def find_existing_dependencies(content: str, target: str) -> Set[str]:
     return deps
 
 
-def determine_required_dependencies(links: List[str]) -> Set[str]:
+def determine_required_dependencies(links: list[str]) -> set[str]:
     """Determine required dependencies based on linked libraries."""
     deps = set()
 
@@ -260,7 +259,7 @@ def determine_required_dependencies(links: List[str]) -> Set[str]:
     return deps
 
 
-def add_dependency_declaration(content: str, target: str, deps: Set[str]) -> str:
+def add_dependency_declaration(content: str, target: str, deps: set[str]) -> str:
     """Add ADD_DEPENDENCIES declaration after ADD_LIBRARY."""
     if not deps:
         return content
@@ -281,7 +280,7 @@ def add_dependency_declaration(content: str, target: str, deps: Set[str]) -> str
     return content
 
 
-def process_cmake_file(filepath: Path, dry_run: bool = False) -> Tuple[bool, List[str]]:
+def process_cmake_file(filepath: Path, dry_run: bool = False) -> tuple[bool, list[str]]:
     """Process a single CMakeLists.txt file."""
     changes = []
 

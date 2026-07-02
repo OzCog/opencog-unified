@@ -33,7 +33,7 @@ jobs:
   build-spacetime:
     runs-on: ubuntu-latest
     name: Build SpaceTime
-#    needs: build-cogserver
+    # needs: build-cogserver
 
     steps:
     - name: Checkout Repository
@@ -66,7 +66,6 @@ jobs:
           libboost-thread-dev \
           guile-3.0-dev \
           libasio-dev \
-          cython3 \
           python3-nose \
           python3-dev \
           valgrind \
@@ -88,7 +87,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF -DBUILD_CYTHON=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -312,4 +311,3 @@ jobs:
 #        cd pln/build
 #        sudo make install
 #        sudo ldconfig
-

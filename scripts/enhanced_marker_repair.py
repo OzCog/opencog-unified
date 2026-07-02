@@ -12,13 +12,11 @@ This script extends the intelligent_marker_repair.py with:
 Part of the Entelechy Framework repair process - Next Phase.
 """
 
-import re
 import json
-import os
-from pathlib import Path
-from typing import Dict, List, Tuple, Optional
-from dataclasses import dataclass, asdict, field
+import re
+from dataclasses import asdict, dataclass
 from datetime import datetime
+from pathlib import Path
 
 
 @dataclass
@@ -29,7 +27,7 @@ class EnhancedRepairAction:
     marker_type: str
     original_line: str
     repair_type: str  # remove, replace, document, convert, implement, defer
-    new_content: Optional[str] = None
+    new_content: str | None = None
     confidence: float = 0.0
     reason: str = ""
     category: str = "general"  # obsolete, empty, documentation, bare_except, etc.
@@ -78,7 +76,7 @@ class EnhancedMarkerRepair:
 
     def __init__(self, repo_root: str = '.'):
         self.repo_root = Path(repo_root).resolve()
-        self.repairs: List[EnhancedRepairAction] = []
+        self.repairs: list[EnhancedRepairAction] = []
         self.stats = {
             'scanned_files': 0,
             'total_markers_found': 0,
@@ -89,12 +87,12 @@ class EnhancedMarkerRepair:
             'errors': []
         }
 
-    def scan_file(self, file_path: Path) -> List[EnhancedRepairAction]:
+    def scan_file(self, file_path: Path) -> list[EnhancedRepairAction]:
         """Scan a single file for repairable markers."""
         repairs = []
 
         try:
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding='utf-8', errors='ignore') as f:
                 lines = f.readlines()
         except Exception as e:
             self.stats['errors'].append(f"Error reading {file_path}: {e}")
@@ -129,7 +127,7 @@ class EnhancedMarkerRepair:
 
         return repairs
 
-    def _analyze_line(self, file_path: str, line_num: int, line: str) -> Optional[EnhancedRepairAction]:
+    def _analyze_line(self, file_path: str, line_num: int, line: str) -> EnhancedRepairAction | None:
         """Analyze a line for repair opportunities."""
         line_stripped = line.strip()
 
@@ -217,12 +215,12 @@ class EnhancedMarkerRepair:
         match = re.search(r'\b(TODO|FIXME|XXX|HACK|STUB|MOCK|PLACEHOLDER)\b', line, re.IGNORECASE)
         return match.group(1).upper() if match else 'UNKNOWN'
 
-    def scan_repository(self, extensions: List[str] = None) -> int:
+    def scan_repository(self, extensions: list[str] | None = None) -> int:
         """Scan the entire repository for repairable markers."""
         if extensions is None:
             extensions = ['.py', '.cc', '.cpp', '.h', '.hpp', '.c', '.scm', '.sql', '.cmake']
 
-        print(f"🔍 Scanning repository for repairable markers...")
+        print("🔍 Scanning repository for repairable markers...")
         print(f"   Extensions: {', '.join(extensions)}")
 
         # Find all files
@@ -244,7 +242,7 @@ class EnhancedMarkerRepair:
 
         return len(self.repairs)
 
-    def apply_safe_repairs(self, dry_run: bool = True, confidence_threshold: float = 0.85) -> Dict:
+    def apply_safe_repairs(self, dry_run: bool = True, confidence_threshold: float = 0.85) -> dict:
         """Apply repairs above the confidence threshold that don't require review."""
         safe_repairs = [
             r for r in self.repairs
@@ -261,7 +259,7 @@ class EnhancedMarkerRepair:
         print(f"\n🔧 {'[DRY RUN] ' if dry_run else ''}Applying {len(safe_repairs)} safe repairs...")
 
         # Group by file
-        by_file: Dict[str, List[EnhancedRepairAction]] = {}
+        by_file: dict[str, list[EnhancedRepairAction]] = {}
         for repair in safe_repairs:
             by_file.setdefault(repair.file_path, []).append(repair)
 
@@ -275,7 +273,7 @@ class EnhancedMarkerRepair:
                 continue
 
             try:
-                with open(full_path, 'r', encoding='utf-8', errors='ignore') as f:
+                with open(full_path, encoding='utf-8', errors='ignore') as f:
                     lines = f.readlines()
 
                 # Sort by line number descending to preserve line numbers
@@ -319,13 +317,13 @@ class EnhancedMarkerRepair:
             'errors': self.stats['errors'][-10:]  # Last 10 errors
         }
 
-    def get_review_queue(self) -> List[EnhancedRepairAction]:
+    def get_review_queue(self) -> list[EnhancedRepairAction]:
         """Get repairs that need human review, sorted by confidence."""
         needs_review = [r for r in self.repairs if r.requires_review and not r.applied]
         needs_review.sort(key=lambda r: (-r.confidence, r.file_path))
         return needs_review
 
-    def export_report(self, output_file: str = 'enhanced_repair_report.json') -> Dict:
+    def export_report(self, output_file: str = 'enhanced_repair_report.json') -> dict:
         """Export comprehensive repair report."""
         report = {
             'timestamp': datetime.utcnow().isoformat() + 'Z',

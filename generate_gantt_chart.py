@@ -1,7 +1,8 @@
-import matplotlib.pyplot as plt
+
 import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
 import pandas as pd
-from datetime import datetime
+
 
 def create_gantt_chart(data, output_path):
     df = pd.DataFrame(data)
@@ -11,7 +12,7 @@ def create_gantt_chart(data, output_path):
 
     fig, ax = plt.subplots(figsize=(12, 8))
 
-    for i, task in df.iterrows():
+    for _i, task in df.iterrows():
         ax.barh(task['task'], task['duration'], left=task['start'], height=0.5, align='center', label=task['priority'])
 
     ax.xaxis_date()
