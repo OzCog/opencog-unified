@@ -2,13 +2,15 @@
 """
 Generate a report on the implemented quick wins.
 """
+
 import json
 from datetime import datetime
+
 
 def generate_report():
     """Generate the final Markdown report"""
 
-    with open('quick_wins.json', 'r') as f:
+    with open("quick_wins.json") as f:
         quick_wins = json.load(f)
 
     implemented_files = [
@@ -16,11 +18,11 @@ def generate_report():
         "atomspace/opencog/query/PatternMatchEngine.cc",
         "atomspace-storage/opencog/persist/proxy/CachingProxy.cc",
         "atomspace-restful/tests/python/restapi/test_restapi.py",
-        "components/core/atomspace-restful/tests/python/restapi/test_restapi.py"
+        "components/core/atomspace-restful/tests/python/restapi/test_restapi.py",
     ]
 
-    implemented_items = [item for item in quick_wins if item['file'] in implemented_files]
-    deferred_items = [item for item in quick_wins if item['file'] not in implemented_files]
+    implemented_items = [item for item in quick_wins if item["file"] in implemented_files]
+    deferred_items = [item for item in quick_wins if item["file"] not in implemented_files]
 
     report = f"""
 # Quick Win Implementation Report
@@ -73,10 +75,11 @@ All changes are purely cosmetic and do not affect the functionality of the code.
 This effort has improved the clarity of the codebase by addressing several minor placeholder comments. The deferred items have been clearly identified as more substantial tasks, which will aid in future development planning.
 """
 
-    with open('quick_win_implementation_report.md', 'w') as f:
+    with open("quick_win_implementation_report.md", "w") as f:
         f.write(report)
 
     print("Quick win implementation report generated successfully: quick_win_implementation_report.md")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     generate_report()

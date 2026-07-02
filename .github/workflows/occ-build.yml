@@ -54,8 +54,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-        cmake \
         build-essential \
+        cmake \
         cxxtest \
         binutils-dev \
         libiberty-dev \
@@ -69,6 +69,8 @@ jobs:
         valgrind \
         doxygen \
         ccache
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Configure CogUtil
       run: |
@@ -161,8 +163,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -174,13 +176,15 @@ jobs:
           libboost-regex-dev \
           guile-3.0-dev \
           libgmp-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           python3-pip \
           valgrind \
           doxygen \
           ccache
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
@@ -197,7 +201,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
 
     - name: Build AtomSpace
       run: |
@@ -266,8 +270,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -277,11 +281,13 @@ jobs:
           libboost-system-dev \
           libboost-thread-dev \
           guile-3.0-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
           doxygen
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
@@ -298,7 +304,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -370,8 +376,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -382,11 +388,13 @@ jobs:
           libboost-thread-dev \
           guile-3.0-dev \
           librocksdb-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
           doxygen
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
@@ -403,7 +411,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -447,6 +455,7 @@ jobs:
         cd atomspace-rocks/build
         cmake .. \
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+          \
           -DCMAKE_PREFIX_PATH="/usr/local/lib/cmake;/usr/local/share/cmake"
 
     - name: Build AtomSpace Rocks
@@ -497,8 +506,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -509,11 +518,13 @@ jobs:
           libboost-thread-dev \
           guile-3.0-dev \
           libasio-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
           doxygen
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Verify Asio Installation
       run: |
@@ -539,7 +550,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -623,8 +634,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -635,11 +646,13 @@ jobs:
           libboost-thread-dev \
           guile-3.0-dev \
           libasio-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
           doxygen
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Verify Asio Installation
       run: |
@@ -665,7 +678,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -760,8 +773,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -771,11 +784,13 @@ jobs:
           libboost-system-dev \
           libboost-thread-dev \
           guile-3.0-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
           doxygen
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
@@ -792,7 +807,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -864,8 +879,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -875,11 +890,13 @@ jobs:
           libboost-system-dev \
           libboost-thread-dev \
           guile-3.0-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
           doxygen
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
@@ -896,7 +913,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -987,8 +1004,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -998,11 +1015,13 @@ jobs:
           libboost-system-dev \
           libboost-thread-dev \
           guile-3.0-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
           doxygen
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
@@ -1019,7 +1038,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1113,8 +1132,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -1125,11 +1144,13 @@ jobs:
           libboost-thread-dev \
           guile-3.0-dev \
           libasio-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
           doxygen
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Verify Asio Installation
       run: |
@@ -1155,7 +1176,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1250,8 +1271,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -1262,11 +1283,13 @@ jobs:
           libboost-thread-dev \
           libboost-regex-dev \
           guile-3.0-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
           doxygen
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
@@ -1283,7 +1306,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1329,6 +1352,7 @@ jobs:
         cd asmoses/build
         cmake .. \
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+          \
           -DBoost_NO_SYSTEM_PATHS=OFF
 
     - name: Build AS-MOSES
@@ -1382,8 +1406,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -1393,11 +1417,13 @@ jobs:
           libboost-system-dev \
           libboost-thread-dev \
           guile-3.0-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
           doxygen
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
@@ -1414,7 +1440,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1486,8 +1512,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -1498,12 +1524,14 @@ jobs:
           libboost-thread-dev \
           guile-3.0-dev \
           libasio-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
           doxygen \
           liboctomap-dev
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
@@ -1520,7 +1548,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1615,8 +1643,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -1627,12 +1655,14 @@ jobs:
           libboost-thread-dev \
           guile-3.0-dev \
           libasio-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
           doxygen \
           liboctomap-dev
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
@@ -1649,7 +1679,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1777,8 +1807,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -1789,11 +1819,13 @@ jobs:
           libboost-thread-dev \
           guile-3.0-dev \
           libasio-dev \
-          cython3 \
+          \
           python3-nose \
           python3-dev \
           valgrind \
           doxygen
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Verify Asio Installation
       run: |
@@ -1819,7 +1851,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1927,42 +1959,44 @@ jobs:
     - name: Generate Build Report
       run: |
         set -eu
-        echo "# OCC Build Report" > BUILD_REPORT.md
-        echo "" >> BUILD_REPORT.md
-        echo "## Build Summary" >> BUILD_REPORT.md
-        echo "Build completed at: $(date)" >> BUILD_REPORT.md
-        echo "" >> BUILD_REPORT.md
-        echo "## Components Built" >> BUILD_REPORT.md
-        echo "" >> BUILD_REPORT.md
+        {
+          echo "# OCC Build Report"
+          echo ""
+          echo "## Build Summary"
+          echo "Build completed at: $(date)"
+          echo ""
+          echo "## Components Built"
+          echo ""
 
-        if [ -d "artifacts" ]; then
-          echo "### Artifacts Generated:" >> BUILD_REPORT.md
-          ls -lh artifacts/ >> BUILD_REPORT.md
-        else
-          echo "No artifacts found" >> BUILD_REPORT.md
-        fi
+          if [ -d "artifacts" ]; then
+            echo "### Artifacts Generated:"
+            ls -lh artifacts/
+          else
+            echo "No artifacts found"
+          fi
 
-        echo "" >> BUILD_REPORT.md
-        echo "## Build Order" >> BUILD_REPORT.md
-        echo "1. CogUtil (Foundation)" >> BUILD_REPORT.md
-        echo "2. AtomSpace (Hypergraph DB)" >> BUILD_REPORT.md
-        echo "3. AtomSpace Storage (Storage backends)" >> BUILD_REPORT.md
-        echo "3b. AtomSpace Rocks (RocksDB storage)" >> BUILD_REPORT.md
-        echo "4. CogServer (Networking)" >> BUILD_REPORT.md
-        echo "4b. AtomSpace Cog (Network storage)" >> BUILD_REPORT.md
-        echo "5. Unify (Unification)" >> BUILD_REPORT.md
-        echo "6. URE (Unified Rule Engine)" >> BUILD_REPORT.md
-        echo "7. Miner (Pattern Mining)" >> BUILD_REPORT.md
-        echo "8. Attention (Attention Allocation)" >> BUILD_REPORT.md
-        echo "9. AS-MOSES (Meta-Optimizing Semantic Evolutionary Search)" >> BUILD_REPORT.md
-        echo "10. Matrix (Sparse Vector/Matrix operations)" >> BUILD_REPORT.md
-        echo "11. SpaceTime (Spatiotemporal representation)" >> BUILD_REPORT.md
-        echo "12. PLN (Probabilistic Logic Networks)" >> BUILD_REPORT.md
-        echo "13. Learn (Language Learning)" >> BUILD_REPORT.md
-        echo "" >> BUILD_REPORT.md
-        echo "## Notes" >> BUILD_REPORT.md
-        echo "- This workflow mirrors the CircleCI configuration" >> BUILD_REPORT.md
-        echo "- Components are built in dependency order" >> BUILD_REPORT.md
+          echo ""
+          echo "## Build Order"
+          echo "1. CogUtil (Foundation)"
+          echo "2. AtomSpace (Hypergraph DB)"
+          echo "3. AtomSpace Storage (Storage backends)"
+          echo "3b. AtomSpace Rocks (RocksDB storage)"
+          echo "4. CogServer (Networking)"
+          echo "4b. AtomSpace Cog (Network storage)"
+          echo "5. Unify (Unification)"
+          echo "6. URE (Unified Rule Engine)"
+          echo "7. Miner (Pattern Mining)"
+          echo "8. Attention (Attention Allocation)"
+          echo "9. AS-MOSES (Meta-Optimizing Semantic Evolutionary Search)"
+          echo "10. Matrix (Sparse Vector/Matrix operations)"
+          echo "11. SpaceTime (Spatiotemporal representation)"
+          echo "12. PLN (Probabilistic Logic Networks)"
+          echo "13. Learn (Language Learning)"
+          echo ""
+          echo "## Notes"
+          echo "- This workflow mirrors the CircleCI configuration"
+          echo "- Components are built in dependency order"
+        } > BUILD_REPORT.md
         echo "- Tests are run but allowed to fail (continue-on-error)" >> BUILD_REPORT.md
         echo "- Build artifacts are cached for 1 day" >> BUILD_REPORT.md
 

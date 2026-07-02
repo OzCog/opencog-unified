@@ -62,7 +62,7 @@ jobs:
       uses: actions/checkout@v6
 
     - name: Setup MSVC
-      uses: microsoft/setup-msbuild@v2
+      uses: microsoft/setup-msbuild@v3
 
     - name: Install Chocolatey
       run: |
@@ -81,7 +81,11 @@ jobs:
         choco install -y cmake 7zip
         cd C:\vcpkg
         # Install all required Boost components for cogutil
-        .\vcpkg install boost-filesystem:x64-windows boost-system:x64-windows boost-thread:x64-windows boost-program-options:x64-windows boost-algorithm:x64-windows boost-lexical-cast:x64-windows boost-spirit:x64-windows
+        .\vcpkg install `
+          boost-filesystem:x64-windows boost-system:x64-windows `
+          boost-thread:x64-windows boost-program-options:x64-windows `
+          boost-algorithm:x64-windows boost-lexical-cast:x64-windows `
+          boost-spirit:x64-windows
       shell: powershell
 
     - name: Build Component
@@ -122,7 +126,14 @@ jobs:
         $pkgDir = "choco-packages\opencog-$component"
         New-Item -ItemType Directory -Force -Path "$pkgDir\tools"
 
-        $nuspec = "<?xml version='1.0'?><package><metadata><id>opencog-$component</id><version>$version</version><title>OpenCog $component</title><authors>OpenCog Foundation</authors><description>OpenCog $component</description></metadata></package>"
+        $nuspec = "<?xml version='1.0'?>" +
+          "<package><metadata>" +
+          "<id>opencog-$component</id>" +
+          "<version>$version</version>" +
+          "<title>OpenCog $component</title>" +
+          "<authors>OpenCog Foundation</authors>" +
+          "<description>OpenCog $component</description>" +
+          "</metadata></package>"
         Set-Content -Path "$pkgDir\opencog-$component.nuspec" -Value $nuspec
 
         cd $pkgDir

@@ -106,7 +106,3 @@ files_to_graph = glob.glob("*_benchmark.csv")
 
 for fn in files_to_graph:
     graph_file(fn);
-
-
-
-

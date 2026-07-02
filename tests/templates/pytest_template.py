@@ -16,8 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 """
 
 import pytest
-import unittest
-from unittest.mock import Mock, patch
+
 
 # Import component modules
 # from opencog.atomspace import AtomSpace, TruthValue
@@ -82,21 +81,25 @@ class TestYourComponent:
         # assert result is not None
         assert True  # Placeholder
 
-    @pytest.mark.parametrize("input_val,expected", [
-        (1, 1),
-        (2, 4),
-        (3, 9),
-    ])
+    @pytest.mark.parametrize(
+        "input_val,expected",
+        [
+            (1, 1),
+            (2, 4),
+            (3, 9),
+        ],
+    )
     def test_parameterized(self, input_val, expected):
         """Test with multiple input/output combinations."""
         # result = self.component.compute(input_val)
         # assert result == expected
-        assert input_val ** 2 == expected  # Placeholder example
+        assert input_val**2 == expected  # Placeholder example
 
     @pytest.mark.slow
     def test_performance(self):
         """Test that operations complete within expected time."""
         import time
+
         start = time.time()
         for _ in range(1000):
             pass  # self.component.operation()
@@ -129,5 +132,5 @@ class TestYourComponentIntegration:
         assert True  # Placeholder
 
 
-if __name__ == '__main__':
-    pytest.main([__file__, '-v'])
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

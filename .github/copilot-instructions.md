@@ -269,3 +269,42 @@ cd tests/integration && python3 test_moses.py
 6. **For troubleshooting:** Use single-threaded verbose builds and individual component tests
 
 **Remember:** This is a complex cognitive system with 14+ integrated components. Build times are long but necessary. Never cancel long-running operations - they will complete successfully with proper timeouts.
+
+## AI Team Agents (Copilot Chat)
+
+Invoke specialized personas with `@agent-name` in Copilot Chat:
+
+| Agent | Persona | Use For |
+|-------|---------|---------|
+| `@nova-cpp` | Nova (Core Engineer) | C++ implementation, AtomSpace, CMake, builds |
+| `@sage-scheme` | Sage (Logic Engineer) | Guile/Scheme, URE rules, PLN, pattern matching |
+| `@milo-research` | Milo (Research Lead) | Algorithms, MOSES, attention dynamics, papers |
+| `@kira-architect` | Kira (Architect) | System design, component interactions, AGI patterns |
+| `@ivy-qa` | Ivy (QA Engineer) | Testing, validation, bug filing |
+| `@remy-producer` | Remy (Producer) | Sprint planning, coordination, scope control |
+| `@dash-devops` | Dash (DevOps) | CI/CD, Docker, build infrastructure |
+
+## Instruction Stacking
+
+Instructions auto-activate by file type:
+- **All files**: `opencog-unified.instructions.md` (project context)
+- **C++ files** (`.cc/.cpp/.h/.hpp`): + `opencog-cpp.instructions.md` + `cmake-vcpkg.instructions.md` + `cpp-language-service-tools.instructions.md`
+- **Scheme files** (`.scm`): + `opencog-scheme.instructions.md`
+- **Shell scripts** (`.sh`): + `shell.instructions.md`
+- **CI/CD** (`.github/workflows/`): + `github-actions-ci-cd-best-practices.instructions.md`
+
+## Memory Bank
+
+Cross-session context persists in `memory-bank/`:
+- `projectbrief.md` — What this project is
+- `productContext.md` — How it works and why
+- `techContext.md` — Technical stack and constraints
+- `activeContext.md` — Current sprint state (update each session)
+- `systemPatterns.md` — Architecture and code patterns
+
+## Sprint Templates
+
+Find templates in `docs/templates/`:
+- `sprint-plan-template.md` — Sprint planning
+- `sprint-done-template.md` — Sprint completion
+- `qa-signoff-template.md` — QA sign-off

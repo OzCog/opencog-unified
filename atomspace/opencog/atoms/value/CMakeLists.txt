@@ -18,6 +18,10 @@ ADD_LIBRARY (value
 	VoidValue.cc
 )
 
+ADD_LIBRARY(atomvalue INTERFACE)
+ADD_DEPENDENCIES(atomvalue value)
+TARGET_LINK_LIBRARIES(atomvalue INTERFACE value)
+
 # Without this, parallel make will race and crap up the generated files.
 ADD_DEPENDENCIES(value atom_types cogutil opencog_atom_types)
 

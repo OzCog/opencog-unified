@@ -41,7 +41,12 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import Callable, Iterable
+from typing import TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
+
 
 LOG = logging.getLogger("auto_fix")
 
@@ -77,10 +82,10 @@ def _apt_install(packages: Iterable[str]) -> bool:
         return False
     LOG.info("apt-get install %s", " ".join(pkgs))
     sudo_prefix = ["sudo"] if shutil.which("sudo") else []
-    update = _run(sudo_prefix + ["apt-get", "update", "-qq"])
+    update = _run([*sudo_prefix, "apt-get", "update", "-qq"])
     if update.returncode != 0:
         LOG.warning("apt-get update returned %d: %s", update.returncode, update.stderr.strip())
-    install = _run(sudo_prefix + ["apt-get", "install", "-y", "--no-install-recommends", *pkgs])
+    install = _run([*sudo_prefix, "apt-get", "install", "-y", "--no-install-recommends", *pkgs])
     if install.returncode != 0:
         LOG.error("apt-get install failed:\n%s", install.stderr)
         return False

@@ -6,33 +6,34 @@ Implements self-actualizing, self-organizing, and self-transcending intelligence
 through multi-dimensional developmental processes.
 """
 
-from .introspector import EntelechyIntrospector
 from .genome import EntelechyGenome
-from .tracker import EntelechyTracker
-from .resonance import detect_resonance
-from .transcendence import SelfTranscendence
+from .introspector import EntelechyIntrospector
 from .optimizer import EntelechyOptimizer
+from .resonance import detect_resonance
+from .tracker import EntelechyTracker
+from .transcendence import SelfTranscendence
 from .types import (
-    EntelechyDimension,
-    FragmentationType,
-    FragmentationSignature,
-    EntelechyMetrics,
     ComponentState,
-    DevelopmentStage
+    DevelopmentStage,
+    EntelechyDimension,
+    EntelechyMetrics,
+    FragmentationSignature,
+    FragmentationType,
 )
+
 
 __version__ = "1.0.0"
 __all__ = [
-    "EntelechyIntrospector",
-    "EntelechyGenome",
-    "EntelechyTracker",
-    "detect_resonance",
-    "SelfTranscendence",
-    "EntelechyOptimizer",
-    "EntelechyDimension",
-    "FragmentationType",
-    "FragmentationSignature",
-    "EntelechyMetrics",
     "ComponentState",
     "DevelopmentStage",
+    "EntelechyDimension",
+    "EntelechyGenome",
+    "EntelechyIntrospector",
+    "EntelechyMetrics",
+    "EntelechyOptimizer",
+    "EntelechyTracker",
+    "FragmentationSignature",
+    "FragmentationType",
+    "SelfTranscendence",
+    "detect_resonance",
 ]
