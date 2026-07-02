@@ -547,6 +547,7 @@ jobs:
       - name: "🧬 Clone All Prerequisites"
         run: |
           set -eu
+          mkdir -p /ws/deps && cd /ws/deps
           echo "📦 Cloning CogUtil..."
           git clone --depth 1 https://github.com/opencog/cogutil.git
 
@@ -565,7 +566,7 @@ jobs:
         run: |
           set -eu
           echo "🔧 Building CogUtil foundation..."
-          cd cogutil
+          cd /ws/deps/cogutil
           mkdir -p build && cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release
           make -j2
@@ -577,7 +578,7 @@ jobs:
         run: |
           set -eu
           echo "🔧 Building AtomSpace core..."
-          cd atomspace
+          cd /ws/deps/atomspace
           mkdir -p build && cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release
           make -j2
@@ -589,7 +590,7 @@ jobs:
         run: |
           set -eu
           echo "🔧 Building AtomSpace-Storage..."
-          cd atomspace-storage
+          cd /ws/deps/atomspace-storage
           mkdir -p build && cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release
           make -j2
@@ -600,7 +601,7 @@ jobs:
       - name: "🧪 Build AtomSpace-Rocks"
         run: |
           set -eu
-          cd atomspace-rocks
+          cd /ws/deps/atomspace-rocks
           mkdir -p build && cd build
 
           echo "🧬 Configuring AtomSpace-Rocks with tensor optimization..."
@@ -610,10 +611,10 @@ jobs:
             echo "🤖 Activating cognitive repair for configuration..."
             cd "${GITHUB_WORKSPACE}"
             python3 scripts/auto_fix.py \
-              --build-cmd "cd atomspace-rocks/build && cmake .. -DCMAKE_BUILD_TYPE=Release" \
+              --build-cmd "cd /ws/deps/atomspace-rocks/build && cmake .. -DCMAKE_BUILD_TYPE=Release" \
               --context "atomspace-rocks" \
               --max-attempts 2
-            cd atomspace-rocks/build
+            cd /ws/deps/atomspace-rocks/build
           fi
 
           echo "🧬 Building AtomSpace-Rocks persistence layer..."
@@ -623,7 +624,7 @@ jobs:
             echo "🤖 Invoking cognitive repair mechanisms..."
             cd "${GITHUB_WORKSPACE}"
             python3 scripts/auto_fix.py \
-              --build-cmd "cd atomspace-rocks/build && make ${MAKEFLAGS}" \
+              --build-cmd "cd /ws/deps/atomspace-rocks/build && make ${MAKEFLAGS}" \
               --context "atomspace-rocks" \
               --max-attempts "${MAX_FIX_ATTEMPTS}"
           fi
@@ -631,7 +632,7 @@ jobs:
       - name: "🧬 Execute RocksDB Tests"
         run: |
           set -eu
-          cd atomspace-rocks/build
+          cd /ws/deps/atomspace-rocks/build
           echo "🧪 Building RocksDB test suite..."
           make tests || echo "⚠️  Test build encountered issues"
 
@@ -641,7 +642,7 @@ jobs:
       - name: "💾 Persist RocksDB State"
         run: |
           set -eu
-          cd atomspace-rocks/build
+          cd /ws/deps/atomspace-rocks/build
           make install
           ldconfig
 
