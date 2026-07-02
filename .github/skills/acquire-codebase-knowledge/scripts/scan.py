@@ -268,7 +268,7 @@ def find_entry_points() -> List[str]:
             found.extend(str(m.relative_to(Path.cwd())) for m in matches)
         elif Path(candidate).exists():
             found.append(candidate)
-    return found
+    return sorted(set(found))
 
 
 def find_lint_config() -> List[str]:
