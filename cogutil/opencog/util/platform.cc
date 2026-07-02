@@ -217,9 +217,9 @@ void opencog::set_thread_name(const char* name)
     pthread_setname_np(name);
 }
 
-#elif defined(_WIN32)
+#elif defined(_WIN32) && !defined(__CYGWIN__)
 
-// Windows (MinGW) implementations
+// Windows (MinGW/MSVC) implementations
 #include <windows.h>
 
 uint64_t opencog::getTotalRAM()
