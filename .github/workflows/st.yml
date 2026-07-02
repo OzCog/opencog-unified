@@ -56,7 +56,6 @@ jobs:
         sudo apt-get install -y \
           cmake \
           build-essential \
-          cxxtest \
           binutils-dev \
           libiberty-dev \
           libboost-dev \
@@ -77,7 +76,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -87,7 +86,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -98,7 +97,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -110,7 +109,7 @@ jobs:
         set -eu
         mkdir -p cogserver/build
         cd cogserver/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -132,7 +131,7 @@ jobs:
         set -eu
         mkdir -p spacetime/build
         cd spacetime/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
     - name: Build SpaceTime
       if: hashFiles('spacetime/CMakeLists.txt') != ''
@@ -183,7 +182,7 @@ jobs:
 #        sudo apt-get install -y \
 #          cmake \
 #          build-essential \
-#          cxxtest \
+#
 #          binutils-dev \
 #          libiberty-dev \
 #          libboost-dev \
@@ -203,7 +202,7 @@ jobs:
 #      run: |
 #        mkdir -p cogutil/build
 #        cd cogutil/build
-#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
@@ -212,7 +211,7 @@ jobs:
 #      run: |
 #        mkdir -p atomspace/build
 #        cd atomspace/build
-#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
@@ -222,7 +221,7 @@ jobs:
 #      run: |
 #        mkdir -p atomspace-storage/build
 #        cd atomspace-storage/build
-#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
@@ -233,7 +232,7 @@ jobs:
 #      run: |
 #        mkdir -p cogserver/build
 #        cd cogserver/build
-#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
@@ -243,7 +242,7 @@ jobs:
 #      run: |
 #        mkdir -p unify/build
 #        cd unify/build
-#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
@@ -253,7 +252,7 @@ jobs:
 #      run: |
 #        mkdir -p ure/build
 #        cd ure/build
-#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
@@ -263,7 +262,7 @@ jobs:
 #      run: |
 #        mkdir -p spacetime/build
 #        cd spacetime/build
-#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
@@ -283,7 +282,7 @@ jobs:
 #      run: |
 #        mkdir -p pln/build
 #        cd pln/build
-#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
 #    - name: Build PLN
 #      if: hashFiles('pln/CMakeLists.txt') != ''

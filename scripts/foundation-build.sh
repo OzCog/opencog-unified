@@ -87,9 +87,9 @@ print_tensor() {
 validate_implementation() {
     local component="$1"
     local component_dir="${REPO_ROOT}/${component}"
-    
+
     print_section "Validating ${component} implementation (no mocks/stubs)"
-    
+
     # Check for placeholder patterns
     local placeholder_count=0
     if [ -d "${component_dir}" ]; then
@@ -97,39 +97,39 @@ validate_implementation() {
             --include="*.cc" --include="*.h" --include="*.c" \
             "${component_dir}/opencog" 2>/dev/null | wc -l || echo "0")
     fi
-    
+
     if [ "$placeholder_count" -gt 0 ]; then
         print_warning "Found ${placeholder_count} placeholder markers in ${component}"
         print_info "Analyzing implementation depth..."
     else
         print_success "No placeholder markers found in ${component}"
     fi
-    
+
     # Verify substantial implementation files
     local impl_count=0
     if [ -d "${component_dir}/opencog" ]; then
         impl_count=$(find "${component_dir}/opencog" -name "*.cc" -size +500c 2>/dev/null | wc -l || echo "0")
     fi
-    
+
     print_info "Found ${impl_count} substantial implementation files (>500 bytes)"
-    
+
     return 0
 }
 
 # Detect and configure hardware capabilities
 detect_hardware_capabilities() {
     print_section "Hardware Capability Detection"
-    
+
     print_info "Architecture: ${ARCH}"
     print_info "Operating System: ${OS}"
     print_info "Detected Platform: ${DETECTED_ARCH}"
-    
+
     # Check for architecture support
     if [ -n "${ARCH_CONFIG[$DETECTED_ARCH]:-}" ]; then
         local arch_features="${ARCH_CONFIG[$DETECTED_ARCH]}"
         IFS=';' read -ra FEATURES <<< "$arch_features"
         print_success "Supported architecture with features: ${FEATURES[*]}"
-        
+
         # Export for CMake
         export OPENCOG_ARCH="${FEATURES[0]}"
         export OPENCOG_SIMD="${FEATURES[1]}"
@@ -141,13 +141,13 @@ detect_hardware_capabilities() {
         export OPENCOG_SIMD="GENERIC"
         export OPENCOG_PLATFORM="GENERIC"
     fi
-    
+
     # CPU feature detection
     if command -v lscpu >/dev/null 2>&1; then
         print_info "CPU Information:"
         lscpu | grep -E "^(Architecture|CPU\(s\)|Thread|Model name|Flags)" || true
     fi
-    
+
     # Memory detection
     if [ -f /proc/meminfo ]; then
         local mem_total
@@ -165,28 +165,28 @@ detect_hardware_capabilities() {
 configure_tensor_parameters() {
     local component="$1"
     local shape="${TENSOR_SHAPES[$component]}"
-    
+
     print_section "Configuring Tensor Parameters for ${component}"
-    
+
     IFS=',' read -ra DIMS <<< "$shape"
     local modules="${DIMS[0]}"
     local build_steps="${DIMS[1]}"
     local tests="${DIMS[2]}"
-    
+
     print_tensor "Tensor Shape: [modules=${modules}, build-steps=${build_steps}, tests=${tests}]"
-    
+
     # Export tensor configuration
     export TENSOR_${component}_MODULES="${modules}"
     export TENSOR_${component}_BUILD_STEPS="${build_steps}"
     export TENSOR_${component}_TESTS="${tests}"
-    
+
     # Calculate tensor degrees of freedom
     local dof
 
     dof=$((modules * build_steps * tests))
     print_tensor "Degrees of Freedom: ${dof}"
     export TENSOR_${component}_DOF="${dof}"
-    
+
     # Generate tensor configuration file
     local tensor_config="${ARTIFACT_DIR}/${component}_tensor_config.json"
     cat > "${tensor_config}" <<EOF
@@ -211,23 +211,23 @@ build_component() {
     local component="$1"
     local component_dir="${REPO_ROOT}/${component}"
     local component_build_dir="${BUILD_DIR}/${component}"
-    
+
     print_header "Building ${component}"
-    
+
     # Validate implementation
     validate_implementation "${component}"
-    
+
     # Configure tensor parameters
     if [ "${ENABLE_GGML_KERNEL}" == "ON" ]; then
         configure_tensor_parameters "${component}"
     fi
-    
+
     # Create build directory
     mkdir -p "${component_build_dir}"
-    
+
     # CMake configuration
     print_section "Configuring ${component} with CMake"
-    
+
     cd "${component_build_dir}"
     cmake "${component_dir}" \
         -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
@@ -238,24 +238,24 @@ build_component() {
         -DOPENCOG_SIMD="${OPENCOG_SIMD}" \
         -DOPENCOG_PLATFORM="${OPENCOG_PLATFORM}" \
         2>&1 | tee "${ARTIFACT_DIR}/${component}_cmake.log"
-    
+
     print_success "CMake configuration complete"
-    
+
     # Build
     print_section "Building ${component}"
-    
+
     cmake --build . --config "${BUILD_TYPE}" -j "${PARALLEL_JOBS}" \
         2>&1 | tee "${ARTIFACT_DIR}/${component}_build.log"
-    
+
     print_success "Build complete for ${component}"
-    
+
     # Install
     print_section "Installing ${component}"
-    
+
     cmake --install . 2>&1 | tee "${ARTIFACT_DIR}/${component}_install.log"
-    
+
     print_success "Installation complete for ${component}"
-    
+
     cd "${REPO_ROOT}"
 }
 
@@ -263,37 +263,37 @@ build_component() {
 run_component_tests() {
     local component="$1"
     local component_build_dir="${BUILD_DIR}/${component}"
-    
+
     if [ "${ENABLE_TESTS}" != "ON" ]; then
         print_info "Tests disabled for ${component}"
         return 0
     fi
-    
+
     print_header "Testing ${component}"
-    
+
     cd "${component_build_dir}"
-    
+
     # Run CTest
     print_section "Running CTest for ${component}"
-    
+
     ctest --output-on-failure --timeout 300 -j "${PARALLEL_JOBS}" \
         2>&1 | tee "${ARTIFACT_DIR}/${component}_test.log" || {
         print_warning "Some tests failed for ${component}"
         return 1
     }
-    
+
     print_success "All tests passed for ${component}"
-    
+
     cd "${REPO_ROOT}"
 }
 
 # Generate build artifacts
 generate_artifacts() {
     print_header "Generating Build Artifacts"
-    
+
     # Create artifact directory
     mkdir -p "${ARTIFACT_DIR}"
-    
+
     # Generate build summary
     local summary_file="${ARTIFACT_DIR}/build_summary.json"
     cat > "${summary_file}" <<EOF
@@ -316,9 +316,9 @@ TENSOR_EOF
 )
 }
 EOF
-    
+
     print_success "Build summary generated: ${summary_file}"
-    
+
     # Generate hardware matrix
     local hw_matrix_file="${ARTIFACT_DIR}/hardware_matrix.json"
     cat > "${hw_matrix_file}" <<EOF
@@ -340,9 +340,9 @@ HW_EOF
   }
 }
 EOF
-    
+
     print_success "Hardware matrix generated: ${hw_matrix_file}"
-    
+
     # Copy compile_commands.json for downstream tools
     for component in cogutil atomspace; do
         local compile_cmds="${BUILD_DIR}/${component}/compile_commands.json"
@@ -351,23 +351,23 @@ EOF
             print_success "Compile commands copied for ${component}"
         fi
     done
-    
+
     # Archive artifacts for downstream jobs
     print_section "Archiving artifacts"
-    
+
     cd "${BUILD_DIR}"
     tar -czf "${ARTIFACT_DIR}/foundation_install.tar.gz" install/
     print_success "Installation archive created"
-    
+
     cd "${REPO_ROOT}"
 }
 
 # Generate tensor degrees of freedom documentation
 generate_tensor_documentation() {
     print_header "Generating Tensor Documentation"
-    
+
     local doc_file="${ARTIFACT_DIR}/TENSOR_DEGREES_OF_FREEDOM.md"
-    
+
     cat > "${doc_file}" <<'EOF'
 # Tensor Degrees of Freedom Documentation
 
@@ -483,7 +483,7 @@ Artifacts for downstream cognitive systems:
 *Generated by Foundation Layer Build System*
 *OpenCog Unified Cognitive Architecture*
 EOF
-    
+
     print_success "Tensor documentation generated: ${doc_file}"
 }
 
@@ -492,35 +492,35 @@ main() {
     print_header "Foundation Layer Build System"
     print_info "OpenCog Unified Cognitive Architecture"
     echo ""
-    
+
     # Create directories
     mkdir -p "${BUILD_DIR}"
     mkdir -p "${ARTIFACT_DIR}"
-    
+
     # Detect hardware
     detect_hardware_capabilities
     echo ""
-    
+
     # Build cogutil (foundation)
     build_component "cogutil"
     run_component_tests "cogutil"
     echo ""
-    
+
     # Update environment for atomspace build
     export CogUtil_DIR="${BUILD_DIR}/cogutil"
     export CMAKE_PREFIX_PATH="${INSTALL_PREFIX}:${CMAKE_PREFIX_PATH:-}"
     export PKG_CONFIG_PATH="${INSTALL_PREFIX}/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
-    
+
     # Build atomspace (depends on cogutil)
     build_component "atomspace"
     run_component_tests "atomspace"
     echo ""
-    
+
     # Generate artifacts
     generate_artifacts
     generate_tensor_documentation
     echo ""
-    
+
     # Summary
     print_header "Build Complete"
     print_success "Foundation layer built successfully"

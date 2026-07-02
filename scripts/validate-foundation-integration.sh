@@ -45,9 +45,9 @@ print_info() {
 check_file() {
     local file="$1"
     local description="$2"
-    
+
     TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
-    
+
     if [ -f "${file}" ]; then
         print_success "${description}"
         return 0
@@ -60,9 +60,9 @@ check_file() {
 check_executable() {
     local file="$1"
     local description="$2"
-    
+
     TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
-    
+
     if [ -x "${file}" ]; then
         print_success "${description}"
         return 0
@@ -75,9 +75,9 @@ check_executable() {
 check_directory() {
     local dir="$1"
     local description="$2"
-    
+
     TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
-    
+
     if [ -d "${dir}" ]; then
         print_success "${description}"
         return 0
@@ -90,14 +90,14 @@ check_directory() {
 validate_json() {
     local file="$1"
     local description="$2"
-    
+
     TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
-    
+
     if [ ! -f "${file}" ]; then
         print_error "${description} - File not found: ${file}"
         return 1
     fi
-    
+
     # Check if jq is available for validation
     if command -v jq >/dev/null 2>&1; then
         if jq empty "${file}" 2>/dev/null; then
@@ -123,13 +123,13 @@ validate_json() {
 main() {
     print_header "Foundation Layer Integration Validation"
     echo ""
-    
+
     # Check foundation components exist
     print_header "Foundation Components"
     check_directory "${REPO_ROOT}/cogutil" "CogUtil component present"
     check_directory "${REPO_ROOT}/atomspace" "AtomSpace component present"
     echo ""
-    
+
     # Check foundation scripts
     print_header "Foundation Scripts"
     check_executable "${REPO_ROOT}/scripts/foundation-seed-master.sh" "Master orchestrator"
@@ -137,7 +137,7 @@ main() {
     check_executable "${REPO_ROOT}/scripts/foundation-test.sh" "Test script"
     check_executable "${REPO_ROOT}/scripts/cognitive-kernel-seed.sh" "Kernel seed script"
     echo ""
-    
+
     # Check cognitive kernel seed structure
     print_header "Cognitive Kernel Seed"
     check_directory "${REPO_ROOT}/cognitive-kernel-seed" "Kernel seed directory"
@@ -145,13 +145,13 @@ main() {
     check_directory "${REPO_ROOT}/cognitive-kernel-seed/loops" "Loops directory"
     check_directory "${REPO_ROOT}/cognitive-kernel-seed/introspection" "Introspection directory"
     echo ""
-    
+
     # Check kernel configurations
     print_header "Kernel Configurations"
     validate_json "${REPO_ROOT}/cognitive-kernel-seed/config/kernel_seed.json" "Kernel seed config"
     validate_json "${REPO_ROOT}/cognitive-kernel-seed/config/meta_system.json" "Meta-system config"
     echo ""
-    
+
     # Check meta-system loops
     print_header "Meta-System Loops"
     check_file "${REPO_ROOT}/cognitive-kernel-seed/loops/level0_object_processing.scm" "Level 0 (Object)"
@@ -159,19 +159,19 @@ main() {
     check_file "${REPO_ROOT}/cognitive-kernel-seed/loops/level2_introspection.scm" "Level 2 (Meta-Meta)"
     check_file "${REPO_ROOT}/cognitive-kernel-seed/loops/autognosis_init.scm" "Autognosis init"
     echo ""
-    
+
     # Check introspection
     print_header "Introspection & Self-Image"
     check_file "${REPO_ROOT}/cognitive-kernel-seed/introspection/self_image_builder.scm" "Self-image builder"
     echo ""
-    
+
     # Check documentation
     print_header "Documentation"
     check_file "${REPO_ROOT}/FOUNDATION_LAYER_GUIDE.md" "Foundation layer guide"
     check_file "${REPO_ROOT}/cognitive-kernel-seed/INTEGRATION_MANIFEST.md" "Integration manifest"
     check_file "${REPO_ROOT}/scripts/README.md" "Scripts README"
     echo ""
-    
+
     # Validate Scheme syntax (basic check)
     print_header "Scheme Syntax Validation"
     local scheme_files=(
@@ -181,10 +181,10 @@ main() {
         "${REPO_ROOT}/cognitive-kernel-seed/loops/autognosis_init.scm"
         "${REPO_ROOT}/cognitive-kernel-seed/introspection/self_image_builder.scm"
     )
-    
+
     for scm_file in "${scheme_files[@]}"; do
         TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
-        
+
         # Basic syntax check: balanced parentheses
         local open_count
 
@@ -192,7 +192,7 @@ main() {
         local close_count
 
         close_count=$(grep -o ")" "${scm_file}" | wc -l)
-        
+
         if [ "$open_count" -eq "$close_count" ]; then
             print_success "$(basename ${scm_file}) - Balanced parentheses"
         else
@@ -200,11 +200,11 @@ main() {
         fi
     done
     echo ""
-    
+
     # Verify tensor configurations in kernel_seed.json
     print_header "Tensor Configuration Validation"
     TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
-    
+
     if [ -f "${REPO_ROOT}/cognitive-kernel-seed/config/kernel_seed.json" ]; then
         if grep -q '"tensor_shape"' "${REPO_ROOT}/cognitive-kernel-seed/config/kernel_seed.json"; then
             print_success "Tensor shapes present in kernel config"
@@ -212,7 +212,7 @@ main() {
             print_error "Tensor shapes missing from kernel config"
         fi
     fi
-    
+
     TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
     if [ -f "${REPO_ROOT}/cognitive-kernel-seed/config/kernel_seed.json" ]; then
         if grep -q '"dof"' "${REPO_ROOT}/cognitive-kernel-seed/config/kernel_seed.json"; then
@@ -222,11 +222,11 @@ main() {
         fi
     fi
     echo ""
-    
+
     # Check meta-loop configuration
     print_header "Meta-System Loop Configuration"
     TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
-    
+
     if [ -f "${REPO_ROOT}/cognitive-kernel-seed/config/meta_system.json" ]; then
         if grep -q '"recursive_loops"' "${REPO_ROOT}/cognitive-kernel-seed/config/meta_system.json"; then
             print_success "Recursive loops configured"
@@ -234,7 +234,7 @@ main() {
             print_error "Recursive loops missing from meta-system config"
         fi
     fi
-    
+
     TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
     if [ -f "${REPO_ROOT}/cognitive-kernel-seed/config/meta_system.json" ]; then
         if grep -q '"autognosis_parameters"' "${REPO_ROOT}/cognitive-kernel-seed/config/meta_system.json"; then
@@ -244,13 +244,13 @@ main() {
         fi
     fi
     echo ""
-    
+
     # Summary
     print_header "Validation Summary"
     echo -e "Total Checks:   ${TOTAL_CHECKS}"
     echo -e "${GREEN}Passed:         ${PASSED_CHECKS}${NC}"
     echo -e "${RED}Failed:         ${FAILED_CHECKS}${NC}"
-    
+
     if [ "$FAILED_CHECKS" -eq 0 ]; then
         echo ""
         echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"

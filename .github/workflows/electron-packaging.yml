@@ -41,7 +41,11 @@ jobs:
       run: |
         set -eu
         mkdir -p electron-app/src
-        echo '{"name":"opencog-explorer","version":"${{ github.event.inputs.version }}","main":"src/main.js","scripts":{"start":"electron ."},"dependencies":{"electron":"^27.0.0"}}' > electron-app/package.json
+        cat > electron-app/package.json << 'EOF'
+        {"name":"opencog-explorer","version":"${{ github.event.inputs.version }}",
+         "main":"src/main.js","scripts":{"start":"electron ."},
+         "dependencies":{"electron":"^27.0.0"}}
+        EOF
       shell: bash
 
     - name: Create Main Script
