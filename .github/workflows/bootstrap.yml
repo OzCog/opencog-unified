@@ -24,7 +24,7 @@ jobs:
         run: |
           set -eu
           sudo apt-get update
-          sudo apt-get install -y guile-3.0 guile-3.0-dev cmake build-essential g++
+          sudo apt-get install -y guile-3.0 guile-3.0-dev build-essential g++
 
       - name: Verify no placeholder implementations
         run: |
@@ -250,7 +250,7 @@ jobs:
         run: |
           set -eu
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential g++ pkg-config guile-3.0 guile-3.0-dev libgmp-dev libboost-all-dev librocksdb-dev cxxtest
+          sudo apt-get install -y build-essential g++ pkg-config guile-3.0 guile-3.0-dev libgmp-dev libboost-all-dev librocksdb-dev cxxtest
 
       - name: CMake configuration test
         run: |

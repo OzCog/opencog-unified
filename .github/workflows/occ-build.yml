@@ -54,7 +54,6 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-        cmake \
         build-essential \
         cxxtest \
         binutils-dev \
@@ -161,7 +160,6 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
           cxxtest \
           binutils-dev \
@@ -266,7 +264,6 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
           cxxtest \
           binutils-dev \
@@ -370,7 +367,6 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
           cxxtest \
           binutils-dev \
@@ -498,7 +494,6 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
           cxxtest \
           binutils-dev \
@@ -624,7 +619,6 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
           cxxtest \
           binutils-dev \
@@ -761,7 +755,6 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
           cxxtest \
           binutils-dev \
@@ -865,7 +858,6 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
           cxxtest \
           binutils-dev \
@@ -988,7 +980,6 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
           cxxtest \
           binutils-dev \
@@ -1114,7 +1105,6 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
           cxxtest \
           binutils-dev \
@@ -1251,7 +1241,6 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
           cxxtest \
           binutils-dev \
@@ -1384,7 +1373,6 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
           cxxtest \
           binutils-dev \
@@ -1488,7 +1476,6 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
           cxxtest \
           binutils-dev \
@@ -1617,7 +1604,6 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
           cxxtest \
           binutils-dev \
@@ -1779,7 +1765,6 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
           cxxtest \
           binutils-dev \
