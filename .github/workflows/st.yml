@@ -71,8 +71,6 @@ jobs:
           valgrind \
           doxygen \
           liboctomap-dev
-        # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-        sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
 
     - name: Rebuild and Install CogUtil
       run: |

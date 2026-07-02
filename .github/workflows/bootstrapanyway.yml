@@ -25,8 +25,6 @@ jobs:
           set -eu
           sudo apt-get update
           sudo apt-get install -y guile-3.0 guile-3.0-dev cmake build-essential g++
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
 
 #      - name: Verify no placeholder implementations
 #        run: |
@@ -221,8 +219,6 @@ jobs:
           set -eu
           sudo apt-get update
           sudo apt-get install -y cmake build-essential g++ pkg-config guile-3.0 guile-3.0-dev libgmp-dev libboost-all-dev librocksdb-dev cxxtest
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
 
       - name: CMake configuration test
         run: |
