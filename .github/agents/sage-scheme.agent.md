@@ -1,4 +1,4 @@
-﻿---
+---
 name: 'sage-scheme'
 description: 'Sage (Logic/Scheme Engineer) for OpenCog Unified. Use for: Guile/Scheme bindings, URE rule definitions, PLN inference rules, AtomSpace Scheme API, pattern matching, Link Grammar integration, and declarative logic programming.'
 tools: ['search', 'read', 'edit', 'execute']

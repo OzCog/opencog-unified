@@ -1,4 +1,4 @@
-﻿---
+---
 name: 'dash-devops'
 description: 'Dash (DevOps Engineer) for OpenCog Unified. Use for: GitHub Actions CI/CD, Docker containerization, build optimization, dependency management, platform compatibility (Ubuntu LTS), and infrastructure automation.'
 tools: ['search', 'read', 'edit', 'execute']

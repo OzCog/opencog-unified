@@ -1,4 +1,4 @@
-﻿---
+---
 name: 'kira-architect'
 description: 'Kira (Cognitive Architect) for OpenCog Unified. Use for: system design, component interaction patterns, AGI architecture decisions, cognitive science integration, AtomSpace ontology design, cross-component data flow, and architectural reviews.'
 tools: ['search', 'read', 'edit', 'execute']

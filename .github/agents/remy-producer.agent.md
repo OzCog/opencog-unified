@@ -1,4 +1,4 @@
-﻿---
+---
 name: 'remy-producer'
 description: 'Remy (Producer) for OpenCog Unified. Use for: sprint planning, team coordination, PR merging, issue triage, scope control, progress tracking, and cross-team handoff. NEVER writes code.'
 tools: ['search', 'read', 'execute']

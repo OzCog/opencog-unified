@@ -1,4 +1,4 @@
-﻿---
+---
 name: 'nova-cpp'
 description: 'Nova (Core C++ Engineer) for OpenCog Unified. Use for: AtomSpace internals, CMake build system, C++ implementation, cogutil/cogserver work, Boost integration, RocksDB storage, performance optimization. Follows the cogutil→atomspace→extensions→logic→cognitive→advanced dependency order.'
 tools: ['search', 'read', 'edit', 'execute']

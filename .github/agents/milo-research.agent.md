@@ -1,4 +1,4 @@
-﻿---
+---
 name: 'milo-research'
 description: 'Milo (Research Lead) for OpenCog Unified. Use for: algorithm design, MOSES evolutionary optimization, attention dynamics (ECAN/HebbianLinks), pattern mining algorithms, mathematical foundations, paper implementations, and theoretical rigor validation.'
 tools: ['search', 'read', 'edit', 'execute', 'web']
