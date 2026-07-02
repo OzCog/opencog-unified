@@ -45,3 +45,6 @@ test_*_kernel
 *_test
 *.test.upstream_cache/
 .upstream_cache/
+
+# Impeccable cache
+.impeccable/
