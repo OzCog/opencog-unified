@@ -262,6 +262,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jq bc
 
+      - name: Sanitize cognitive report JSON files
+        run: |
+          # Strip control characters (U+0000-U+001F except newline/tab) that break jq
+          for f in ./cognitive-reports/*.json; do
+            if [[ -f "$f" ]]; then
+              LC_ALL=C sed -i 's/[\x00-\x08\x0b\x0c\x0e-\x1f]//g' "$f"
+            fi
+          done
+
       - name: Generate enhanced verification report with cognitive synergy
         run: |
           set -eu

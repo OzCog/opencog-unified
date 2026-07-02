@@ -86,7 +86,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DBUILD_TESTING=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig

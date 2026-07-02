@@ -45,6 +45,11 @@
 #include <sys/time.h>
 #endif
 
+#if defined(__MINGW32__) || defined(__MINGW64__)
+#include <io.h>
+#define fdatasync(fd) _commit(fd)
+#endif
+
 #ifdef HAVE_VALGRIND
 #include <valgrind/drd.h>
 #endif
