@@ -75,7 +75,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
 
     - name: Build CogUtil
       run: |
@@ -187,7 +187,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -197,7 +197,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
 
     - name: Build AtomSpace
       run: |
@@ -288,7 +288,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -298,7 +298,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -320,7 +320,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
 
     - name: Build AtomSpace Storage
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
@@ -393,7 +393,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -403,7 +403,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -414,7 +414,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -529,7 +529,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -539,7 +539,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -550,7 +550,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -573,7 +573,7 @@ jobs:
         set -eu
         mkdir -p cogserver/build
         cd cogserver/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
 
     - name: Build CogServer
       if: hashFiles('cogserver/CMakeLists.txt') != ''
@@ -655,7 +655,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -665,7 +665,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -676,7 +676,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -688,7 +688,7 @@ jobs:
         set -eu
         mkdir -p cogserver/build
         cd cogserver/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -710,7 +710,7 @@ jobs:
         set -eu
         mkdir -p atomspace-cog/build
         cd atomspace-cog/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
 
     - name: Build AtomSpace Cog
       if: hashFiles('atomspace-cog/CMakeLists.txt') != ''
@@ -782,7 +782,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -792,7 +792,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -814,7 +814,7 @@ jobs:
         set -eu
         mkdir -p unify/build
         cd unify/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
 
     - name: Build Unify
       if: hashFiles('unify/CMakeLists.txt') != ''
@@ -886,7 +886,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -896,7 +896,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -907,7 +907,7 @@ jobs:
         set -eu
         mkdir -p unify/build
         cd unify/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -929,7 +929,7 @@ jobs:
         set -eu
         mkdir -p ure/build
         cd ure/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
 
     - name: Build URE
       if: hashFiles('ure/CMakeLists.txt') != ''
@@ -1009,7 +1009,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1019,7 +1019,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1030,7 +1030,7 @@ jobs:
         set -eu
         mkdir -p unify/build
         cd unify/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1041,7 +1041,7 @@ jobs:
         set -eu
         mkdir -p ure/build
         cd ure/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1063,7 +1063,7 @@ jobs:
         set -eu
         mkdir -p miner/build
         cd miner/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
 
     - name: Build Miner
       if: hashFiles('miner/CMakeLists.txt') != ''
@@ -1145,7 +1145,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1155,7 +1155,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1166,7 +1166,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1178,7 +1178,7 @@ jobs:
         set -eu
         mkdir -p cogserver/build
         cd cogserver/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1200,7 +1200,7 @@ jobs:
         set -eu
         mkdir -p attention/build
         cd attention/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
 
     - name: Build Attention
       if: hashFiles('attention/CMakeLists.txt') != ''
@@ -1273,7 +1273,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1283,7 +1283,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1294,7 +1294,7 @@ jobs:
         set -eu
         mkdir -p unify/build
         cd unify/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1305,7 +1305,7 @@ jobs:
         set -eu
         mkdir -p ure/build
         cd ure/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1404,7 +1404,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1414,7 +1414,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1436,7 +1436,7 @@ jobs:
         set -eu
         mkdir -p matrix/build
         cd matrix/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
 
     - name: Build Matrix
       if: hashFiles('matrix/CMakeLists.txt') != ''
@@ -1510,7 +1510,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1520,7 +1520,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1531,7 +1531,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1543,7 +1543,7 @@ jobs:
         set -eu
         mkdir -p cogserver/build
         cd cogserver/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1565,7 +1565,7 @@ jobs:
         set -eu
         mkdir -p spacetime/build
         cd spacetime/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
 
     - name: Build SpaceTime
       if: hashFiles('spacetime/CMakeLists.txt') != ''
@@ -1639,7 +1639,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1649,7 +1649,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1660,7 +1660,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1672,7 +1672,7 @@ jobs:
         set -eu
         mkdir -p cogserver/build
         cd cogserver/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1683,7 +1683,7 @@ jobs:
         set -eu
         mkdir -p unify/build
         cd unify/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1694,7 +1694,7 @@ jobs:
         set -eu
         mkdir -p ure/build
         cd ure/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1705,7 +1705,7 @@ jobs:
         set -eu
         mkdir -p spacetime/build
         cd spacetime/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1727,7 +1727,7 @@ jobs:
         set -eu
         mkdir -p pln/build
         cd pln/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
 
     - name: Build PLN
       if: hashFiles('pln/CMakeLists.txt') != ''
@@ -1809,7 +1809,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1819,7 +1819,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1831,7 +1831,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1843,7 +1843,7 @@ jobs:
         set -eu
         mkdir -p cogserver/build
         cd cogserver/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1865,7 +1865,7 @@ jobs:
         set -eu
         mkdir -p learn/build
         cd learn/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
 
     - name: Build Learn
       if: hashFiles('learn/CMakeLists.txt') != ''
@@ -1927,42 +1927,44 @@ jobs:
     - name: Generate Build Report
       run: |
         set -eu
-        echo "# OCC Build Report" > BUILD_REPORT.md
-        echo "" >> BUILD_REPORT.md
-        echo "## Build Summary" >> BUILD_REPORT.md
-        echo "Build completed at: $(date)" >> BUILD_REPORT.md
-        echo "" >> BUILD_REPORT.md
-        echo "## Components Built" >> BUILD_REPORT.md
-        echo "" >> BUILD_REPORT.md
+        {
+          echo "# OCC Build Report"
+          echo ""
+          echo "## Build Summary"
+          echo "Build completed at: $(date)"
+          echo ""
+          echo "## Components Built"
+          echo ""
 
-        if [ -d "artifacts" ]; then
-          echo "### Artifacts Generated:" >> BUILD_REPORT.md
-          ls -lh artifacts/ >> BUILD_REPORT.md
-        else
-          echo "No artifacts found" >> BUILD_REPORT.md
-        fi
+          if [ -d "artifacts" ]; then
+            echo "### Artifacts Generated:"
+            ls -lh artifacts/
+          else
+            echo "No artifacts found"
+          fi
 
-        echo "" >> BUILD_REPORT.md
-        echo "## Build Order" >> BUILD_REPORT.md
-        echo "1. CogUtil (Foundation)" >> BUILD_REPORT.md
-        echo "2. AtomSpace (Hypergraph DB)" >> BUILD_REPORT.md
-        echo "3. AtomSpace Storage (Storage backends)" >> BUILD_REPORT.md
-        echo "3b. AtomSpace Rocks (RocksDB storage)" >> BUILD_REPORT.md
-        echo "4. CogServer (Networking)" >> BUILD_REPORT.md
-        echo "4b. AtomSpace Cog (Network storage)" >> BUILD_REPORT.md
-        echo "5. Unify (Unification)" >> BUILD_REPORT.md
-        echo "6. URE (Unified Rule Engine)" >> BUILD_REPORT.md
-        echo "7. Miner (Pattern Mining)" >> BUILD_REPORT.md
-        echo "8. Attention (Attention Allocation)" >> BUILD_REPORT.md
-        echo "9. AS-MOSES (Meta-Optimizing Semantic Evolutionary Search)" >> BUILD_REPORT.md
-        echo "10. Matrix (Sparse Vector/Matrix operations)" >> BUILD_REPORT.md
-        echo "11. SpaceTime (Spatiotemporal representation)" >> BUILD_REPORT.md
-        echo "12. PLN (Probabilistic Logic Networks)" >> BUILD_REPORT.md
-        echo "13. Learn (Language Learning)" >> BUILD_REPORT.md
-        echo "" >> BUILD_REPORT.md
-        echo "## Notes" >> BUILD_REPORT.md
-        echo "- This workflow mirrors the CircleCI configuration" >> BUILD_REPORT.md
-        echo "- Components are built in dependency order" >> BUILD_REPORT.md
+          echo ""
+          echo "## Build Order"
+          echo "1. CogUtil (Foundation)"
+          echo "2. AtomSpace (Hypergraph DB)"
+          echo "3. AtomSpace Storage (Storage backends)"
+          echo "3b. AtomSpace Rocks (RocksDB storage)"
+          echo "4. CogServer (Networking)"
+          echo "4b. AtomSpace Cog (Network storage)"
+          echo "5. Unify (Unification)"
+          echo "6. URE (Unified Rule Engine)"
+          echo "7. Miner (Pattern Mining)"
+          echo "8. Attention (Attention Allocation)"
+          echo "9. AS-MOSES (Meta-Optimizing Semantic Evolutionary Search)"
+          echo "10. Matrix (Sparse Vector/Matrix operations)"
+          echo "11. SpaceTime (Spatiotemporal representation)"
+          echo "12. PLN (Probabilistic Logic Networks)"
+          echo "13. Learn (Language Learning)"
+          echo ""
+          echo "## Notes"
+          echo "- This workflow mirrors the CircleCI configuration"
+          echo "- Components are built in dependency order"
+        } > BUILD_REPORT.md
         echo "- Tests are run but allowed to fail (continue-on-error)" >> BUILD_REPORT.md
         echo "- Build artifacts are cached for 1 day" >> BUILD_REPORT.md
 

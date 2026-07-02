@@ -26,7 +26,7 @@ runs:
         key: opencog-deps-${{ runner.os }}-${{ inputs.cache-key-suffix }}-${{ hashFiles('**/CMakeLists.txt') }}
         restore-keys: |
           opencog-deps-${{ runner.os }}-
-    
+
     - name: Install Dependencies
       if: steps.cache-deps.outputs.cache-hit != 'true'
       shell: bash

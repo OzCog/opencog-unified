@@ -139,7 +139,7 @@ stmt.setString(1, email);
 
 ```javascript
 // ❌ BAD: Exposed secret in code
-const API_KEY = "sk_live_abc123xyz789";
+const API_KEY = "example_test_api_key";
 
 // ✅ GOOD: Use environment variables
 const API_KEY = process.env.API_KEY;

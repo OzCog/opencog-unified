@@ -409,7 +409,7 @@ Require current password before account deletion, email change, or other sensiti
 
 ```typescript
 // BAD
-const API_KEY = 'sk_live_abc123def456';
+const API_KEY = 'example_test_api_key';
 
 // GOOD
 const API_KEY = process.env.API_KEY;

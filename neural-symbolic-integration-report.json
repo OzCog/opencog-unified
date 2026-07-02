@@ -44,19 +44,13 @@
         {"component": "ggml_integration", "operation_info": "Input"},
         {"component": "tensor", "operation_info": "tensor"},
         {"component": "shape", "operation_info": ""},
-        {"component": "[2x3]
-Weights", "operation_info": "[2x3]
-Weights"},
+        {"component": "[2x3]\\nWeights", "operation_info": "[2x3]\\nWeights"},
         {"component": "tensor", "operation_info": "tensor"},
         {"component": "shape", "operation_info": ""},
-        {"component": "[3x4]
-Activated", "operation_info": "[3x4]
-Activated"},
+        {"component": "[3x4]\\nActivated", "operation_info": "[3x4]\\nActivated"},
         {"component": "tensor", "operation_info": "tensor"},
         {"component": "shape", "operation_info": ""},
-        {"component": "[2x4]
-GGML", "operation_info": "[2x4]
-GGML"},
+        {"component": "[2x4]\\nGGML", "operation_info": "[2x4]\\nGGML"},
         {"component": "tensor", "operation_info": "tensor"},
         {"component": "operations", "operation_info": ""},
         {"component": "SUCCESS", "operation_info": "SUCCESS"}

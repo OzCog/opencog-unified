@@ -24,7 +24,7 @@ jobs:
         run: |
           set -eu
           sudo apt-get update
-          sudo apt-get install -y guile-3.0 cmake build-essential g++
+          sudo apt-get install -y guile-3.0 guile-3.0-dev cmake build-essential g++
 
 #      - name: Verify no placeholder implementations
 #        run: |
@@ -101,30 +101,32 @@ jobs:
       - name: Generate verification report
         run: |
           set -eu
-          echo "📊 VERIFICATION SUMMARY" > verification-report.txt
-          echo "======================" >> verification-report.txt
-          echo "Timestamp: $(date)" >> verification-report.txt
-          echo "Commit: ${GITHUB_SHA}" >> verification-report.txt
-          echo "" >> verification-report.txt
+          {
+            echo "📊 VERIFICATION SUMMARY"
+            echo "======================"
+            echo "Timestamp: $(date)"
+            echo "Commit: ${GITHUB_SHA}"
+            echo ""
 
-          # Count implementations
-          cpp_files=$(find . -name "*.cc" -o -name "*.cpp" | wc -l)
-          header_files=$(find . -name "*.h" -o -name "*.hpp" | wc -l)
-          scheme_files=$(find . -name "*.scm" | wc -l)
+            # Count implementations
+            cpp_files=$(find . -name "*.cc" -o -name "*.cpp" | wc -l)
+            header_files=$(find . -name "*.h" -o -name "*.hpp" | wc -l)
+            scheme_files=$(find . -name "*.scm" | wc -l)
 
-          echo "Implementation Statistics:" >> verification-report.txt
-          echo "- C++ source files: $cpp_files" >> verification-report.txt
-          echo "- C++ header files: $header_files" >> verification-report.txt
-          echo "- Scheme files: $scheme_files" >> verification-report.txt
-          echo "" >> verification-report.txt
+            echo "Implementation Statistics:"
+            echo "- C++ source files: $cpp_files"
+            echo "- C++ header files: $header_files"
+            echo "- Scheme files: $scheme_files"
+            echo ""
 
-          # Calculate total size
-          total_size=$(find . \( -name "*.cc" -o -name "*.h" -o -name "*.scm" \) -exec stat -c%s {} + | awk '{sum+=$1} END {print sum}')
-          echo "Total implementation size: $total_size bytes" >> verification-report.txt
-          echo "" >> verification-report.txt
+            # Calculate total size
+            total_size=$(find . \( -name "*.cc" -o -name "*.h" -o -name "*.scm" \) -exec stat -c%s {} + | awk '{sum+=$1} END {print sum}')
+            echo "Total implementation size: $total_size bytes"
+            echo ""
 
-          echo "✅ ALL IMPLEMENTATIONS VERIFIED AS REAL AND FUNCTIONAL" >> verification-report.txt
-          echo "🛡️  Recursive safeguard against simulation: ACTIVE" >> verification-report.txt
+            echo "✅ ALL IMPLEMENTATIONS VERIFIED AS REAL AND FUNCTIONAL"
+            echo "🛡️  Recursive safeguard against simulation: ACTIVE"
+          } > verification-report.txt
 
           cat verification-report.txt
 
@@ -146,7 +148,7 @@ jobs:
         run: |
           set -eu
           sudo apt-get update
-          sudo apt-get install -y jq bc guile-3.0
+          sudo apt-get install -y jq bc guile-3.0 guile-3.0-dev
 
       - name: Extract ECAN-style attention metrics
         run: |
@@ -216,7 +218,7 @@ jobs:
         run: |
           set -eu
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential g++ pkg-config
+          sudo apt-get install -y cmake build-essential g++ pkg-config guile-3.0 guile-3.0-dev libboost-all-dev
 
       - name: CMake configuration test
         run: |
@@ -266,83 +268,39 @@ jobs:
       - name: Generate enhanced verification report with cognitive synergy
         run: |
           set -eu
-          echo "📊 ENHANCED VERIFICATION WITH COGNITIVE SYNERGY" > enhanced-verification-report.txt
-          echo "===============================================" >> enhanced-verification-report.txt
-          echo "Timestamp: $(date)" >> enhanced-verification-report.txt
-          echo "Commit: ${GITHUB_SHA}" >> enhanced-verification-report.txt
-          echo "Workflow Run: $GITHUB_RUN_ID" >> enhanced-verification-report.txt
-          echo "" >> enhanced-verification-report.txt
-
-          # Include original verification results
-          if [[ -f "./verification-reports/verification-report.txt" ]]; then
-            echo "=== CORE VERIFICATION RESULTS ===" >> enhanced-verification-report.txt
-            cat "./verification-reports/verification-report.txt" >> enhanced-verification-report.txt
-            echo "" >> enhanced-verification-report.txt
-          fi
-
-          # Add cognitive enhancement metrics
-          echo "=== COGNITIVE ENHANCEMENT METRICS ===" >> enhanced-verification-report.txt
-
-          # Attention allocation metrics
+          # Extract metrics from cognitive reports
+          total_attention=0; attention_balance="unknown"; system_urgency=0
           if [[ -f "./cognitive-reports/attention-metrics.json" ]]; then
-            echo "🧠 ECAN-Style Attention Allocation:" >> enhanced-verification-report.txt
             total_attention=$(jq -r '.ecan_attention_metrics.cognitive_workload_distribution.total_attention // 0' ./cognitive-reports/attention-metrics.json)
             attention_balance=$(jq -r '.meta_analysis.attention_balance // "unknown"' ./cognitive-reports/attention-metrics.json)
             system_urgency=$(jq -r '.ecan_attention_metrics.urgency_metrics.total_urgency // 0' ./cognitive-reports/attention-metrics.json)
-            echo "  - Total Attention Units: $total_attention" >> enhanced-verification-report.txt
-            echo "  - Attention Balance: $attention_balance" >> enhanced-verification-report.txt
-            echo "  - System Urgency: $system_urgency units" >> enhanced-verification-report.txt
           fi
-
-          # Neural-symbolic integration metrics
+          success_rate=0; synergy="limited"
           if [[ -f "./cognitive-reports/neural-symbolic-integration-report.json" ]]; then
-            echo "🔬 Neural-Symbolic Integration:" >> enhanced-verification-report.txt
             success_rate=$(jq -r '.neural_symbolic_integration.overall_metrics.overall_success_rate // 0' ./cognitive-reports/neural-symbolic-integration-report.json)
             synergy=$(jq -r '.neural_symbolic_integration.overall_metrics.neural_symbolic_synergy // "limited"' ./cognitive-reports/neural-symbolic-integration-report.json)
-            echo "  - Integration Success Rate: ${success_rate}%" >> enhanced-verification-report.txt
-            echo "  - Neural-Symbolic Synergy: $synergy" >> enhanced-verification-report.txt
           fi
-
-          # Tensor field synthesis metrics
+          synthesis_energy=0; field_coherence=0; meta_completeness=0
           if [[ -f "./cognitive-reports/tensor-field-analysis.json" ]]; then
-            echo "⚡ Tensor Field Synthesis:" >> enhanced-verification-report.txt
             synthesis_energy=$(jq -r '.tensor_field_analysis.tensor_field_synthesis.synthesis_energy // 0' ./cognitive-reports/tensor-field-analysis.json)
             field_coherence=$(jq -r '.tensor_field_analysis.tensor_field_synthesis.field_coherence_percentage // 0' ./cognitive-reports/tensor-field-analysis.json)
             meta_completeness=$(jq -r '.tensor_field_analysis.meta_completeness_metrics.meta_completeness_percentage // 0' ./cognitive-reports/tensor-field-analysis.json)
-            echo "  - Synthesis Energy: $synthesis_energy units" >> enhanced-verification-report.txt
-            echo "  - Field Coherence: ${field_coherence}%" >> enhanced-verification-report.txt
-            echo "  - Meta-Completeness: ${meta_completeness}%" >> enhanced-verification-report.txt
           fi
-
-          # Hypergraph pattern metrics
+          total_nodes=0; integration_strength="low"
           if [[ -f "./cognitive-reports/hypergraph-patterns.json" ]]; then
-            echo "🕸️  Hypergraph Pattern Encoding:" >> enhanced-verification-report.txt
             total_nodes=$(jq -r '.hypergraph_patterns.hypergraph_metrics.total_nodes // 0' ./cognitive-reports/hypergraph-patterns.json)
             integration_strength=$(jq -r '.hypergraph_patterns.hypergraph_metrics.integration_strength // "low"' ./cognitive-reports/hypergraph-patterns.json)
-            echo "  - Total Hypergraph Nodes: $total_nodes" >> enhanced-verification-report.txt
-            echo "  - Integration Strength: $integration_strength" >> enhanced-verification-report.txt
           fi
-
-          # Overall completeness assessment
+          overall_completeness=0; completeness_level="developing"
           if [[ -f "./cognitive-reports/meta-completeness-analysis.json" ]]; then
-            echo "🔍 Meta-Completeness Assessment:" >> enhanced-verification-report.txt
             overall_completeness=$(jq -r '.meta_completeness_analysis.overall_meta_completeness.overall_percentage // 0' ./cognitive-reports/meta-completeness-analysis.json)
             completeness_level=$(jq -r '.meta_completeness_analysis.overall_meta_completeness.completeness_level // "developing"' ./cognitive-reports/meta-completeness-analysis.json)
-            echo "  - Overall Completeness: ${overall_completeness}%" >> enhanced-verification-report.txt
-            echo "  - Completeness Level: $completeness_level" >> enhanced-verification-report.txt
           fi
-
-          # Recursive feedback summary
+          gaps_identified=0; priority_level="medium"
           if [[ -f "./cognitive-reports/recursive-feedback-report.json" ]]; then
-            echo "🔄 Recursive Enhancement Status:" >> enhanced-verification-report.txt
             gaps_identified=$(jq -r '.recursive_feedback_analysis.cognitive_gap_analysis.total_gaps_identified // 0' ./cognitive-reports/recursive-feedback-report.json)
             priority_level=$(jq -r '.recursive_feedback_analysis.priority_assessment.priority_level // "medium"' ./cognitive-reports/recursive-feedback-report.json)
-            echo "  - Cognitive Gaps Identified: $gaps_identified" >> enhanced-verification-report.txt
-            echo "  - Enhancement Priority: $priority_level" >> enhanced-verification-report.txt
           fi
-
-          echo "" >> enhanced-verification-report.txt
-          echo "=== COGNITIVE SYNERGY ASSESSMENT ===" >> enhanced-verification-report.txt
 
           # Calculate overall cognitive readiness score
           cognitive_score=0
@@ -368,24 +326,81 @@ jobs:
           cognitive_percentage=$((cognitive_score * 100 / max_score))
           cognitive_percentage=$((cognitive_percentage > 100 ? 100 : cognitive_percentage))
 
-          echo "🌟 Overall Cognitive Synergy Score: ${cognitive_percentage}% ($cognitive_score/$max_score)" >> enhanced-verification-report.txt
+          {
+            echo "📊 ENHANCED VERIFICATION WITH COGNITIVE SYNERGY"
+            echo "==============================================="
+            echo "Timestamp: $(date)"
+            echo "Commit: ${GITHUB_SHA}"
+            echo "Workflow Run: $GITHUB_RUN_ID"
+            echo ""
 
-          if [[ $cognitive_percentage -gt 80 ]]; then
-            echo "🎉 EXCELLENT: Cognitive unity approaching optimal synthesis!" >> enhanced-verification-report.txt
-          elif [[ $cognitive_percentage -gt 60 ]]; then
-            echo "✅ GOOD: Strong cognitive synergy with room for enhancement!" >> enhanced-verification-report.txt
-          elif [[ $cognitive_percentage -gt 40 ]]; then
-            echo "⚠️  MODERATE: Cognitive patterns developing, continued enhancement needed!" >> enhanced-verification-report.txt
-          else
-            echo "🔧 DEVELOPING: Early cognitive patterns detected, significant enhancement opportunities!" >> enhanced-verification-report.txt
-          fi
+            if [[ -f "./verification-reports/verification-report.txt" ]]; then
+              echo "=== CORE VERIFICATION RESULTS ==="
+              cat "./verification-reports/verification-report.txt"
+              echo ""
+            fi
 
-          echo "" >> enhanced-verification-report.txt
-          echo "🛡️  RECURSIVE SAFEGUARD AGAINST SIMULATION: ACTIVE AND ENHANCED" >> enhanced-verification-report.txt
-          echo "🧠 COGNITIVE ENHANCEMENT SYSTEM: OPERATIONAL" >> enhanced-verification-report.txt
-          echo "⚡ TENSOR FIELD SYNTHESIS: READY FOR RECURSIVE EVOLUTION" >> enhanced-verification-report.txt
-          echo "🕸️  HYPERGRAPH PATTERNS: CATALOGED FOR ATOMSPACE INGESTION" >> enhanced-verification-report.txt
-          echo "🔄 RECURSIVE FEEDBACK LOOPS: INITIALIZED FOR CONTINUOUS IMPROVEMENT" >> enhanced-verification-report.txt
+            echo "=== COGNITIVE ENHANCEMENT METRICS ==="
+
+            if [[ -f "./cognitive-reports/attention-metrics.json" ]]; then
+              echo "🧠 ECAN-Style Attention Allocation:"
+              echo "  - Total Attention Units: $total_attention"
+              echo "  - Attention Balance: $attention_balance"
+              echo "  - System Urgency: $system_urgency units"
+            fi
+
+            if [[ -f "./cognitive-reports/neural-symbolic-integration-report.json" ]]; then
+              echo "🔬 Neural-Symbolic Integration:"
+              echo "  - Integration Success Rate: ${success_rate}%"
+              echo "  - Neural-Symbolic Synergy: $synergy"
+            fi
+
+            if [[ -f "./cognitive-reports/tensor-field-analysis.json" ]]; then
+              echo "⚡ Tensor Field Synthesis:"
+              echo "  - Synthesis Energy: $synthesis_energy units"
+              echo "  - Field Coherence: ${field_coherence}%"
+              echo "  - Meta-Completeness: ${meta_completeness}%"
+            fi
+
+            if [[ -f "./cognitive-reports/hypergraph-patterns.json" ]]; then
+              echo "🕸️  Hypergraph Pattern Encoding:"
+              echo "  - Total Hypergraph Nodes: $total_nodes"
+              echo "  - Integration Strength: $integration_strength"
+            fi
+
+            if [[ -f "./cognitive-reports/meta-completeness-analysis.json" ]]; then
+              echo "🔍 Meta-Completeness Assessment:"
+              echo "  - Overall Completeness: ${overall_completeness}%"
+              echo "  - Completeness Level: $completeness_level"
+            fi
+
+            if [[ -f "./cognitive-reports/recursive-feedback-report.json" ]]; then
+              echo "🔄 Recursive Enhancement Status:"
+              echo "  - Cognitive Gaps Identified: $gaps_identified"
+              echo "  - Enhancement Priority: $priority_level"
+            fi
+
+            echo ""
+            echo "=== COGNITIVE SYNERGY ASSESSMENT ==="
+            echo "🌟 Overall Cognitive Synergy Score: ${cognitive_percentage}% ($cognitive_score/$max_score)"
+
+            if [[ $cognitive_percentage -gt 80 ]]; then
+              echo "🎉 EXCELLENT: Cognitive unity approaching optimal synthesis!"
+            elif [[ $cognitive_percentage -gt 60 ]]; then
+              echo "✅ GOOD: Strong cognitive synergy with room for enhancement!"
+            elif [[ $cognitive_percentage -gt 40 ]]; then
+              echo "⚠️  MODERATE: Cognitive patterns developing, continued enhancement needed!"
+            else
+              echo "🔧 DEVELOPING: Early cognitive patterns detected, significant enhancement opportunities!"
+            fi
+
+            echo ""
+            echo "🛡️  RECURSIVE SAFEGUARD AGAINST SIMULATION: ACTIVE AND ENHANCED"
+            echo "🧠 COGNITIVE ENHANCEMENT SYSTEM: OPERATIONAL"
+            echo "⚡ TENSOR FIELD SYNTHESIS: READY FOR RECURSIVE EVOLUTION"
+            echo "🕸️  HYPERGRAPH PATTERNS: CATALOGED FOR ATOMSPACE INGESTION"
+            echo "🔄 RECURSIVE FEEDBACK LOOPS: INITIALIZED FOR CONTINUOUS IMPROVEMENT"
+          } > enhanced-verification-report.txt
 
           cat enhanced-verification-report.txt
 

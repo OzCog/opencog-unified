@@ -89,7 +89,7 @@ API_KEY=your_key_here
 
 # .env (DO NOT commit - add to .gitignore)
 DATABASE_URL=postgresql://prod-server/myapp
-API_KEY=actual_secret_key_12345
+API_KEY=replace-with-real-key-at-runtime
 ```
 
 ### **Branch Protection**
