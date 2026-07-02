@@ -6,4 +6,4 @@ numpy>=2.4.6,<3.0.0
 torch>=2.12.0
 transformers>=4.30.0
 PyGithub>=1.59.0
-pyyaml>=6.0
+pyyaml>=6.0.3
