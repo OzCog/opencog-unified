@@ -24,7 +24,7 @@ jobs:
         run: |
           set -eu
           sudo apt-get update
-          sudo apt-get install -y guile-3.0 cmake build-essential g++
+          sudo apt-get install -y guile-3.0 guile-3.0-dev cmake build-essential g++
 
 #      - name: Verify no placeholder implementations
 #        run: |
@@ -146,7 +146,7 @@ jobs:
         run: |
           set -eu
           sudo apt-get update
-          sudo apt-get install -y jq bc guile-3.0
+          sudo apt-get install -y jq bc guile-3.0 guile-3.0-dev
 
       - name: Extract ECAN-style attention metrics
         run: |

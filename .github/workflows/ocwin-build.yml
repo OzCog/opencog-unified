@@ -57,7 +57,6 @@ jobs:
 
     - name: Install Dependencies via Chocolatey
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System'
         choco install -y visualstudio2022-workload-nativedesktop
@@ -65,7 +64,6 @@ jobs:
 
     - name: Install Dependencies via vcpkg
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd C:\vcpkg
         .\vcpkg install boost-filesystem:x64-windows boost-program-options:x64-windows boost-system:x64-windows boost-thread:x64-windows boost-regex:x64-windows
@@ -73,7 +71,6 @@ jobs:
 
     - name: Configure CogUtil
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         mkdir cogutil\build
         cd cogutil\build
@@ -82,7 +79,6 @@ jobs:
 
     - name: Build CogUtil
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd cogutil\build
         cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
@@ -90,7 +86,6 @@ jobs:
 
     - name: Run CogUtil Tests
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd cogutil\build
         ctest -C ${{ env.BUILD_TYPE }} --output-on-failure
@@ -99,7 +94,6 @@ jobs:
 
     - name: Install CogUtil
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd cogutil\build
         cmake --install . --config ${{ env.BUILD_TYPE }}
@@ -139,7 +133,6 @@ jobs:
 
     - name: Install Dependencies via Chocolatey
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System'
         choco install -y python3
@@ -147,7 +140,6 @@ jobs:
 
     - name: Install Dependencies via vcpkg
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd C:\vcpkg
         .\vcpkg install boost-filesystem:x64-windows boost-program-options:x64-windows boost-system:x64-windows boost-thread:x64-windows boost-regex:x64-windows
@@ -155,7 +147,6 @@ jobs:
 
     - name: Rebuild and Install CogUtil
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         mkdir cogutil\build -Force
         cd cogutil\build
@@ -166,7 +157,6 @@ jobs:
 
     - name: Configure AtomSpace
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         mkdir atomspace\build -Force
         cd atomspace\build
@@ -175,7 +165,6 @@ jobs:
 
     - name: Build AtomSpace
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd atomspace\build
         cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
@@ -183,7 +172,6 @@ jobs:
 
     - name: Run AtomSpace Tests
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd atomspace\build
         ctest -C ${{ env.BUILD_TYPE }} --output-on-failure
@@ -192,7 +180,6 @@ jobs:
 
     - name: Install AtomSpace
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd atomspace\build
         cmake --install . --config ${{ env.BUILD_TYPE }}
@@ -224,7 +211,6 @@ jobs:
     
     - name: Install Dependencies via vcpkg
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd C:\vcpkg
         .\vcpkg install boost-filesystem:x64-windows boost-program-options:x64-windows boost-system:x64-windows boost-thread:x64-windows
@@ -232,7 +218,6 @@ jobs:
 
     - name: Rebuild and Install CogUtil
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         mkdir cogutil\build -Force
         cd cogutil\build
@@ -243,7 +228,6 @@ jobs:
 
     - name: Rebuild and Install AtomSpace
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         mkdir atomspace\build -Force
         cd atomspace\build
@@ -254,7 +238,6 @@ jobs:
 
     - name: Check AtomSpace Storage Directory
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         if (Test-Path "atomspace-storage") {
           Write-Host "AtomSpace Storage directory exists"
@@ -268,7 +251,6 @@ jobs:
     - name: Configure AtomSpace Storage
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         mkdir atomspace-storage\build -Force
         cd atomspace-storage\build
@@ -278,7 +260,6 @@ jobs:
     - name: Build AtomSpace Storage
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd atomspace-storage\build
         cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
@@ -287,7 +268,6 @@ jobs:
     - name: Run Tests
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd atomspace-storage\build
         ctest -C ${{ env.BUILD_TYPE }} --output-on-failure
@@ -297,7 +277,6 @@ jobs:
     - name: Install AtomSpace Storage
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd atomspace-storage\build
         cmake --install . --config ${{ env.BUILD_TYPE }}
@@ -320,7 +299,6 @@ jobs:
     
     - name: Install Dependencies via vcpkg
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd C:\vcpkg
         .\vcpkg install boost-filesystem:x64-windows boost-program-options:x64-windows boost-system:x64-windows boost-thread:x64-windows rocksdb:x64-windows
@@ -328,7 +306,6 @@ jobs:
 
     - name: Rebuild and Install CogUtil
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         mkdir cogutil\build -Force
         cd cogutil\build
@@ -339,7 +316,6 @@ jobs:
 
     - name: Rebuild and Install AtomSpace
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         mkdir atomspace\build -Force
         cd atomspace\build
@@ -351,7 +327,6 @@ jobs:
     - name: Rebuild and Install AtomSpace Storage
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         mkdir atomspace-storage\build -Force
         cd atomspace-storage\build
@@ -362,7 +337,6 @@ jobs:
 
     - name: Check AtomSpace Rocks Directory
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         if (Test-Path "atomspace-rocks") {
           Write-Host "AtomSpace Rocks directory exists"
@@ -376,7 +350,6 @@ jobs:
     - name: Configure AtomSpace Rocks
       if: hashFiles('atomspace-rocks/CMakeLists.txt') != ''
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         mkdir atomspace-rocks\build -Force
         cd atomspace-rocks\build
@@ -386,7 +359,6 @@ jobs:
     - name: Build AtomSpace Rocks
       if: hashFiles('atomspace-rocks/CMakeLists.txt') != ''
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd atomspace-rocks\build
         cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
@@ -395,7 +367,6 @@ jobs:
     - name: Run Tests
       if: hashFiles('atomspace-rocks/CMakeLists.txt') != ''
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd atomspace-rocks\build
         ctest -C ${{ env.BUILD_TYPE }} --output-on-failure
@@ -405,7 +376,6 @@ jobs:
     - name: Install AtomSpace Rocks
       if: hashFiles('atomspace-rocks/CMakeLists.txt') != ''
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd atomspace-rocks\build
         cmake --install . --config ${{ env.BUILD_TYPE }}
@@ -428,7 +398,6 @@ jobs:
     
     - name: Install Dependencies via vcpkg
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd C:\vcpkg
         .\vcpkg install boost-filesystem:x64-windows boost-program-options:x64-windows boost-system:x64-windows boost-thread:x64-windows asio:x64-windows
@@ -436,7 +405,6 @@ jobs:
 
     - name: Rebuild and Install CogUtil
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         mkdir cogutil\build -Force
         cd cogutil\build
@@ -447,7 +415,6 @@ jobs:
 
     - name: Rebuild and Install AtomSpace
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         mkdir atomspace\build -Force
         cd atomspace\build
@@ -458,7 +425,6 @@ jobs:
 
     - name: Check CogServer Directory
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         if (Test-Path "cogserver") {
           Write-Host "CogServer directory exists"
@@ -472,7 +438,6 @@ jobs:
     - name: Configure CogServer
       if: hashFiles('cogserver/CMakeLists.txt') != ''
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         mkdir cogserver\build -Force
         cd cogserver\build
@@ -482,7 +447,6 @@ jobs:
     - name: Build CogServer
       if: hashFiles('cogserver/CMakeLists.txt') != ''
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd cogserver\build
         cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
@@ -491,7 +455,6 @@ jobs:
     - name: Run Tests
       if: hashFiles('cogserver/CMakeLists.txt') != ''
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd cogserver\build
         ctest -C ${{ env.BUILD_TYPE }} --output-on-failure
@@ -501,7 +464,6 @@ jobs:
     - name: Install CogServer
       if: hashFiles('cogserver/CMakeLists.txt') != ''
       run: |
-        set -eu
         $ErrorActionPreference = 'Stop'
         cd cogserver\build
         cmake --install . --config ${{ env.BUILD_TYPE }}
@@ -528,7 +490,6 @@ jobs:
 
     - name: Generate Build Report
       run: |
-        set -eu
         $report = "# OCC Windows Build Report`n`n"
         $report += "## Build Summary`n"
         $report += "Build completed at: $(Get-Date)`n`n"
