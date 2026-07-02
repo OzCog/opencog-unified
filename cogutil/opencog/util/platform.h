@@ -47,6 +47,8 @@ char*              __strtok_r(char *s1, const char *s2, char **lasts);
 
 #define M_PI 3.14159265358979323846
 
+// MinGW already provides POSIX-compatible functions; only declare for MSVC.
+#if defined(_MSC_VER)
 struct timezone {};
 
 int                round(float x);
@@ -58,6 +60,7 @@ double             rint(double nr);
 int                __dup2(int, int);
 unsigned long long atoll(const char *str);
 unsigned int       sleep(unsigned seconds);
+#endif // _MSC_VER
 
 #endif // ~WIN32_NOT_UNIX
 
