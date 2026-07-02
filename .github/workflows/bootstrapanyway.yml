@@ -229,7 +229,7 @@ jobs:
           set -eu
           mkdir build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DBUILD_SHARED_LIBS=OFF
+          cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
           echo "✅ CMake configuration successful"
 
       - name: Test partial build
