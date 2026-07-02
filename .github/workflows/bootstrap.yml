@@ -250,14 +250,14 @@ jobs:
         run: |
           set -eu
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential g++ pkg-config guile-3.0 guile-3.0-dev libgmp-dev libboost-all-dev
+          sudo apt-get install -y cmake build-essential g++ pkg-config guile-3.0 guile-3.0-dev libgmp-dev libboost-all-dev librocksdb-dev cxxtest
 
       - name: CMake configuration test
         run: |
           set -eu
           mkdir build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Debug
+          cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF
           echo "✅ CMake configuration successful"
 
       - name: Test partial build

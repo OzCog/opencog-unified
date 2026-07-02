@@ -35,7 +35,7 @@ env:
 jobs:
   # Stage 1: Build CogUtil (Foundation)
   build-cogutil:
-    runs-on: windows-latest
+    runs-on: windows-2022
     name: Build CogUtil (Windows)
 
     steps:
@@ -109,7 +109,7 @@ jobs:
 
   # Stage 2: Build AtomSpace (depends on CogUtil)
   build-atomspace:
-    runs-on: windows-latest
+    runs-on: windows-2022
     name: Build AtomSpace (Windows)
     needs: build-cogutil
 
@@ -195,7 +195,7 @@ jobs:
 
   # Stage 3: Build AtomSpace Storage (depends on AtomSpace)
   build-atomspace-storage:
-    runs-on: windows-latest
+    runs-on: windows-2022
     name: Build AtomSpace Storage (Windows)
     needs: build-atomspace
 
@@ -282,7 +282,7 @@ jobs:
 
   # Stage 3b: Build AtomSpace Rocks (depends on AtomSpace Storage)
   build-atomspace-rocks:
-    runs-on: windows-latest
+    runs-on: windows-2022
     name: Build AtomSpace RocksDB Storage (Windows)
     needs: build-atomspace-storage
 
@@ -381,7 +381,7 @@ jobs:
 
   # Stage 4: Build CogServer (depends on AtomSpace)
   build-cogserver:
-    runs-on: windows-latest
+    runs-on: windows-2022
     name: Build CogServer (Windows)
     needs: build-atomspace-storage
 
@@ -469,7 +469,7 @@ jobs:
 
   # Final Stage: Package and Report
   package-and-report:
-    runs-on: windows-latest
+    runs-on: windows-2022
     name: Package OCC Windows Build
     needs:
       - build-atomspace-rocks
