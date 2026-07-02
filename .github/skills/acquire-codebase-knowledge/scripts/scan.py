@@ -263,7 +263,10 @@ def find_entry_points() -> List[str]:
     """Find entry point candidates."""
     found = []
     for candidate in ENTRY_CANDIDATES:
-        if Path(candidate).exists():
+        if "*" in candidate:
+            matches = list(Path.cwd().glob(candidate))
+            found.extend(str(m.relative_to(Path.cwd())) for m in matches)
+        elif Path(candidate).exists():
             found.append(candidate)
     return found
 
@@ -364,7 +367,8 @@ def is_git_repo() -> bool:
             ["git", "rev-parse", "--git-dir"],
             capture_output=True,
             cwd=Path.cwd(),
-            timeout=2
+            timeout=2,
+            check=True
         )
         return True
     except Exception:
@@ -420,6 +424,14 @@ def detect_containers() -> List[str]:
     containers = []
 
     for config in CONTAINER_FILES:
+        if "*" in config:
+            matches = list(Path.cwd().glob(config))
+            for match in matches:
+                if "Dockerfile" in match.name:
+                    containers.append(f"Container: Docker found ({match.name})")
+                else:
+                    containers.append(f"Container/Orchestration: {match.name}")
+            continue
         path = Path(config)
         if path.is_file():
             if "Dockerfile" in config:
