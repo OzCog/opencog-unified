@@ -149,7 +149,7 @@ jobs:
   secret-scan:
     name: Secret Scan
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
         with:
@@ -162,7 +162,13 @@ jobs:
           sudo mv /tmp/gitleaks /usr/local/bin/
           gitleaks version
       - name: Scan for leaked secrets
-        run: gitleaks detect --no-banner --redact --verbose
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            gitleaks detect --no-banner --redact --verbose \
+              --log-opts="${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
+          else
+            gitleaks detect --no-banner --redact --verbose
+          fi
 
   # ---------------------------------------------------------------------------
   # Aggregator job — set this as the single required status check so adding

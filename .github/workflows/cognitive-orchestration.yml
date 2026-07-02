@@ -131,26 +131,32 @@ jobs:
 
           # Persist cognitive state with tensor annotations
           mkdir -p /ws/cognitive-state/foundation
-          echo "COGUTIL_INSTALLED=$(date)" > /ws/cognitive-state/foundation/state.txt
-          echo "TENSOR_SHAPE=[512,128,8]" >> /ws/cognitive-state/foundation/state.txt
-          echo "DEGREES_OF_FREEDOM=$((512 * 128 * 8))" >> /ws/cognitive-state/foundation/state.txt
+          {
+            echo "COGUTIL_INSTALLED=$(date)"
+            echo "TENSOR_SHAPE=[512,128,8]"
+            echo "DEGREES_OF_FREEDOM=$((512 * 128 * 8))"
+          } > /ws/cognitive-state/foundation/state.txt
 
           # Generate cognitive artifacts
-          echo "{" > /ws/cognitive-state/foundation/tensor-metrics.json
-          echo '  "layer": "foundation",' >> /ws/cognitive-state/foundation/tensor-metrics.json
-          echo '  "component": "cogutil",' >> /ws/cognitive-state/foundation/tensor-metrics.json
-          echo '  "tensor_shape": [512, 128, 8],' >> /ws/cognitive-state/foundation/tensor-metrics.json
-          echo '  "degrees_of_freedom": '$((512 * 128 * 8))',' >> /ws/cognitive-state/foundation/tensor-metrics.json
-          printf '  "build_timestamp": "%s",\n' "$(date -Iseconds)" >> /ws/cognitive-state/foundation/tensor-metrics.json
-          echo '  "cognitive_status": "active"' >> /ws/cognitive-state/foundation/tensor-metrics.json
-          echo "}" >> /ws/cognitive-state/foundation/tensor-metrics.json
+          {
+            echo "{"
+            echo '  "layer": "foundation",'
+            echo '  "component": "cogutil",'
+            echo '  "tensor_shape": [512, 128, 8],'
+            echo '  "degrees_of_freedom": '$((512 * 128 * 8))','
+            printf '  "build_timestamp": "%s",\n' "$(date -Iseconds)"
+            echo '  "cognitive_status": "active"'
+            echo "}"
+          } > /ws/cognitive-state/foundation/tensor-metrics.json
 
       - name: "🎯 Configure Tensor Output"
         id: tensor-config
         run: |
           set -eu
-          echo "shape=[512,128,8]" >> "${GITHUB_OUTPUT}"
-          echo "state=foundation-active" >> "${GITHUB_OUTPUT}"
+          {
+            echo "shape=[512,128,8]"
+            echo "state=foundation-active"
+          } >> "${GITHUB_OUTPUT}"
 
       - name: "💾 Save Hypergraph State"
         uses: actions/cache@v5
@@ -194,7 +200,7 @@ jobs:
         image: opencog/postgres:latest
         env:
           POSTGRES_USER: opencog_test
-          POSTGRES_PASSWORD: cheese
+          POSTGRES_PASSWORD: cheese  # pragma: allowlist secret
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -214,14 +220,16 @@ jobs:
 
     steps:
       - name: "🌀 Initialize Hypergraph Substrate"
-        run: |
+        run: |  # pragma: allowlist secret
           set -eu
-          echo "COGNITIVE_LAYER=CORE" >> "${GITHUB_ENV}"
-          echo "TENSOR_SHAPE=[1024,256,16,4]" >> "${GITHUB_ENV}"
-          echo "VARIANT=${{ matrix.variant }}" >> "${GITHUB_ENV}"
-          echo "PGHOST=postgres" >> "${GITHUB_ENV}"
-          echo "PGUSER=opencog_test" >> "${GITHUB_ENV}"
-          echo "PGPASSWORD=cheese" >> "${GITHUB_ENV}"
+          {
+            echo "COGNITIVE_LAYER=CORE"
+            echo "TENSOR_SHAPE=[1024,256,16,4]"
+            echo "VARIANT=${{ matrix.variant }}"
+            echo "PGHOST=postgres"
+            echo "PGUSER=opencog_test"
+            echo "PGPASSWORD=cheese"  # pragma: allowlist secret
+          } >> "${GITHUB_ENV}"
 
           mkdir -p /ws/cognitive-state/core
           echo "Hypergraph substrate ${{ matrix.variant }} initialized at $(date)" > /ws/cognitive-state/core/genesis-${{ matrix.variant }}.log
@@ -314,22 +322,26 @@ jobs:
 
           # Save hypergraph configuration with tensor annotations
           mkdir -p /ws/cognitive-state/core
-          echo "ATOMSPACE_${{ matrix.variant }}=$(date)" > /ws/cognitive-state/core/state-${{ matrix.variant }}.txt
-          echo "TENSOR_SHAPE=[1024,256,16,4]" >> /ws/cognitive-state/core/state-${{ matrix.variant }}.txt
-          echo "TENSOR_MODULATION=${{ matrix.tensor_mod }}" >> /ws/cognitive-state/core/state-${{ matrix.variant }}.txt
-          echo "DEGREES_OF_FREEDOM=$((1024 * 256 * 16 * 4))" >> /ws/cognitive-state/core/state-${{ matrix.variant }}.txt
+          {
+            echo "ATOMSPACE_${{ matrix.variant }}=$(date)"
+            echo "TENSOR_SHAPE=[1024,256,16,4]"
+            echo "TENSOR_MODULATION=${{ matrix.tensor_mod }}"
+            echo "DEGREES_OF_FREEDOM=$((1024 * 256 * 16 * 4))"
+          } > /ws/cognitive-state/core/state-${{ matrix.variant }}.txt
 
           # Generate tensor field metrics
-          echo "{" > /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
-          echo '  "layer": "core",' >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
-          echo '  "component": "atomspace",' >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
-          echo '  "variant": "'${{ matrix.variant }}'",' >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
-          echo '  "tensor_shape": [1024, 256, 16, 4],' >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
-          echo '  "degrees_of_freedom": '$((1024 * 256 * 16 * 4))',' >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
-          echo '  "tensor_modulation": '${{ matrix.tensor_mod }}',' >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
-          printf '  "build_timestamp": "%s",\n' "$(date -Iseconds)" >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
-          echo '  "hypergraph_status": "materialized"' >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
-          echo "}" >> /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
+          {
+            echo "{"
+            echo '  "layer": "core",'
+            echo '  "component": "atomspace",'
+            echo '  "variant": "'${{ matrix.variant }}'",'
+            echo '  "tensor_shape": [1024, 256, 16, 4],'
+            echo '  "degrees_of_freedom": '$((1024 * 256 * 16 * 4))','
+            echo '  "tensor_modulation": '${{ matrix.tensor_mod }}','
+            printf '  "build_timestamp": "%s",\n' "$(date -Iseconds)"
+            echo '  "hypergraph_status": "materialized"'
+            echo "}"
+          } > /ws/cognitive-state/core/tensor-metrics-${{ matrix.variant }}.json
 
       - name: "📊 Generate Cognitive Metrics"
         if: always()
@@ -385,6 +397,7 @@ jobs:
       - name: "🧬 Clone Prerequisites"
         run: |
           set -eu
+          mkdir -p /ws/deps && cd /ws/deps
           echo "📦 Cloning CogUtil..."
           git clone --depth 1 https://github.com/opencog/cogutil.git
 
@@ -400,7 +413,7 @@ jobs:
         run: |
           set -eu
           echo "🔧 Building CogUtil foundation..."
-          cd cogutil
+          cd /ws/deps/cogutil
           mkdir -p build && cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release
           make -j2
@@ -412,9 +425,9 @@ jobs:
         run: |
           set -eu
           echo "🔧 Building AtomSpace core..."
-          cd atomspace
+          cd /ws/deps/atomspace
           mkdir -p build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF
           make -j2
           make install
           ldconfig
@@ -423,7 +436,7 @@ jobs:
       - name: "🧪 Build AtomSpace-Storage"
         run: |
           set -eu
-          cd atomspace-storage
+          cd /ws/deps/atomspace-storage
           mkdir -p build && cd build
 
           echo "🧬 Configuring AtomSpace-Storage with tensor optimization..."
@@ -433,10 +446,10 @@ jobs:
             echo "🤖 Activating cognitive repair for configuration..."
             cd "${GITHUB_WORKSPACE}"
             python3 scripts/auto_fix.py \
-              --build-cmd "cd atomspace-storage/build && cmake .. -DCMAKE_BUILD_TYPE=Release" \
+              --build-cmd "cd /ws/deps/atomspace-storage/build && cmake .. -DCMAKE_BUILD_TYPE=Release" \
               --context "atomspace-storage" \
               --max-attempts 2
-            cd atomspace-storage/build
+            cd /ws/deps/atomspace-storage/build
           fi
 
           echo "🧬 Building AtomSpace-Storage persistence layer..."
@@ -446,7 +459,7 @@ jobs:
             echo "🤖 Invoking cognitive repair mechanisms..."
             cd "${GITHUB_WORKSPACE}"
             python3 scripts/auto_fix.py \
-              --build-cmd "cd atomspace-storage/build && make ${MAKEFLAGS}" \
+              --build-cmd "cd /ws/deps/atomspace-storage/build && make ${MAKEFLAGS}" \
               --context "atomspace-storage" \
               --max-attempts "${MAX_FIX_ATTEMPTS}"
           fi
@@ -454,7 +467,7 @@ jobs:
       - name: "🧬 Execute Storage Tests"
         run: |
           set -eu
-          cd atomspace-storage/build
+          cd /ws/deps/atomspace-storage/build
           echo "🧪 Building storage test suite..."
           make tests || echo "⚠️  Test build encountered issues"
 
@@ -464,25 +477,29 @@ jobs:
       - name: "💾 Persist Storage State"
         run: |
           set -eu
-          cd atomspace-storage/build
+          cd /ws/deps/atomspace-storage/build
           make install
           ldconfig
 
           # Save storage configuration with tensor annotations
           mkdir -p /ws/cognitive-state/core-storage
-          echo "ATOMSPACE_STORAGE=$(date)" > /ws/cognitive-state/core-storage/state.txt
-          echo "TENSOR_SHAPE=[896,224,14,4]" >> /ws/cognitive-state/core-storage/state.txt
-          echo "DEGREES_OF_FREEDOM=$((896 * 224 * 14 * 4))" >> /ws/cognitive-state/core-storage/state.txt
+          {
+            echo "ATOMSPACE_STORAGE=$(date)"
+            echo "TENSOR_SHAPE=[896,224,14,4]"
+            echo "DEGREES_OF_FREEDOM=$((896 * 224 * 14 * 4))"
+          } > /ws/cognitive-state/core-storage/state.txt
 
           # Generate tensor field metrics
-          echo "{" > /ws/cognitive-state/core-storage/tensor-metrics.json
-          echo '  "layer": "core-storage",' >> /ws/cognitive-state/core-storage/tensor-metrics.json
-          echo '  "component": "atomspace-storage",' >> /ws/cognitive-state/core-storage/tensor-metrics.json
-          echo '  "tensor_shape": [896, 224, 14, 4],' >> /ws/cognitive-state/core-storage/tensor-metrics.json
-          echo '  "degrees_of_freedom": '$((896 * 224 * 14 * 4))',' >> /ws/cognitive-state/core-storage/tensor-metrics.json
-          printf '  "build_timestamp": "%s",\n' "$(date -Iseconds)" >> /ws/cognitive-state/core-storage/tensor-metrics.json
-          echo '  "storage_status": "materialized"' >> /ws/cognitive-state/core-storage/tensor-metrics.json
-          echo "}" >> /ws/cognitive-state/core-storage/tensor-metrics.json
+          {
+            echo "{"
+            echo '  "layer": "core-storage",'
+            echo '  "component": "atomspace-storage",'
+            echo '  "tensor_shape": [896, 224, 14, 4],'
+            echo '  "degrees_of_freedom": '$((896 * 224 * 14 * 4))','
+            printf '  "build_timestamp": "%s",\n' "$(date -Iseconds)"
+            echo '  "storage_status": "materialized"'
+            echo "}"
+          } > /ws/cognitive-state/core-storage/tensor-metrics.json
 
       - name: "📊 Generate Storage Metrics"
         if: always()
@@ -630,19 +647,23 @@ jobs:
 
           # Save RocksDB configuration with tensor annotations
           mkdir -p /ws/cognitive-state/core-rocks
-          echo "ATOMSPACE_ROCKS=$(date)" > /ws/cognitive-state/core-rocks/state.txt
-          echo "TENSOR_SHAPE=[768,192,12]" >> /ws/cognitive-state/core-rocks/state.txt
-          echo "DEGREES_OF_FREEDOM=$((768 * 192 * 12))" >> /ws/cognitive-state/core-rocks/state.txt
+          {
+            echo "ATOMSPACE_ROCKS=$(date)"
+            echo "TENSOR_SHAPE=[768,192,12]"
+            echo "DEGREES_OF_FREEDOM=$((768 * 192 * 12))"
+          } > /ws/cognitive-state/core-rocks/state.txt
 
           # Generate tensor field metrics
-          echo "{" > /ws/cognitive-state/core-rocks/tensor-metrics.json
-          echo '  "layer": "core-rocks",' >> /ws/cognitive-state/core-rocks/tensor-metrics.json
-          echo '  "component": "atomspace-rocks",' >> /ws/cognitive-state/core-rocks/tensor-metrics.json
-          echo '  "tensor_shape": [768, 192, 12],' >> /ws/cognitive-state/core-rocks/tensor-metrics.json
-          echo '  "degrees_of_freedom": '$((768 * 192 * 12))',' >> /ws/cognitive-state/core-rocks/tensor-metrics.json
-          printf '  "build_timestamp": "%s",\n' "$(date -Iseconds)" >> /ws/cognitive-state/core-rocks/tensor-metrics.json
-          echo '  "rocks_status": "materialized"' >> /ws/cognitive-state/core-rocks/tensor-metrics.json
-          echo "}" >> /ws/cognitive-state/core-rocks/tensor-metrics.json
+          {
+            echo "{"
+            echo '  "layer": "core-rocks",'
+            echo '  "component": "atomspace-rocks",'
+            echo '  "tensor_shape": [768, 192, 12],'
+            echo '  "degrees_of_freedom": '$((768 * 192 * 12))','
+            printf '  "build_timestamp": "%s",\n' "$(date -Iseconds)"
+            echo '  "rocks_status": "materialized"'
+            echo "}"
+          } > /ws/cognitive-state/core-rocks/tensor-metrics.json
 
       - name: "📊 Generate RocksDB Metrics"
         if: always()
@@ -844,19 +865,21 @@ jobs:
 
           # Create performance analysis
           mkdir -p evolution-artifacts
-          echo "{" > evolution-artifacts/performance-metrics.json
-          printf '  "analysis_timestamp": "%s",\n' "$(date -Iseconds)" >> evolution-artifacts/performance-metrics.json
-          echo '  "foundation_efficiency": 0.92,' >> evolution-artifacts/performance-metrics.json
-          echo '  "core_hypergraph_stability": 0.88,' >> evolution-artifacts/performance-metrics.json
-          echo '  "tensor_field_coherence": 0.95,' >> evolution-artifacts/performance-metrics.json
-          echo '  "self_healing_success_rate": 0.89,' >> evolution-artifacts/performance-metrics.json
-          echo '  "recommended_optimizations": [' >> evolution-artifacts/performance-metrics.json
-          echo '    "increase_parallel_factor_by_1.2",' >> evolution-artifacts/performance-metrics.json
-          echo '    "optimize_cache_hit_rate_to_0.95",' >> evolution-artifacts/performance-metrics.json
-          echo '    "compress_tensor_shapes_by_0.8",' >> evolution-artifacts/performance-metrics.json
-          echo '    "expand_matrix_strategies"' >> evolution-artifacts/performance-metrics.json
-          echo '  ]' >> evolution-artifacts/performance-metrics.json
-          echo "}" >> evolution-artifacts/performance-metrics.json
+          {
+            echo "{"
+            printf '  "analysis_timestamp": "%s",\n' "$(date -Iseconds)"
+            echo '  "foundation_efficiency": 0.92,'
+            echo '  "core_hypergraph_stability": 0.88,'
+            echo '  "tensor_field_coherence": 0.95,'
+            echo '  "self_healing_success_rate": 0.89,'
+            echo '  "recommended_optimizations": ['
+            echo '    "increase_parallel_factor_by_1.2",'
+            echo '    "optimize_cache_hit_rate_to_0.95",'
+            echo '    "compress_tensor_shapes_by_0.8",'
+            echo '    "expand_matrix_strategies"'
+            echo '  ]'
+            echo "}"
+          } > evolution-artifacts/performance-metrics.json
 
       - name: "🧬 Generate Evolved Pipeline Configuration"
         run: |

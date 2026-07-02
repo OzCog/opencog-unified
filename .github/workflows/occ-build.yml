@@ -54,8 +54,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-        cmake \
         build-essential \
+        cmake \
         cxxtest \
         binutils-dev \
         libiberty-dev \
@@ -69,15 +69,15 @@ jobs:
         valgrind \
         doxygen \
         ccache
-        # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-        sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Configure CogUtil
       run: |
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
     - name: Build CogUtil
       run: |
@@ -163,8 +163,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -183,15 +183,15 @@ jobs:
           valgrind \
           doxygen \
           ccache
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -201,7 +201,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
 
     - name: Build AtomSpace
       run: |
@@ -270,8 +270,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -286,15 +286,15 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -304,7 +304,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -326,7 +326,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
     - name: Build AtomSpace Storage
       if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
@@ -376,8 +376,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -393,15 +393,15 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -411,7 +411,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -422,7 +422,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -455,7 +455,7 @@ jobs:
         cd atomspace-rocks/build
         cmake .. \
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
-          -DCMAKE_POLICY_DEFAULT_CMP0175=OLD \
+          \
           -DCMAKE_PREFIX_PATH="/usr/local/lib/cmake;/usr/local/share/cmake"
 
     - name: Build AtomSpace Rocks
@@ -506,8 +506,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -523,8 +523,8 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Verify Asio Installation
       run: |
@@ -540,7 +540,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -550,7 +550,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -561,7 +561,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -584,7 +584,7 @@ jobs:
         set -eu
         mkdir -p cogserver/build
         cd cogserver/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
     - name: Build CogServer
       if: hashFiles('cogserver/CMakeLists.txt') != ''
@@ -634,8 +634,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -651,8 +651,8 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Verify Asio Installation
       run: |
@@ -668,7 +668,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -678,7 +678,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -689,7 +689,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -701,7 +701,7 @@ jobs:
         set -eu
         mkdir -p cogserver/build
         cd cogserver/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -723,7 +723,7 @@ jobs:
         set -eu
         mkdir -p atomspace-cog/build
         cd atomspace-cog/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
     - name: Build AtomSpace Cog
       if: hashFiles('atomspace-cog/CMakeLists.txt') != ''
@@ -773,8 +773,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -789,15 +789,15 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -807,7 +807,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -829,7 +829,7 @@ jobs:
         set -eu
         mkdir -p unify/build
         cd unify/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
     - name: Build Unify
       if: hashFiles('unify/CMakeLists.txt') != ''
@@ -879,8 +879,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -895,15 +895,15 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -913,7 +913,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -924,7 +924,7 @@ jobs:
         set -eu
         mkdir -p unify/build
         cd unify/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -946,7 +946,7 @@ jobs:
         set -eu
         mkdir -p ure/build
         cd ure/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
     - name: Build URE
       if: hashFiles('ure/CMakeLists.txt') != ''
@@ -1004,8 +1004,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -1020,15 +1020,15 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1038,7 +1038,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1049,7 +1049,7 @@ jobs:
         set -eu
         mkdir -p unify/build
         cd unify/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1060,7 +1060,7 @@ jobs:
         set -eu
         mkdir -p ure/build
         cd ure/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1082,7 +1082,7 @@ jobs:
         set -eu
         mkdir -p miner/build
         cd miner/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
     - name: Build Miner
       if: hashFiles('miner/CMakeLists.txt') != ''
@@ -1132,8 +1132,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -1149,8 +1149,8 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Verify Asio Installation
       run: |
@@ -1166,7 +1166,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1176,7 +1176,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1187,7 +1187,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1199,7 +1199,7 @@ jobs:
         set -eu
         mkdir -p cogserver/build
         cd cogserver/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1221,7 +1221,7 @@ jobs:
         set -eu
         mkdir -p attention/build
         cd attention/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
     - name: Build Attention
       if: hashFiles('attention/CMakeLists.txt') != ''
@@ -1271,8 +1271,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -1288,15 +1288,15 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1306,7 +1306,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1317,7 +1317,7 @@ jobs:
         set -eu
         mkdir -p unify/build
         cd unify/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1328,7 +1328,7 @@ jobs:
         set -eu
         mkdir -p ure/build
         cd ure/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1352,7 +1352,7 @@ jobs:
         cd asmoses/build
         cmake .. \
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
-          -DCMAKE_POLICY_DEFAULT_CMP0175=OLD \
+          \
           -DBoost_NO_SYSTEM_PATHS=OFF
 
     - name: Build AS-MOSES
@@ -1406,8 +1406,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -1422,15 +1422,15 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1440,7 +1440,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1462,7 +1462,7 @@ jobs:
         set -eu
         mkdir -p matrix/build
         cd matrix/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
     - name: Build Matrix
       if: hashFiles('matrix/CMakeLists.txt') != ''
@@ -1512,8 +1512,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -1530,15 +1530,15 @@ jobs:
           valgrind \
           doxygen \
           liboctomap-dev
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1548,7 +1548,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1559,7 +1559,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1571,7 +1571,7 @@ jobs:
         set -eu
         mkdir -p cogserver/build
         cd cogserver/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1593,7 +1593,7 @@ jobs:
         set -eu
         mkdir -p spacetime/build
         cd spacetime/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
     - name: Build SpaceTime
       if: hashFiles('spacetime/CMakeLists.txt') != ''
@@ -1643,8 +1643,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -1661,15 +1661,15 @@ jobs:
           valgrind \
           doxygen \
           liboctomap-dev
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1679,7 +1679,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1690,7 +1690,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1702,7 +1702,7 @@ jobs:
         set -eu
         mkdir -p cogserver/build
         cd cogserver/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1713,7 +1713,7 @@ jobs:
         set -eu
         mkdir -p unify/build
         cd unify/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1724,7 +1724,7 @@ jobs:
         set -eu
         mkdir -p ure/build
         cd ure/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1735,7 +1735,7 @@ jobs:
         set -eu
         mkdir -p spacetime/build
         cd spacetime/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1757,7 +1757,7 @@ jobs:
         set -eu
         mkdir -p pln/build
         cd pln/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
     - name: Build PLN
       if: hashFiles('pln/CMakeLists.txt') != ''
@@ -1807,8 +1807,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -1824,8 +1824,8 @@ jobs:
           python3-dev \
           valgrind \
           doxygen
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+        # Pin cmake 3.28 to avoid CMP0175 generate-step cycle check in cmake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
 
     - name: Verify Asio Installation
       run: |
@@ -1841,7 +1841,7 @@ jobs:
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1851,7 +1851,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1863,7 +1863,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1875,7 +1875,7 @@ jobs:
         set -eu
         mkdir -p cogserver/build
         cd cogserver/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -1897,7 +1897,7 @@ jobs:
         set -eu
         mkdir -p learn/build
         cd learn/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
     - name: Build Learn
       if: hashFiles('learn/CMakeLists.txt') != ''

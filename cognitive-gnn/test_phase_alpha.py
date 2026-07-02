@@ -415,9 +415,9 @@ class PhaseAlphaIntegrationTest(unittest.TestCase):
         def make_serializable(obj):
             if hasattr(obj, "tolist"):  # numpy arrays
                 return obj.tolist()
-            elif isinstance(obj, (np.integer, int)):
+            elif isinstance(obj, np.integer | int):
                 return int(obj)
-            elif isinstance(obj, (np.floating, float)):
+            elif isinstance(obj, np.floating | float):
                 return float(obj)
             elif isinstance(obj, bool):
                 return bool(obj)

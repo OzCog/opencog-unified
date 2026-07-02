@@ -54,8 +54,8 @@ jobs:
         set -eu
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
           build-essential \
+          cmake \
           cxxtest \
           binutils-dev \
           libiberty-dev \
@@ -71,15 +71,17 @@ jobs:
           valgrind \
           doxygen \
           liboctomap-dev
-        # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-        sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+        # Use apt cmake (3.28) instead of runner-preinstalled cmake 3.31+
+        # to avoid CMP0175 generate-step cycle check bug
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
+        cmake --version
 
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -89,7 +91,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_DISABLE_FIND_PACKAGE_Cxxtest=TRUE -DBUILD_EXAMPLES=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -100,7 +102,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -112,7 +114,7 @@ jobs:
         set -eu
         mkdir -p cogserver/build
         cd cogserver/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -134,7 +136,7 @@ jobs:
         set -eu
         mkdir -p spacetime/build
         cd spacetime/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
     - name: Build SpaceTime
       if: hashFiles('spacetime/CMakeLists.txt') != ''

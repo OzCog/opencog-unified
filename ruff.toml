@@ -102,6 +102,10 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 "tests/integration/*.py" = ["F401"]
 # Scripts can have different requirements
 "scripts/*.py" = ["T201", "PLR2004"]
+# Files that need sys.path manipulation before local imports
+"cognitive-membrane-sync/demonstrate_framework.py" = ["E402"]
+"cognitive-membrane-sync/test_json_encoder.py" = ["E402"]
+"tests/test_entelechy_framework.py" = ["E402"]
 
 [lint.isort]
 known-first-party = ["opencog"]

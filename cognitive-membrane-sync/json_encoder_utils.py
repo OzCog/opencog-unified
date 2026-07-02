@@ -38,28 +38,26 @@ class EnhancedJSONEncoder(json.JSONEncoder):
         # Handle NumPy integers (NumPy 2.0 compatible)
         if isinstance(
             obj,
-            (
-                np.integer,
-                np.intc,
-                np.intp,
-                np.int8,
-                np.int16,
-                np.int32,
-                np.int64,
-                np.uint8,
-                np.uint16,
-                np.uint32,
-                np.uint64,
-            ),
+            np.integer
+            | np.intc
+            | np.intp
+            | np.int8
+            | np.int16
+            | np.int32
+            | np.int64
+            | np.uint8
+            | np.uint16
+            | np.uint32
+            | np.uint64,
         ):
             return int(obj)
 
         # Handle NumPy floats (NumPy 2.0 compatible)
-        if isinstance(obj, (np.floating, np.float16, np.float32, np.float64)):
+        if isinstance(obj, np.floating | np.float16 | np.float32 | np.float64):
             return float(obj)
 
         # Handle NumPy booleans
-        if isinstance(obj, (np.bool_, bool)):
+        if isinstance(obj, np.bool_ | bool):
             return bool(obj)
 
         # Handle NumPy arrays
@@ -90,34 +88,32 @@ def deep_convert(obj: Any) -> Any:
     if isinstance(obj, dict):
         return {k: deep_convert(v) for k, v in obj.items()}
 
-    if isinstance(obj, (list, tuple)):
+    if isinstance(obj, list | tuple):
         return [deep_convert(item) for item in obj]
 
     # Handle NumPy integers (NumPy 2.0 compatible)
     if isinstance(
         obj,
-        (
-            np.integer,
-            np.intc,
-            np.intp,
-            np.int8,
-            np.int16,
-            np.int32,
-            np.int64,
-            np.uint8,
-            np.uint16,
-            np.uint32,
-            np.uint64,
-        ),
+        np.integer
+        | np.intc
+        | np.intp
+        | np.int8
+        | np.int16
+        | np.int32
+        | np.int64
+        | np.uint8
+        | np.uint16
+        | np.uint32
+        | np.uint64,
     ):
         return int(obj)
 
     # Handle NumPy floats (NumPy 2.0 compatible)
-    if isinstance(obj, (np.floating, np.float16, np.float32, np.float64)):
+    if isinstance(obj, np.floating | np.float16 | np.float32 | np.float64):
         return float(obj)
 
     # Handle NumPy booleans
-    if isinstance(obj, (np.bool_, bool)):
+    if isinstance(obj, np.bool_ | bool):
         return bool(obj)
 
     # Handle NumPy arrays
@@ -186,28 +182,26 @@ def enhanced_json_encoder(obj: Any) -> Any:
     # Handle NumPy integers (NumPy 2.0 compatible)
     if isinstance(
         obj,
-        (
-            np.integer,
-            np.intc,
-            np.intp,
-            np.int8,
-            np.int16,
-            np.int32,
-            np.int64,
-            np.uint8,
-            np.uint16,
-            np.uint32,
-            np.uint64,
-        ),
+        np.integer
+        | np.intc
+        | np.intp
+        | np.int8
+        | np.int16
+        | np.int32
+        | np.int64
+        | np.uint8
+        | np.uint16
+        | np.uint32
+        | np.uint64,
     ):
         return int(obj)
 
     # Handle NumPy floats (NumPy 2.0 compatible)
-    if isinstance(obj, (np.floating, np.float16, np.float32, np.float64)):
+    if isinstance(obj, np.floating | np.float16 | np.float32 | np.float64):
         return float(obj)
 
     # Handle NumPy booleans
-    if isinstance(obj, (np.bool_, bool)):
+    if isinstance(obj, np.bool_ | bool):
         return bool(obj)
 
     # Handle NumPy arrays

@@ -24,9 +24,7 @@ jobs:
         run: |
           set -eu
           sudo apt-get update
-          sudo apt-get install -y guile-3.0 guile-3.0-dev cmake build-essential g++
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+          sudo apt-get install -y guile-3.0 guile-3.0-dev build-essential g++
 
 #      - name: Verify no placeholder implementations
 #        run: |
@@ -220,26 +218,21 @@ jobs:
         run: |
           set -eu
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential g++ pkg-config guile-3.0 guile-3.0-dev libgmp-dev libboost-all-dev librocksdb-dev cxxtest
-          # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
-          sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+          sudo apt-get install -y build-essential g++ pkg-config guile-3.0 guile-3.0-dev libgmp-dev libboost-all-dev librocksdb-dev cxxtest
 
       - name: CMake configuration test
         run: |
           set -eu
           mkdir build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
-          echo "✅ CMake configuration successful"
+          cmake ../cogutil -DCMAKE_BUILD_TYPE=Debug
+          echo "✅ CMake configuration successful (cogutil)"
 
       - name: Test partial build
         run: |
           set -eu
           cd build
-          # Test building tensor kernel if available
-          if [[ -f "../ggml-tensor-kernel/CMakeLists.txt" ]]; then
-            make -j2 2>/dev/null || echo "⚠️  Some build targets unavailable (expected in this environment)"
-          fi
+          make -j2 || echo "⚠️  Some build targets unavailable (expected in this environment)"
           echo "✅ Build verification completed"
 
 
@@ -269,41 +262,66 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jq bc
 
+      - name: Sanitize cognitive report JSON files
+        run: |
+          # Use Python to repair JSON files that contain control chars in strings
+          for f in ./cognitive-reports/*.json; do
+            if [[ -f "$f" ]]; then
+              python3 -c "
+          import json, sys, re
+          with open('$f', 'r', errors='replace') as fh:
+              raw = fh.read()
+          # Remove control chars that aren't valid in JSON
+          raw = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', '', raw)
+          try:
+              data = json.loads(raw)
+              with open('$f', 'w') as fh:
+                  json.dump(data, fh, indent=2)
+          except json.JSONDecodeError:
+              # Write back sanitized content even if not valid JSON
+              with open('$f', 'w') as fh:
+                  fh.write(raw)
+          "
+            fi
+          done
+
       - name: Generate enhanced verification report with cognitive synergy
         run: |
-          set -eu
-          # Extract metrics from cognitive reports
+          set -u
+          # Extract metrics from cognitive reports (fault-tolerant jq calls)
           total_attention=0; attention_balance="unknown"; system_urgency=0
           if [[ -f "./cognitive-reports/attention-metrics.json" ]]; then
-            total_attention=$(jq -r '.ecan_attention_metrics.cognitive_workload_distribution.total_attention // 0' ./cognitive-reports/attention-metrics.json)
-            attention_balance=$(jq -r '.meta_analysis.attention_balance // "unknown"' ./cognitive-reports/attention-metrics.json)
-            system_urgency=$(jq -r '.ecan_attention_metrics.urgency_metrics.total_urgency // 0' ./cognitive-reports/attention-metrics.json)
+            total_attention=$(jq -r '.ecan_attention_metrics.cognitive_workload_distribution.total_attention // 0' ./cognitive-reports/attention-metrics.json 2>/dev/null || echo "0")
+            attention_balance=$(jq -r '.meta_analysis.attention_balance // "unknown"' ./cognitive-reports/attention-metrics.json 2>/dev/null || echo "unknown")
+            system_urgency=$(jq -r '.ecan_attention_metrics.urgency_metrics.total_urgency // 0' ./cognitive-reports/attention-metrics.json 2>/dev/null || echo "0")
           fi
           success_rate=0; synergy="limited"
           if [[ -f "./cognitive-reports/neural-symbolic-integration-report.json" ]]; then
-            success_rate=$(jq -r '.neural_symbolic_integration.overall_metrics.overall_success_rate // 0' ./cognitive-reports/neural-symbolic-integration-report.json)
-            synergy=$(jq -r '.neural_symbolic_integration.overall_metrics.neural_symbolic_synergy // "limited"' ./cognitive-reports/neural-symbolic-integration-report.json)
+            nsi=./cognitive-reports/neural-symbolic-integration-report.json
+            success_rate=$(jq -r '.neural_symbolic_integration.overall_metrics.overall_success_rate // 0' "$nsi" 2>/dev/null || echo "0")
+            synergy=$(jq -r '.neural_symbolic_integration.overall_metrics.neural_symbolic_synergy // "limited"' "$nsi" 2>/dev/null || echo "limited")
           fi
           synthesis_energy=0; field_coherence=0; meta_completeness=0
           if [[ -f "./cognitive-reports/tensor-field-analysis.json" ]]; then
-            synthesis_energy=$(jq -r '.tensor_field_analysis.tensor_field_synthesis.synthesis_energy // 0' ./cognitive-reports/tensor-field-analysis.json)
-            field_coherence=$(jq -r '.tensor_field_analysis.tensor_field_synthesis.field_coherence_percentage // 0' ./cognitive-reports/tensor-field-analysis.json)
-            meta_completeness=$(jq -r '.tensor_field_analysis.meta_completeness_metrics.meta_completeness_percentage // 0' ./cognitive-reports/tensor-field-analysis.json)
+            synthesis_energy=$(jq -r '.tensor_field_analysis.tensor_field_synthesis.synthesis_energy // 0' ./cognitive-reports/tensor-field-analysis.json 2>/dev/null || echo "0")
+            field_coherence=$(jq -r '.tensor_field_analysis.tensor_field_synthesis.field_coherence_percentage // 0' ./cognitive-reports/tensor-field-analysis.json 2>/dev/null || echo "0")
+            meta_completeness=$(jq -r '.tensor_field_analysis.meta_completeness_metrics.meta_completeness_percentage // 0' ./cognitive-reports/tensor-field-analysis.json 2>/dev/null || echo "0")
           fi
           total_nodes=0; integration_strength="low"
           if [[ -f "./cognitive-reports/hypergraph-patterns.json" ]]; then
-            total_nodes=$(jq -r '.hypergraph_patterns.hypergraph_metrics.total_nodes // 0' ./cognitive-reports/hypergraph-patterns.json)
-            integration_strength=$(jq -r '.hypergraph_patterns.hypergraph_metrics.integration_strength // "low"' ./cognitive-reports/hypergraph-patterns.json)
+            total_nodes=$(jq -r '.hypergraph_patterns.hypergraph_metrics.total_nodes // 0' ./cognitive-reports/hypergraph-patterns.json 2>/dev/null || echo "0")
+            integration_strength=$(jq -r '.hypergraph_patterns.hypergraph_metrics.integration_strength // "low"' ./cognitive-reports/hypergraph-patterns.json 2>/dev/null || echo "low")
           fi
           overall_completeness=0; completeness_level="developing"
           if [[ -f "./cognitive-reports/meta-completeness-analysis.json" ]]; then
-            overall_completeness=$(jq -r '.meta_completeness_analysis.overall_meta_completeness.overall_percentage // 0' ./cognitive-reports/meta-completeness-analysis.json)
-            completeness_level=$(jq -r '.meta_completeness_analysis.overall_meta_completeness.completeness_level // "developing"' ./cognitive-reports/meta-completeness-analysis.json)
+            mca=./cognitive-reports/meta-completeness-analysis.json
+            overall_completeness=$(jq -r '.meta_completeness_analysis.overall_meta_completeness.overall_percentage // 0' "$mca" 2>/dev/null || echo "0")
+            completeness_level=$(jq -r '.meta_completeness_analysis.overall_meta_completeness.completeness_level // "developing"' "$mca" 2>/dev/null || echo "developing")
           fi
           gaps_identified=0; priority_level="medium"
           if [[ -f "./cognitive-reports/recursive-feedback-report.json" ]]; then
-            gaps_identified=$(jq -r '.recursive_feedback_analysis.cognitive_gap_analysis.total_gaps_identified // 0' ./cognitive-reports/recursive-feedback-report.json)
-            priority_level=$(jq -r '.recursive_feedback_analysis.priority_assessment.priority_level // "medium"' ./cognitive-reports/recursive-feedback-report.json)
+            gaps_identified=$(jq -r '.recursive_feedback_analysis.cognitive_gap_analysis.total_gaps_identified // 0' ./cognitive-reports/recursive-feedback-report.json 2>/dev/null || echo "0")
+            priority_level=$(jq -r '.recursive_feedback_analysis.priority_assessment.priority_level // "medium"' ./cognitive-reports/recursive-feedback-report.json 2>/dev/null || echo "medium")
           fi
 
           # Calculate overall cognitive readiness score

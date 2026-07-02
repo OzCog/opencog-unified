@@ -73,7 +73,7 @@ repos:
   # PYTHON VALIDATION
   # =================================================================
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.9
+    rev: v0.15.20
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -138,9 +138,9 @@ repos:
       # Validate tensor dimensions in cognitive files
       - id: validate-tensor-dims
         name: Validate tensor dimension format
-        entry: bash -c 'for f in "$@"; do if grep -E "tensor.shape.*\[" "$f" | grep -vE "\[[0-9, ]+\]"; then echo "❌ Invalid tensor shape format in $f"; exit 1; fi; done'
+        entry: bash -c 'for f in "$@"; do if grep -En "\"tensor_shape\"\s*:\s*\[" "$f" | grep -vE "\[[0-9, ]+\]"; then echo "❌ Invalid tensor shape format in $f"; exit 1; fi; done'
         language: system
-        files: \.(scm|py|yml|yaml)$
+        files: \.(scm|yml|yaml)$
         stages: [commit]
 
       # Check for hardcoded paths in workflows

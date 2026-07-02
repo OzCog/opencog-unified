@@ -26,6 +26,7 @@
 
 #include <opencog/util/platform.h>
 #include <opencog/util/exceptions.h>
+#include <opencog/util/Logger.h>
 
 #include <opencog/atoms/value/ValueFactory.h>
 #include "SimpleTruthValue.h"

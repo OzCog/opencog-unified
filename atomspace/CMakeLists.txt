@@ -303,19 +303,22 @@ IF (CXXTEST_FOUND)
 	)
 ENDIF (CXXTEST_FOUND)
 
-ADD_SUBDIRECTORY(examples EXCLUDE_FROM_ALL)
+OPTION(BUILD_EXAMPLES "Build AtomSpace examples" ON)
+IF (BUILD_EXAMPLES)
+	ADD_SUBDIRECTORY(examples EXCLUDE_FROM_ALL)
 
-ADD_CUSTOM_TARGET (examples
-	# Using CMAKE_BUILD_TOOL results in the cryptic error message:
-	# warning: jobserver unavailable: using -j1.  Add `+' to parent make rule.
-	# This is because make doesn't know how to pass jobserver args to
-	# the submake.  So, instead, just use $(MAKE) (with round parens)
-	# -- that will do the right thing.
-	# COMMAND ${CMAKE_BUILD_TOOL}
-	COMMAND $(MAKE)
-	WORKING_DIRECTORY examples
-	COMMENT "Building examples"
-)
+	ADD_CUSTOM_TARGET (examples
+		# Using CMAKE_BUILD_TOOL results in the cryptic error message:
+		# warning: jobserver unavailable: using -j1.  Add `+' to parent make rule.
+		# This is because make doesn't know how to pass jobserver args to
+		# the submake.  So, instead, just use $(MAKE) (with round parens)
+		# -- that will do the right thing.
+		# COMMAND ${CMAKE_BUILD_TOOL}
+		COMMAND $(MAKE)
+		WORKING_DIRECTORY examples
+		COMMENT "Building examples"
+	)
+ENDIF (BUILD_EXAMPLES)
 
 ADD_CUSTOM_TARGET(atomspace-cscope
 	COMMAND find opencog examples tests -name '*.cc' -o -name '*.h' -o -name '*.cxxtest' -o -name '*.scm' > ${CMAKE_SOURCE_DIR}/atomspace-cscope.files
