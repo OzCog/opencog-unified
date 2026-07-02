@@ -71,13 +71,15 @@ jobs:
           valgrind \
           doxygen \
           liboctomap-dev
+        # Use apt-installed CMake 3.28 to avoid CMP0175 cycle error in CMake 3.31+
+        sudo rm -f /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
 
     - name: Rebuild and Install CogUtil
       run: |
         set -eu
         mkdir -p cogutil/build
         cd cogutil/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -87,7 +89,7 @@ jobs:
         set -eu
         mkdir -p atomspace/build
         cd atomspace/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -98,7 +100,7 @@ jobs:
         set -eu
         mkdir -p atomspace-storage/build
         cd atomspace-storage/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -110,7 +112,7 @@ jobs:
         set -eu
         mkdir -p cogserver/build
         cd cogserver/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DBUILD_SHARED_LIBS=OFF
         make ${{ env.MAKEFLAGS }}
         sudo make install
         sudo ldconfig
@@ -132,7 +134,7 @@ jobs:
         set -eu
         mkdir -p spacetime/build
         cd spacetime/build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DBUILD_SHARED_LIBS=OFF
 
     - name: Build SpaceTime
       if: hashFiles('spacetime/CMakeLists.txt') != ''
@@ -203,7 +205,7 @@ jobs:
 #      run: |
 #        mkdir -p cogutil/build
 #        cd cogutil/build
-#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DBUILD_SHARED_LIBS=OFF
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
@@ -212,7 +214,7 @@ jobs:
 #      run: |
 #        mkdir -p atomspace/build
 #        cd atomspace/build
-#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DBUILD_SHARED_LIBS=OFF
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
@@ -222,7 +224,7 @@ jobs:
 #      run: |
 #        mkdir -p atomspace-storage/build
 #        cd atomspace-storage/build
-#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DBUILD_SHARED_LIBS=OFF
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
@@ -233,7 +235,7 @@ jobs:
 #      run: |
 #        mkdir -p cogserver/build
 #        cd cogserver/build
-#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DBUILD_SHARED_LIBS=OFF
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
@@ -243,7 +245,7 @@ jobs:
 #      run: |
 #        mkdir -p unify/build
 #        cd unify/build
-#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DBUILD_SHARED_LIBS=OFF
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
@@ -253,7 +255,7 @@ jobs:
 #      run: |
 #        mkdir -p ure/build
 #        cd ure/build
-#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DBUILD_SHARED_LIBS=OFF
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
@@ -263,7 +265,7 @@ jobs:
 #      run: |
 #        mkdir -p spacetime/build
 #        cd spacetime/build
-#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DBUILD_SHARED_LIBS=OFF
 #        make ${{ env.MAKEFLAGS }}
 #        sudo make install
 #        sudo ldconfig
@@ -283,7 +285,7 @@ jobs:
 #      run: |
 #        mkdir -p pln/build
 #        cd pln/build
-#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_SHARED_LIBS=OFF
+#        cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DBUILD_SHARED_LIBS=OFF
 
 #    - name: Build PLN
 #      if: hashFiles('pln/CMakeLists.txt') != ''
