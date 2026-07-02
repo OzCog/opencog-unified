@@ -296,10 +296,22 @@ jobs:
 
       - name: Sanitize cognitive report JSON files
         run: |
-          # Strip control characters (U+0000-U+001F except newline/tab) that break jq
+          # Use Python to repair JSON files that contain control chars in strings
           for f in ./cognitive-reports/*.json; do
             if [[ -f "$f" ]]; then
-              LC_ALL=C sed -i 's/[\x00-\x08\x0b\x0c\x0e-\x1f]//g' "$f"
+              python3 -c "
+          import json, sys, re
+          with open('$f', 'r', errors='replace') as fh:
+              raw = fh.read()
+          # Remove control chars that aren't valid in JSON
+          raw = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', '', raw)
+          try:
+              data = json.loads(raw)
+              with open('$f', 'w') as fh:
+                  json.dump(data, fh, indent=2)
+          except json.JSONDecodeError:
+              pass  # Leave file as-is if not parseable
+          "
             fi
           done
 

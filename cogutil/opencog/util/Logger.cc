@@ -48,6 +48,10 @@
 #if defined(__MINGW32__) || defined(__MINGW64__)
 #include <io.h>
 #define fdatasync(fd) _commit(fd)
+// MinGW lacks gmtime_r; use gmtime_s with swapped args
+static inline struct tm* gmtime_r(const time_t* t, struct tm* result) {
+    return (gmtime_s(result, t) == 0) ? result : NULL;
+}
 #endif
 
 #ifdef HAVE_VALGRIND
