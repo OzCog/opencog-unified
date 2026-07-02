@@ -9,8 +9,10 @@ http://wiki.opencog.org/w/REST_API
 
 __author__ = 'Cosmo Harrigan'
 
-from requests import *
 import json
+
+from requests import *
+
 
 # Define the API Endpoint - replace 127.0.0.1 with the server IP address if
 # necessary

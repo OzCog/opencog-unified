@@ -21976,7 +21976,7 @@
           ""
         ],
         "context_after": [
-          "        todo_pattern = r'- \\[ \\] \\*\\*([^:]+):(\\d+)\\*\\* \\(([^,]+), ([^)]+)\\)\\n  - `([^`]+)`\\n  - \\[Code reference\\]\\(([^)]+)\\)'",
+          "        todo_pattern = r'- \\[ \\] \\*\\*([^:]+):(\\d+)\\*\\* \\(([^+), ([^)]+)\\)\\n  - `([^`]+)`\\n  - \\[Code reference\\]\\(([^)]+)\\)'",
           "",
           "        matches = re.findall(todo_pattern, content)"
         ],
@@ -45478,7 +45478,7 @@
           ""
         ],
         "context_after": [
-          "        todo_pattern = r'- \\[ \\] \\*\\*([^:]+):(\\d+)\\*\\* \\(([^,]+), ([^)]+)\\)\\n  - `([^`]+)`\\n  - \\[Code reference\\]\\(([^)]+)\\)'",
+          "        todo_pattern = r'- \\[ \\] \\*\\*([^:]+):(\\d+)\\*\\* \\(([^+), ([^)]+)\\)\\n  - `([^`]+)`\\n  - \\[Code reference\\]\\(([^)]+)\\)'",
           "",
           "        matches = re.findall(todo_pattern, content)"
         ],
@@ -75225,7 +75225,7 @@
           ""
         ],
         "context_after": [
-          "        todo_pattern = r'- \\[ \\] \\*\\*([^:]+):(\\d+)\\*\\* \\(([^,]+), ([^)]+)\\)\\n  - `([^`]+)`\\n  - \\[Code reference\\]\\(([^)]+)\\)'",
+          "        todo_pattern = r'- \\[ \\] \\*\\*([^:]+):(\\d+)\\*\\* \\(([^+), ([^)]+)\\)\\n  - `([^`]+)`\\n  - \\[Code reference\\]\\(([^)]+)\\)'",
           "",
           "        matches = re.findall(todo_pattern, content)"
         ],

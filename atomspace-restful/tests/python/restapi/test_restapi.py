@@ -1,8 +1,11 @@
 __author__ = 'Cosmo Harrigan'
 
-from nose.tools import *
 import json
+
+from nose.tools import *
+
 from opencog.atomspace import *
+
 
 # Only run the unit tests if the required dependencies have been installed
 # (see: https://github.com/opencog/opencog/issues/337)
@@ -15,7 +18,7 @@ except ImportError:
                             "dependencies are installed.")
 
 
-class TestRESTApi():
+class TestRESTApi:
     """
     Unit tests for the OpenCog REST API.
 
@@ -202,7 +205,7 @@ class TestRESTApi():
         # Check if the link is in the incoming set of each of the nodes
         jswan = self.get_atom(jswan['handle'])
         janimal = self.get_atom(janimal['handle'])
-        for h in post_result['outgoing']:
+        for _h in post_result['outgoing']:
             assert post_result['handle'] in jswan['incoming']
             assert post_result['handle'] in janimal['incoming']
 

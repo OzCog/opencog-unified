@@ -30,78 +30,90 @@ WORKFLOW_RUN_ID="${GITHUB_RUN_ID:-local_$(date +%s)}"
 # Function to collect all previous analysis results
 collect_analysis_data() {
     echo "📊 Collecting Analysis Data from Previous Steps..."
-    
+
     # Initialize default values in case files don't exist
     export ATTENTION_METRICS_AVAILABLE=false
     export INTEGRATION_METRICS_AVAILABLE=false
     export TENSOR_METRICS_AVAILABLE=false
     export HYPERGRAPH_METRICS_AVAILABLE=false
     export COMPLETENESS_METRICS_AVAILABLE=false
-    
+
     # Check and load attention metrics
     if [[ -f "attention-metrics.json" ]]; then
         echo "  ✅ Attention metrics found"
         export ATTENTION_METRICS_AVAILABLE=true
-        export TOTAL_ATTENTION=$(sanitize_int "$(jq -r '.ecan_attention_metrics.cognitive_workload_distribution.total_attention // 0' attention-metrics.json 2>/dev/null)" 0)
-        export ATTENTION_BALANCE=$(jq -r '.meta_analysis.attention_balance // "unknown"' attention-metrics.json 2>/dev/null || echo "unknown")
-        export SYSTEM_URGENCY=$(sanitize_int "$(jq -r '.ecan_attention_metrics.urgency_metrics.total_urgency // 0' attention-metrics.json 2>/dev/null)" 0)
+        TOTAL_ATTENTION=$(sanitize_int "$(jq -r '.ecan_attention_metrics.cognitive_workload_distribution.total_attention // 0' attention-metrics.json 2>/dev/null)" 0)
+        export TOTAL_ATTENTION
+        ATTENTION_BALANCE=$(jq -r '.meta_analysis.attention_balance // "unknown"' attention-metrics.json 2>/dev/null || echo "unknown")
+        export ATTENTION_BALANCE
+        SYSTEM_URGENCY=$(sanitize_int "$(jq -r '.ecan_attention_metrics.urgency_metrics.total_urgency // 0' attention-metrics.json 2>/dev/null)" 0)
+        export SYSTEM_URGENCY
     else
         echo "  ⚠️  Attention metrics not available"
         export TOTAL_ATTENTION=0
         export ATTENTION_BALANCE="unknown"
         export SYSTEM_URGENCY=0
     fi
-    
+
     # Check and load integration metrics
     if [[ -f "neural-symbolic-integration-report.json" ]]; then
         echo "  ✅ Neural-symbolic integration metrics found"
         export INTEGRATION_METRICS_AVAILABLE=true
-        export INTEGRATION_SUCCESS_RATE=$(sanitize_int "$(jq -r '.neural_symbolic_integration.overall_metrics.overall_success_rate // 0' neural-symbolic-integration-report.json 2>/dev/null)" 0)
-        export NEURAL_SYMBOLIC_SYNERGY=$(jq -r '.neural_symbolic_integration.overall_metrics.neural_symbolic_synergy // "limited"' neural-symbolic-integration-report.json 2>/dev/null || echo "limited")
+        INTEGRATION_SUCCESS_RATE=$(sanitize_int "$(jq -r '.neural_symbolic_integration.overall_metrics.overall_success_rate // 0' neural-symbolic-integration-report.json 2>/dev/null)" 0)
+        export INTEGRATION_SUCCESS_RATE
+        NEURAL_SYMBOLIC_SYNERGY=$(jq -r '.neural_symbolic_integration.overall_metrics.neural_symbolic_synergy // "limited"' neural-symbolic-integration-report.json 2>/dev/null || echo "limited")
+        export NEURAL_SYMBOLIC_SYNERGY
     else
         echo "  ⚠️  Integration metrics not available"
         export INTEGRATION_SUCCESS_RATE=0
         export NEURAL_SYMBOLIC_SYNERGY="limited"
     fi
-    
+
     # Check and load tensor metrics
     if [[ -f "tensor-field-analysis.json" ]]; then
         echo "  ✅ Tensor field metrics found"
         export TENSOR_METRICS_AVAILABLE=true
-        export SYNTHESIS_ENERGY=$(sanitize_int "$(jq -r '.tensor_field_analysis.tensor_field_synthesis.synthesis_energy // 0' tensor-field-analysis.json 2>/dev/null)" 0)
-        export FIELD_COHERENCE=$(sanitize_int "$(jq -r '.tensor_field_analysis.tensor_field_synthesis.field_coherence_percentage // 0' tensor-field-analysis.json 2>/dev/null)" 0)
-        export META_COMPLETENESS=$(sanitize_int "$(jq -r '.tensor_field_analysis.meta_completeness_metrics.meta_completeness_percentage // 0' tensor-field-analysis.json 2>/dev/null)" 0)
+        SYNTHESIS_ENERGY=$(sanitize_int "$(jq -r '.tensor_field_analysis.tensor_field_synthesis.synthesis_energy // 0' tensor-field-analysis.json 2>/dev/null)" 0)
+        export SYNTHESIS_ENERGY
+        FIELD_COHERENCE=$(sanitize_int "$(jq -r '.tensor_field_analysis.tensor_field_synthesis.field_coherence_percentage // 0' tensor-field-analysis.json 2>/dev/null)" 0)
+        export FIELD_COHERENCE
+        META_COMPLETENESS=$(sanitize_int "$(jq -r '.tensor_field_analysis.meta_completeness_metrics.meta_completeness_percentage // 0' tensor-field-analysis.json 2>/dev/null)" 0)
+        export META_COMPLETENESS
     else
         echo "  ⚠️  Tensor field metrics not available"
         export SYNTHESIS_ENERGY=0
         export FIELD_COHERENCE=0
         export META_COMPLETENESS=0
     fi
-    
+
     # Check and load hypergraph metrics
     if [[ -f "hypergraph-patterns.json" ]]; then
         echo "  ✅ Hypergraph pattern metrics found"
         export HYPERGRAPH_METRICS_AVAILABLE=true
-        export TOTAL_NODES=$(sanitize_int "$(jq -r '.hypergraph_patterns.hypergraph_metrics.total_nodes // 0' hypergraph-patterns.json 2>/dev/null)" 0)
-        export INTEGRATION_STRENGTH=$(jq -r '.hypergraph_patterns.hypergraph_metrics.integration_strength // "low"' hypergraph-patterns.json 2>/dev/null || echo "low")
+        TOTAL_NODES=$(sanitize_int "$(jq -r '.hypergraph_patterns.hypergraph_metrics.total_nodes // 0' hypergraph-patterns.json 2>/dev/null)" 0)
+        export TOTAL_NODES
+        INTEGRATION_STRENGTH=$(jq -r '.hypergraph_patterns.hypergraph_metrics.integration_strength // "low"' hypergraph-patterns.json 2>/dev/null || echo "low")
+        export INTEGRATION_STRENGTH
     else
         echo "  ⚠️  Hypergraph pattern metrics not available"
         export TOTAL_NODES=0
         export INTEGRATION_STRENGTH="low"
     fi
-    
+
     # Check and load completeness metrics
     if [[ -f "meta-completeness-analysis.json" ]]; then
         echo "  ✅ Meta-completeness metrics found"
         export COMPLETENESS_METRICS_AVAILABLE=true
-        export OVERALL_COMPLETENESS=$(sanitize_int "$(jq -r '.meta_completeness_analysis.overall_meta_completeness.overall_percentage // 0' meta-completeness-analysis.json 2>/dev/null)" 0)
-        export COMPLETENESS_LEVEL=$(jq -r '.meta_completeness_analysis.overall_meta_completeness.completeness_level // "developing"' meta-completeness-analysis.json 2>/dev/null || echo "developing")
+        OVERALL_COMPLETENESS=$(sanitize_int "$(jq -r '.meta_completeness_analysis.overall_meta_completeness.overall_percentage // 0' meta-completeness-analysis.json 2>/dev/null)" 0)
+        export OVERALL_COMPLETENESS
+        COMPLETENESS_LEVEL=$(jq -r '.meta_completeness_analysis.overall_meta_completeness.completeness_level // "developing"' meta-completeness-analysis.json 2>/dev/null || echo "developing")
+        export COMPLETENESS_LEVEL
     else
         echo "  ⚠️  Meta-completeness metrics not available"
         export OVERALL_COMPLETENESS=0
         export COMPLETENESS_LEVEL="developing"
     fi
-    
+
     echo "  📈 Data collection summary:"
     echo "    - Total Attention Units: $TOTAL_ATTENTION"
     echo "    - Integration Success Rate: ${INTEGRATION_SUCCESS_RATE}%"
@@ -113,11 +125,11 @@ collect_analysis_data() {
 identify_cognitive_gaps() {
     echo ""
     echo "🔍 Identifying Cognitive Gaps and Enhancement Opportunities..."
-    
+
     local cognitive_gaps=()
     local priority_gaps=()
     local gap_count=0
-    
+
     # Analyze attention allocation gaps
     echo "  🧠 Analyzing attention allocation gaps..."
     if [[ $TOTAL_ATTENTION -lt 200 ]]; then
@@ -133,7 +145,7 @@ identify_cognitive_gaps() {
     else
         echo "    ✅ Attention allocation appears adequate"
     fi
-    
+
     # Analyze neural-symbolic integration gaps
     echo "  🔗 Analyzing neural-symbolic integration gaps..."
     if [[ $INTEGRATION_SUCCESS_RATE -lt 60 ]]; then
@@ -149,7 +161,7 @@ identify_cognitive_gaps() {
     else
         echo "    ✅ Neural-symbolic integration appears functional"
     fi
-    
+
     # Analyze tensor field synthesis gaps
     echo "  ⚡ Analyzing tensor field synthesis gaps..."
     if [[ $SYNTHESIS_ENERGY -lt 200 ]]; then
@@ -158,14 +170,14 @@ identify_cognitive_gaps() {
         gap_count=$((gap_count + 1))
         echo "    ❌ Low tensor field synthesis energy"
     fi
-    
+
     if [[ $FIELD_COHERENCE -lt 40 ]]; then
         cognitive_gaps+=("poor_field_coherence:Tensor field coherence below optimal (${FIELD_COHERENCE}%)")
         priority_gaps+=("coherence_improvement")
         gap_count=$((gap_count + 1))
         echo "    ❌ Poor tensor field coherence"
     fi
-    
+
     # Analyze meta-completeness gaps
     echo "  🔍 Analyzing meta-completeness gaps..."
     if [[ $OVERALL_COMPLETENESS -lt 50 ]]; then
@@ -181,7 +193,7 @@ identify_cognitive_gaps() {
     else
         echo "    ✅ Meta-completeness appears adequate"
     fi
-    
+
     # Analyze hypergraph integration gaps
     echo "  🕸️  Analyzing hypergraph integration gaps..."
     if [[ $TOTAL_NODES -lt 20 ]]; then
@@ -190,18 +202,18 @@ identify_cognitive_gaps() {
         gap_count=$((gap_count + 1))
         echo "    ❌ Sparse hypergraph structure"
     fi
-    
+
     if [[ "$INTEGRATION_STRENGTH" == "low" ]]; then
         cognitive_gaps+=("weak_integration:Hypergraph integration strength insufficient")
         priority_gaps+=("integration_strengthening")
         gap_count=$((gap_count + 1))
         echo "    ❌ Weak hypergraph integration"
     fi
-    
+
     echo "  📊 Gap analysis summary:"
     echo "    - Total gaps identified: $gap_count"
     echo "    - Priority enhancement areas: ${#priority_gaps[@]}"
-    
+
     # Export gap analysis
     export COGNITIVE_GAPS="${cognitive_gaps[*]}"
     export PRIORITY_GAPS="${priority_gaps[*]}"
@@ -212,14 +224,14 @@ identify_cognitive_gaps() {
 generate_next_step_proposals() {
     echo ""
     echo "🚀 Generating Next-Step Enhancement Proposals..."
-    
+
     local enhancement_proposals=()
     local implementation_steps=()
     local proposal_count=0
-    
+
     # Generate proposals based on identified gaps
     IFS=' ' read -ra gaps <<< "$PRIORITY_GAPS"
-    
+
     for gap in "${gaps[@]}"; do
         case "$gap" in
             "attention_enhancement")
@@ -254,22 +266,22 @@ generate_next_step_proposals() {
                 ;;
         esac
     done
-    
+
     # Add general recursive enhancement proposals
     enhancement_proposals+=("Implement recursive workflow optimization with self-modifying bootstrap logic")
     implementation_steps+=("recursive_optimization:Create RecursiveWorkflowOptimizer in scripts/")
     proposal_count=$((proposal_count + 1))
-    
+
     enhancement_proposals+=("Add real-time cognitive metric monitoring with adaptive thresholds")
     implementation_steps+=("cognitive_monitoring:Implement CognitiveMetricsMonitor in scripts/")
     proposal_count=$((proposal_count + 1))
-    
+
     enhancement_proposals+=("Create automated hypergraph visualization with attention overlay")
     implementation_steps+=("hypergraph_visualization:Build HypergraphVisualizer in cognitive-visualization/")
     proposal_count=$((proposal_count + 1))
-    
+
     echo "  🎯 Generated $proposal_count enhancement proposals"
-    
+
     # Export proposals
     export ENHANCEMENT_PROPOSALS="${enhancement_proposals[*]}"
     export IMPLEMENTATION_STEPS="${implementation_steps[*]}"
@@ -280,20 +292,32 @@ generate_next_step_proposals() {
 calculate_priority_score() {
     echo ""
     echo "⚖️  Calculating Cognitive Priority Scores..."
-    
-    local urgency_score=$((SYSTEM_URGENCY / 10))
-    local completeness_deficit=$((100 - OVERALL_COMPLETENESS))
-    local integration_deficit=$((100 - INTEGRATION_SUCCESS_RATE))
-    local synthesis_need=$((500 - SYNTHESIS_ENERGY))
-    
+
+    local urgency_score
+
+
+    urgency_score=$((SYSTEM_URGENCY / 10))
+    local completeness_deficit
+
+    completeness_deficit=$((100 - OVERALL_COMPLETENESS))
+    local integration_deficit
+
+    integration_deficit=$((100 - INTEGRATION_SUCCESS_RATE))
+    local synthesis_need
+
+    synthesis_need=$((500 - SYNTHESIS_ENERGY))
+
     # Normalize scores
     urgency_score=$((urgency_score > 10 ? 10 : urgency_score))
     completeness_deficit=$((completeness_deficit > 50 ? 50 : completeness_deficit))
     integration_deficit=$((integration_deficit > 40 ? 40 : integration_deficit))
     synthesis_need=$((synthesis_need > 300 ? 30 : synthesis_need / 10))
-    
-    local total_priority=$((urgency_score + completeness_deficit + integration_deficit + synthesis_need))
-    
+
+    local total_priority
+
+
+    total_priority=$((urgency_score + completeness_deficit + integration_deficit + synthesis_need))
+
     local priority_level="medium"
     if [[ $total_priority -gt 80 ]]; then
         priority_level="critical"
@@ -302,7 +326,7 @@ calculate_priority_score() {
     elif [[ $total_priority -lt 30 ]]; then
         priority_level="low"
     fi
-    
+
     echo "  📊 Priority calculation:"
     echo "    - Urgency score: $urgency_score/10"
     echo "    - Completeness deficit: $completeness_deficit/50"
@@ -310,7 +334,7 @@ calculate_priority_score() {
     echo "    - Synthesis need: $synthesis_need/30"
     echo "    - Total priority score: $total_priority"
     echo "    - Priority level: $priority_level"
-    
+
     export PRIORITY_SCORE="$total_priority"
     export PRIORITY_LEVEL="$priority_level"
 }
@@ -319,16 +343,16 @@ calculate_priority_score() {
 create_issue_template() {
     echo ""
     echo "📝 Creating Cognitive Enhancement Issue Template..."
-    
+
     cat > "$ISSUE_TEMPLATE" << EOF
 # Recursive Cognitive Enhancement - Workflow Run #$WORKFLOW_RUN_ID
 
 ## 🧠 Cognitive System Status Overview
 
-**Generated:** $TIMESTAMP  
-**Workflow Run:** $WORKFLOW_RUN_ID  
-**Priority Level:** $PRIORITY_LEVEL  
-**Priority Score:** $PRIORITY_SCORE/130  
+**Generated:** $TIMESTAMP
+**Workflow Run:** $WORKFLOW_RUN_ID
+**Priority Level:** $PRIORITY_LEVEL
+**Priority Score:** $PRIORITY_SCORE/130
 
 ## 📊 Current Cognitive Metrics
 
@@ -405,7 +429,7 @@ fi)
 ### Immediate Actions (Next Sprint)
 $(IFS=' ' read -ra gaps <<< "$PRIORITY_GAPS"; for gap in "${gaps[@]:0:3}"; do echo "- [ ] Address $gap"; done)
 
-### Medium-term Goals (Next Month)  
+### Medium-term Goals (Next Month)
 - [ ] Achieve >80% meta-completeness across all cognitive patterns
 - [ ] Establish robust neural-symbolic integration pathways
 - [ ] Implement tensor field coherence optimization
@@ -452,7 +476,7 @@ EOF
 generate_feedback_report() {
     echo ""
     echo "📋 Generating Comprehensive Feedback Report..."
-    
+
     cat > "$FEEDBACK_REPORT" << EOF
 {
   "timestamp": "$TIMESTAMP",
@@ -551,7 +575,7 @@ EOF
 main() {
     echo "Starting recursive feedback and issue generation at $TIMESTAMP"
     echo ""
-    
+
     # Run all feedback analysis functions
     collect_analysis_data
     identify_cognitive_gaps
@@ -559,7 +583,7 @@ main() {
     calculate_priority_score
     create_issue_template
     generate_feedback_report
-    
+
     echo ""
     echo "🎉 Recursive Feedback Analysis Complete!"
     echo "📊 Results summary:"
@@ -570,7 +594,7 @@ main() {
     echo "   - Feedback report: $FEEDBACK_REPORT"
     echo ""
     echo "🔄 Recursive enhancement cycle initiated - ready for cognitive evolution!"
-    
+
     # Output issue template content for potential GitHub issue creation
     if [[ "$PRIORITY_LEVEL" == "critical" || "$PRIORITY_LEVEL" == "high" ]]; then
         echo ""

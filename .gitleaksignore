@@ -1,0 +1,4 @@
+# False positives: example/placeholder API keys in documentation and instruction files
+c7f699e5afdb03ae012c65b37b31d53832a1fe00:.github/agents/se-gitops-ci-specialist.agent.md:generic-api-key:92
+c7f699e5afdb03ae012c65b37b31d53832a1fe00:.github/instructions/code-review-generic.instructions.md:stripe-access-token:142
+c7f699e5afdb03ae012c65b37b31d53832a1fe00:.github/instructions/security-and-owasp.instructions.md:stripe-access-token:412
