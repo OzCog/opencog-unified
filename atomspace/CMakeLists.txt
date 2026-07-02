@@ -18,6 +18,14 @@ IF(CMAKE_VERSION VERSION_GREATER 3.31)
    CMAKE_POLICY(SET CMP0177 NEW)
 ENDIF(CMAKE_VERSION VERSION_GREATER 3.31)
 
+# CMake 3.31 introduced CMP0175 which rejects add_dependencies() calls
+# that create cycles. AtomSpace has legitimate circular dependencies among
+# its static libraries (atombase, truthvalue, atomspace, atomcore, etc.)
+# and test/example targets use add_dependencies on these. Allow old behavior.
+IF(POLICY CMP0175)
+   CMAKE_POLICY(SET CMP0175 OLD)
+ENDIF(POLICY CMP0175)
+
 PROJECT(atomspace)
 
 # ----------------------------------------------------------
