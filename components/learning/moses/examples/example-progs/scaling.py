@@ -46,5 +46,3 @@ for nodes in range(2,12):
 
     sys.stdout.flush()
     time.sleep(15)
-
-

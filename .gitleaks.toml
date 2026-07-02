@@ -1,0 +1,6 @@
+# Gitleaks configuration
+# Exclude files that contain hashed secrets for baseline/audit purposes
+[allowlist]
+paths = [
+  '''.secrets.baseline''',
+]

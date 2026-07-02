@@ -41,7 +41,7 @@ unsigned int opencog::bitcount(unsigned long n)
     return ((tmp + (tmp >> 3)) & 030707070707) % 63;
 }
 
-#ifndef CYGWIN
+#ifndef WIN32
 std::string opencog::demangle(const std::string& mangled)
 {
     int status = 0;

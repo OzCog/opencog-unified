@@ -7,33 +7,37 @@ From the wiki documentation located here:
 http://wiki.opencog.org/w/REST_API
 """
 
-__author__ = 'Cosmo Harrigan'
+__author__ = "Cosmo Harrigan"
+
+import json
 
 from requests import *
-import json
+
 
 # Define the API Endpoint - replace 127.0.0.1 with the server IP address if
 # necessary
-IP_ADDRESS = '127.0.0.1'
-PORT = '5000'
-uri = 'http://' + IP_ADDRESS + ':' + PORT + '/api/v1.1/'
-headers = {'content-type': 'application/json'}
+IP_ADDRESS = "127.0.0.1"
+PORT = "5000"
+uri = "http://" + IP_ADDRESS + ":" + PORT + "/api/v1.1/"
+headers = {"content-type": "application/json"}
+
 
 # Pretty print function for displaying JSON request/response information
 def pprint(call, contents):
-    print('\n' + call.request.method + ' ' + call.request.path_url + ':')
+    print("\n" + call.request.method + " " + call.request.path_url + ":")
     print(json.dumps(contents, indent=2))
+
 
 ####################################################################
 # Example POST and GET requests to create and read nodes and links #
 ####################################################################
 # POST a new node
-truthvalue = {'type': 'simple', 'details': {'strength': 0.08, 'count': 0.2}}
-atom = {'type': 'ConceptNode', 'name': 'giant_frog', 'truthvalue': truthvalue}
-post_response = post(uri + 'atoms', data=json.dumps(atom), headers=headers)
+truthvalue = {"type": "simple", "details": {"strength": 0.08, "count": 0.2}}
+atom = {"type": "ConceptNode", "name": "giant_frog", "truthvalue": truthvalue}
+post_response = post(uri + "atoms", data=json.dumps(atom), headers=headers)
 post_result = post_response.json()
 pprint(post_response, post_result)
-'''
+"""
 POST /api/v1.1/atoms:
 {
   "outgoing": [],
@@ -55,14 +59,14 @@ POST /api/v1.1/atoms:
   "handle": 57,
   "type": "ConceptNode"
 }
-'''
+"""
 
 # GET the newly created node
-handle_node_1 = post_result['atoms']['handle']
-get_response = get(uri + 'atoms/' + str(handle_node_1))
-get_result = get_response.json()['result']['atoms']
+handle_node_1 = post_result["atoms"]["handle"]
+get_response = get(uri + "atoms/" + str(handle_node_1))
+get_result = get_response.json()["result"]["atoms"]
 pprint(get_response, get_result)
-'''
+"""
 GET /api/v1.1/atoms/57:
 {
   "outgoing": [],
@@ -84,14 +88,14 @@ GET /api/v1.1/atoms/57:
   "handle": 57,
   "type": "ConceptNode"
 }
-'''
+"""
 
 # GET the newly created node by name
-name = post_result['atoms']['name']
-get_response = get(uri + 'atoms', params={'name': name})
-get_result = get_response.json()['result']['atoms'][0]
+name = post_result["atoms"]["name"]
+get_response = get(uri + "atoms", params={"name": name})
+get_result = get_response.json()["result"]["atoms"][0]
 pprint(get_response, get_result)
-'''
+"""
 GET /api/v1.1/atoms?name=giant_frog:
 {
   "outgoing": [],
@@ -113,14 +117,14 @@ GET /api/v1.1/atoms?name=giant_frog:
   "handle": 57,
   "type": "ConceptNode"
 }
-'''
+"""
 
 # GET the newly created node by name and type
-type = post_result['atoms']['type']
-get_response = get(uri + 'atoms', params={'name': name, 'type': type})
-get_result = get_response.json()['result']['atoms'][0]
+type = post_result["atoms"]["type"]
+get_response = get(uri + "atoms", params={"name": name, "type": type})
+get_result = get_response.json()["result"]["atoms"][0]
 pprint(get_response, get_result)
-'''
+"""
 GET /api/v1.1/atoms?name=giant_frog&type=ConceptNode:
 {
   "outgoing": [],
@@ -142,16 +146,16 @@ GET /api/v1.1/atoms?name=giant_frog&type=ConceptNode:
   "handle": 57,
   "type": "ConceptNode"
 }
-'''
+"""
 
 # POST another new node
-truthvalue = {'type': 'simple', 'details': {'strength': 0.20, 'count': 0.5}}
-atom = {'type': 'ConceptNode', 'name': 'animal', 'truthvalue': truthvalue}
-post_response = post(uri + 'atoms', data=json.dumps(atom), headers=headers)
-post_result = post_response.json()['atoms']
-handle_node_2 = post_result['handle']
+truthvalue = {"type": "simple", "details": {"strength": 0.20, "count": 0.5}}
+atom = {"type": "ConceptNode", "name": "animal", "truthvalue": truthvalue}
+post_response = post(uri + "atoms", data=json.dumps(atom), headers=headers)
+post_result = post_response.json()["atoms"]
+handle_node_2 = post_result["handle"]
 pprint(post_response, post_result)
-'''
+"""
 POST /api/v1.1/atoms:
 {
   "outgoing": [],
@@ -173,17 +177,15 @@ POST /api/v1.1/atoms:
   "handle": 58,
   "type": "ConceptNode"
 }
-'''
+"""
 
 # POST a new link between the two newly created nodes
-truthvalue = {'type': 'simple', 'details': {'strength': 0.5, 'count': 0.4}}
-atom = {'type': 'InheritanceLink',
-        'truthvalue': truthvalue,
-        'outgoing': [handle_node_1, handle_node_2]}
-post_response = post(uri + 'atoms', data=json.dumps(atom), headers=headers)
-post_result = post_response.json()['atoms']
+truthvalue = {"type": "simple", "details": {"strength": 0.5, "count": 0.4}}
+atom = {"type": "InheritanceLink", "truthvalue": truthvalue, "outgoing": [handle_node_1, handle_node_2]}
+post_response = post(uri + "atoms", data=json.dumps(atom), headers=headers)
+post_result = post_response.json()["atoms"]
 pprint(post_response, post_result)
-'''
+"""
 POST /api/v1.1/atoms:
 {
   "outgoing": [
@@ -208,21 +210,19 @@ POST /api/v1.1/atoms:
   "handle": 59,
   "type": "InheritanceLink"
 }
-'''
+"""
 
 #########################################
 # Example PUT request to update an atom #
 #########################################
 # Update the TruthValue and AttentionValue of an atom
-truthvalue = {'type': 'simple', 'details': {'strength': 0.006, 'count': 0.8}}
-attentionvalue = {'sti': 5, 'lti': 3, 'vlti': True}
-atom_update = {'truthvalue': truthvalue, 'attentionvalue': attentionvalue}
-put_response = put(uri + 'atoms/' + str(handle_node_1),
-                   data=json.dumps(atom_update),
-                   headers=headers)
-put_result = put_response.json()['atoms']
+truthvalue = {"type": "simple", "details": {"strength": 0.006, "count": 0.8}}
+attentionvalue = {"sti": 5, "lti": 3, "vlti": True}
+atom_update = {"truthvalue": truthvalue, "attentionvalue": attentionvalue}
+put_response = put(uri + "atoms/" + str(handle_node_1), data=json.dumps(atom_update), headers=headers)
+put_result = put_response.json()["atoms"]
 pprint(put_response, put_result)
-'''
+"""
 PUT /api/v1.1/atoms/76:
 {
   "outgoing": [],
@@ -246,19 +246,19 @@ PUT /api/v1.1/atoms/76:
   "handle": 76,
   "type": "ConceptNode"
 }
-'''
+"""
 
 ############################################
 # Example DELETE request to delete an atom #
 ############################################
 # Delete an atom
-delete_response = delete(uri + 'atoms/' + str(handle_node_1))
-delete_result = delete_response.json()['result']
+delete_response = delete(uri + "atoms/" + str(handle_node_1))
+delete_result = delete_response.json()["result"]
 pprint(delete_response, delete_result)
-'''
+"""
 DELETE /api/v1.1/atoms/76:
 {
   "handle": 76,
   "success": true
 }
-'''
+"""

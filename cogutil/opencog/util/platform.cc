@@ -164,6 +164,8 @@ unsigned long long atoll(const char *str)
 // ==========================================================
 
 #include <stdlib.h>
+
+#ifndef _WIN32
 #include <unistd.h>   // for sbrk(), sysconf()
 
 // Return memory usage per sbrk system call.
@@ -179,6 +181,13 @@ size_t opencog::getMemUsage()
     size_t diff = (size_t)p - (size_t)old_sbrk;
     return diff;
 }
+#else
+// Windows (MinGW) - sbrk not available
+size_t opencog::getMemUsage()
+{
+    return 0;
+}
+#endif
 
 #ifdef __APPLE__
 #include <sys/sysctl.h>
@@ -208,9 +217,34 @@ void opencog::set_thread_name(const char* name)
     pthread_setname_np(name);
 }
 
-#else // __APPLE__
+#elif defined(_WIN32) && !defined(__CYGWIN__)
 
-// If not Apple, then Linux.
+// Windows (MinGW/MSVC) implementations
+#include <windows.h>
+
+uint64_t opencog::getTotalRAM()
+{
+    MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+    GlobalMemoryStatusEx(&memInfo);
+    return memInfo.ullTotalPhys;
+}
+
+uint64_t opencog::getFreeRAM()
+{
+    MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+    GlobalMemoryStatusEx(&memInfo);
+    return memInfo.ullAvailPhys;
+}
+
+void opencog::set_thread_name(const char* name)
+{
+    (void)name;
+}
+
+#else // Linux
+
 #include <sys/sysinfo.h>
 #include <sys/prctl.h>
 
@@ -230,4 +264,4 @@ void opencog::set_thread_name(const char* name)
 {
     prctl(PR_SET_NAME, name, 0, 0, 0);
 }
-#endif // __APPLE__
+#endif

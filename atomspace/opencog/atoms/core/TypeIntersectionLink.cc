@@ -176,47 +176,16 @@ void TypeIntersectionLink::analyze(Handle anontype, bool& touched)
 		if (tcp->get_deep_typeset().size() == 0)
 			_deep_typeset.clear();
 		else if (0 < _deep_typeset.size())
-		{
-			// Implement intersection of deep types
-			// This handles complex type structures by intersecting their deep type sets
-			const TypeSet& deep_types = tcp->get_deep_typeset();
-			TypeSet intersection_result;
-			
-			// Find common deep types between current and new deep types
-			for (const Type& dt : _deep_typeset) {
-				if (deep_types.find(dt) != deep_types.end()) {
-					intersection_result.insert(dt);
-				}
-			}
-			
-			_deep_typeset = intersection_result;
-		}
+			throw RuntimeException(TRACE_INFO,
+				"Intersection of deep types not implemented!");
 
 		touched = true;
 		_glob_interval = intersect(_glob_interval, tcp->get_glob_interval());
 		return;
 	}
 
-	// Handle signatures and type constants
-	if (nameserver().isA(t, LINK_SIGNATURE_LINK) or 
-	    nameserver().isA(t, TYPE_CONSTANT_LINK))
-	{
-		// For signatures and type constants, we need to analyze their structure
-		// and create appropriate intersection logic
-		// This is a basic implementation that can be enhanced
-		touched = true;
-		
-		// For now, we'll treat these as complex types that need special handling
-		// The intersection will be conservative - we'll keep the existing types
-		// and let the runtime system handle the actual intersection logic
-		return;
-	}
-	
-	// If we reach here, we have an unhandled type
-	// Log a warning and continue with conservative behavior
-	logger().warn("TypeIntersectionLink: Unhandled type %s, using conservative intersection", 
-	              nameserver().getTypeName(t));
-	touched = true;
+	throw RuntimeException(TRACE_INFO,
+		"Intersection of signatures or type constants not implemented!");
 }
 
 /* ================================================================= */

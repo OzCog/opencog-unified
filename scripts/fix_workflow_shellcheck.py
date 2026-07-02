@@ -22,12 +22,14 @@ Usage:
     python3 scripts/fix_workflow_shellcheck.py --check     # exit 1 if any change needed
     python3 scripts/fix_workflow_shellcheck.py --all       # process all workflows
 """
+
 from __future__ import annotations
 
 import argparse
 import re
 import sys
 from pathlib import Path
+
 
 GH_VARS = (
     "GITHUB_ENV",

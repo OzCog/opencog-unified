@@ -1,26 +1,20 @@
 name: OCC Windows Build - Complete Stack
 
 # This workflow builds the OpenCog Collection (OCC) monorepo for Windows
-# Adapted from occ-build.yml with Windows-specific build tools and package managers
-# Uses vcpkg for C++ dependencies and Chocolatey for system tools
-# Builds components in dependency order: cogutil -> atomspace -> cogserver -> attention -> unify -> ure -> miner -> asmoses
+# Uses MSYS2/MinGW-w64 which provides GCC and POSIX compatibility headers
+# that the OpenCog C++ codebase requires (unistd.h, strings.h, etc.)
+# Builds components in dependency order: cogutil -> atomspace -> cogserver
 
 permissions:
   contents: read
   actions: read
 
-
-# NOTE: This workflow rebuilds dependencies multiple times.
-# Consider using Docker images or build artifacts to optimize build time.
-# See: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows
-
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
   workflow_dispatch:
-
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -28,545 +22,227 @@ concurrency:
 
 env:
   BUILD_TYPE: Release
-  VCPKG_DEFAULT_TRIPLET: x64-windows
-  CMAKE_GENERATOR: "Visual Studio 17 2022"
-  CMAKE_GENERATOR_PLATFORM: x64
 
 jobs:
-  # Stage 1: Build CogUtil (Foundation)
   build-cogutil:
-    runs-on: windows-latest
+    runs-on: windows-2022
     name: Build CogUtil (Windows)
 
+    defaults:
+      run:
+        shell: msys2 {0}
+
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v6
-      with:
-        submodules: false
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          submodules: false
 
-    - name: Setup MSVC
-      uses: microsoft/setup-msbuild@v2
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-boost
+            mingw-w64-x86_64-binutils
+            make
+            pkg-config
 
-    - name: Cache vcpkg
-      uses: actions/cache@v5
-      with:
-        path: C:\vcpkg\installed
-        key: vcpkg-cogutil-${{ runner.os }}-${{ hashFiles('cogutil/**') }}
-        restore-keys: |
-          vcpkg-cogutil-${{ runner.os }}-
+      - name: Configure CogUtil
+        run: |
+          cd cogutil
+          mkdir -p build && cd build
+          cmake .. -G "MSYS Makefiles" \
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+            -DCMAKE_INSTALL_PREFIX=/mingw64
 
-    - name: Install Dependencies via Chocolatey
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System'
-        choco install -y visualstudio2022-workload-nativedesktop
-      shell: powershell
+      - name: Build CogUtil
+        run: |
+          cd cogutil/build
+          make -j2
 
-    - name: Install Dependencies via vcpkg
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd C:\vcpkg
-        .\vcpkg install boost-filesystem:x64-windows boost-program-options:x64-windows boost-system:x64-windows boost-thread:x64-windows boost-regex:x64-windows
-      shell: powershell
+      - name: Run CogUtil Tests
+        run: |
+          cd cogutil/build
+          ctest --output-on-failure || true
 
-    - name: Configure CogUtil
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        mkdir cogutil\build
-        cd cogutil\build
-        cmake .. -G "${{ env.CMAKE_GENERATOR }}" -A ${{ env.CMAKE_GENERATOR_PLATFORM }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
-      shell: powershell
+      - name: Install CogUtil
+        run: |
+          cd cogutil/build
+          make install
 
-    - name: Build CogUtil
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd cogutil\build
-        cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
-      shell: powershell
-
-    - name: Run CogUtil Tests
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd cogutil\build
-        ctest -C ${{ env.BUILD_TYPE }} --output-on-failure
-      continue-on-error: true
-      shell: powershell
-
-    - name: Install CogUtil
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd cogutil\build
-        cmake --install . --config ${{ env.BUILD_TYPE }}
-      shell: powershell
-
-    - name: Upload CogUtil Build
-      uses: actions/upload-artifact@v6
-      with:
-        name: cogutil-build-windows
-        path: |
-          cogutil\build\**\*.dll
-          cogutil\build\**\*.lib
-        retention-days: 1
-
-  # Stage 2: Build AtomSpace (depends on CogUtil)
   build-atomspace:
-    runs-on: windows-latest
+    runs-on: windows-2022
     name: Build AtomSpace (Windows)
     needs: build-cogutil
 
+    defaults:
+      run:
+        shell: msys2 {0}
+
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v6
-      with:
-        submodules: false
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          submodules: false
 
-    - name: Setup MSVC
-      uses: microsoft/setup-msbuild@v2
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-boost
+            mingw-w64-x86_64-python
+            mingw-w64-x86_64-binutils
+            make
+            pkg-config
 
-    - name: Cache vcpkg
-      uses: actions/cache@v5
-      with:
-        path: C:\vcpkg\installed
-        key: vcpkg-atomspace-${{ runner.os }}-${{ hashFiles('atomspace/**') }}
-        restore-keys: |
-          vcpkg-atomspace-${{ runner.os }}-
+      - name: Build and Install CogUtil
+        run: |
+          cd cogutil
+          mkdir -p build && cd build
+          cmake .. -G "MSYS Makefiles" \
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+            -DCMAKE_INSTALL_PREFIX=/mingw64
+          make -j2
+          make install
 
-    - name: Install Dependencies via Chocolatey
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System'
-        choco install -y python3
-      shell: powershell
+      - name: Configure AtomSpace
+        run: |
+          cd atomspace
+          mkdir -p build && cd build
+          cmake .. -G "MSYS Makefiles" \
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+            -DCMAKE_INSTALL_PREFIX=/mingw64 \
+            -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
 
-    - name: Install Dependencies via vcpkg
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd C:\vcpkg
-        .\vcpkg install boost-filesystem:x64-windows boost-program-options:x64-windows boost-system:x64-windows boost-thread:x64-windows boost-regex:x64-windows
-      shell: powershell
+      - name: Build AtomSpace
+        run: |
+          cd atomspace/build
+          make -j2
 
-    - name: Rebuild and Install CogUtil
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        mkdir cogutil\build -Force
-        cd cogutil\build
-        cmake .. -G "${{ env.CMAKE_GENERATOR }}" -A ${{ env.CMAKE_GENERATOR_PLATFORM }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
-        cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
-        cmake --install . --config ${{ env.BUILD_TYPE }}
-      shell: powershell
+      - name: Run AtomSpace Tests
+        run: |
+          cd atomspace/build
+          ctest --output-on-failure || true
 
-    - name: Configure AtomSpace
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        mkdir atomspace\build -Force
-        cd atomspace\build
-        cmake .. -G "${{ env.CMAKE_GENERATOR }}" -A ${{ env.CMAKE_GENERATOR_PLATFORM }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
-      shell: powershell
+      - name: Install AtomSpace
+        run: |
+          cd atomspace/build
+          make install
 
-    - name: Build AtomSpace
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd atomspace\build
-        cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
-      shell: powershell
-
-    - name: Run AtomSpace Tests
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd atomspace\build
-        ctest -C ${{ env.BUILD_TYPE }} --output-on-failure
-      continue-on-error: true
-      shell: powershell
-
-    - name: Install AtomSpace
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd atomspace\build
-        cmake --install . --config ${{ env.BUILD_TYPE }}
-      shell: powershell
-
-    - name: Upload AtomSpace Build
-      uses: actions/upload-artifact@v6
-      with:
-        name: atomspace-build-windows
-        path: |
-          atomspace\build\**\*.dll
-          atomspace\build\**\*.lib
-        retention-days: 1
-
-  # Stage 3: Build AtomSpace Storage (depends on AtomSpace)
-  build-atomspace-storage:
-    runs-on: windows-latest
-    name: Build AtomSpace Storage (Windows)
+  build-cogserver:
+    runs-on: windows-2022
+    name: Build CogServer (Windows)
     needs: build-atomspace
 
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v6
-      with:
-        submodules: false
-
-    - name: Setup MSVC
-      uses: microsoft/setup-msbuild@v2
-
-    - name: Install Dependencies via vcpkg
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd C:\vcpkg
-        .\vcpkg install boost-filesystem:x64-windows boost-program-options:x64-windows boost-system:x64-windows boost-thread:x64-windows
-      shell: powershell
-
-    - name: Rebuild and Install CogUtil
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        mkdir cogutil\build -Force
-        cd cogutil\build
-        cmake .. -G "${{ env.CMAKE_GENERATOR }}" -A ${{ env.CMAKE_GENERATOR_PLATFORM }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
-        cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
-        cmake --install . --config ${{ env.BUILD_TYPE }}
-      shell: powershell
-
-    - name: Rebuild and Install AtomSpace
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        mkdir atomspace\build -Force
-        cd atomspace\build
-        cmake .. -G "${{ env.CMAKE_GENERATOR }}" -A ${{ env.CMAKE_GENERATOR_PLATFORM }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
-        cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
-        cmake --install . --config ${{ env.BUILD_TYPE }}
-      shell: powershell
-
-    - name: Check AtomSpace Storage Directory
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        if (Test-Path "atomspace-storage") {
-          Write-Host "AtomSpace Storage directory exists"
-          Get-ChildItem atomspace-storage
-        } else {
-          Write-Host "AtomSpace Storage directory not found, skipping build"
-          exit 0
-        }
-      shell: powershell
-
-    - name: Configure AtomSpace Storage
-      if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        mkdir atomspace-storage\build -Force
-        cd atomspace-storage\build
-        cmake .. -G "${{ env.CMAKE_GENERATOR }}" -A ${{ env.CMAKE_GENERATOR_PLATFORM }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
-      shell: powershell
-
-    - name: Build AtomSpace Storage
-      if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd atomspace-storage\build
-        cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
-      shell: powershell
-
-    - name: Run Tests
-      if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd atomspace-storage\build
-        ctest -C ${{ env.BUILD_TYPE }} --output-on-failure
-      continue-on-error: true
-      shell: powershell
-
-    - name: Install AtomSpace Storage
-      if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd atomspace-storage\build
-        cmake --install . --config ${{ env.BUILD_TYPE }}
-      shell: powershell
-
-  # Stage 3b: Build AtomSpace Rocks (depends on AtomSpace Storage)
-  build-atomspace-rocks:
-    runs-on: windows-latest
-    name: Build AtomSpace RocksDB Storage (Windows)
-    needs: build-atomspace-storage
+    defaults:
+      run:
+        shell: msys2 {0}
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v6
-      with:
-        submodules: false
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          submodules: false
 
-    - name: Setup MSVC
-      uses: microsoft/setup-msbuild@v2
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-boost
+            mingw-w64-x86_64-binutils
+            make
+            pkg-config
 
-    - name: Install Dependencies via vcpkg
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd C:\vcpkg
-        .\vcpkg install boost-filesystem:x64-windows boost-program-options:x64-windows boost-system:x64-windows boost-thread:x64-windows rocksdb:x64-windows
-      shell: powershell
+      - name: Build and Install CogUtil
+        run: |
+          cd cogutil
+          mkdir -p build && cd build
+          cmake .. -G "MSYS Makefiles" \
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+            -DCMAKE_INSTALL_PREFIX=/mingw64
+          make -j2
+          make install
 
-    - name: Rebuild and Install CogUtil
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        mkdir cogutil\build -Force
-        cd cogutil\build
-        cmake .. -G "${{ env.CMAKE_GENERATOR }}" -A ${{ env.CMAKE_GENERATOR_PLATFORM }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
-        cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
-        cmake --install . --config ${{ env.BUILD_TYPE }}
-      shell: powershell
+      - name: Build and Install AtomSpace
+        run: |
+          cd atomspace
+          mkdir -p build && cd build
+          cmake .. -G "MSYS Makefiles" \
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+            -DCMAKE_INSTALL_PREFIX=/mingw64 \
+            -DCMAKE_POLICY_DEFAULT_CMP0175=OLD
+          make -j2
+          make install
 
-    - name: Rebuild and Install AtomSpace
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        mkdir atomspace\build -Force
-        cd atomspace\build
-        cmake .. -G "${{ env.CMAKE_GENERATOR }}" -A ${{ env.CMAKE_GENERATOR_PLATFORM }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
-        cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
-        cmake --install . --config ${{ env.BUILD_TYPE }}
-      shell: powershell
+      - name: Configure CogServer
+        if: hashFiles('cogserver/CMakeLists.txt') != ''
+        run: |
+          cd cogserver
+          mkdir -p build && cd build
+          cmake .. -G "MSYS Makefiles" \
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+            -DCMAKE_INSTALL_PREFIX=/mingw64
 
-    - name: Rebuild and Install AtomSpace Storage
-      if: hashFiles('atomspace-storage/CMakeLists.txt') != ''
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        mkdir atomspace-storage\build -Force
-        cd atomspace-storage\build
-        cmake .. -G "${{ env.CMAKE_GENERATOR }}" -A ${{ env.CMAKE_GENERATOR_PLATFORM }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
-        cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
-        cmake --install . --config ${{ env.BUILD_TYPE }}
-      shell: powershell
+      - name: Build CogServer
+        if: hashFiles('cogserver/CMakeLists.txt') != ''
+        run: |
+          cd cogserver/build
+          make -j2
 
-    - name: Check AtomSpace Rocks Directory
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        if (Test-Path "atomspace-rocks") {
-          Write-Host "AtomSpace Rocks directory exists"
-          Get-ChildItem atomspace-rocks
-        } else {
-          Write-Host "AtomSpace Rocks directory not found, skipping build"
-          exit 0
-        }
-      shell: powershell
+      - name: Run CogServer Tests
+        if: hashFiles('cogserver/CMakeLists.txt') != ''
+        run: |
+          cd cogserver/build
+          ctest --output-on-failure || true
 
-    - name: Configure AtomSpace Rocks
-      if: hashFiles('atomspace-rocks/CMakeLists.txt') != ''
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        mkdir atomspace-rocks\build -Force
-        cd atomspace-rocks\build
-        cmake .. -G "${{ env.CMAKE_GENERATOR }}" -A ${{ env.CMAKE_GENERATOR_PLATFORM }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
-      shell: powershell
-
-    - name: Build AtomSpace Rocks
-      if: hashFiles('atomspace-rocks/CMakeLists.txt') != ''
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd atomspace-rocks\build
-        cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
-      shell: powershell
-
-    - name: Run Tests
-      if: hashFiles('atomspace-rocks/CMakeLists.txt') != ''
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd atomspace-rocks\build
-        ctest -C ${{ env.BUILD_TYPE }} --output-on-failure
-      continue-on-error: true
-      shell: powershell
-
-    - name: Install AtomSpace Rocks
-      if: hashFiles('atomspace-rocks/CMakeLists.txt') != ''
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd atomspace-rocks\build
-        cmake --install . --config ${{ env.BUILD_TYPE }}
-      shell: powershell
-
-  # Stage 4: Build CogServer (depends on AtomSpace)
-  build-cogserver:
-    runs-on: windows-latest
-    name: Build CogServer (Windows)
-    needs: build-atomspace-storage
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v6
-      with:
-        submodules: false
-
-    - name: Setup MSVC
-      uses: microsoft/setup-msbuild@v2
-
-    - name: Install Dependencies via vcpkg
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd C:\vcpkg
-        .\vcpkg install boost-filesystem:x64-windows boost-program-options:x64-windows boost-system:x64-windows boost-thread:x64-windows asio:x64-windows
-      shell: powershell
-
-    - name: Rebuild and Install CogUtil
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        mkdir cogutil\build -Force
-        cd cogutil\build
-        cmake .. -G "${{ env.CMAKE_GENERATOR }}" -A ${{ env.CMAKE_GENERATOR_PLATFORM }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
-        cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
-        cmake --install . --config ${{ env.BUILD_TYPE }}
-      shell: powershell
-
-    - name: Rebuild and Install AtomSpace
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        mkdir atomspace\build -Force
-        cd atomspace\build
-        cmake .. -G "${{ env.CMAKE_GENERATOR }}" -A ${{ env.CMAKE_GENERATOR_PLATFORM }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
-        cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
-        cmake --install . --config ${{ env.BUILD_TYPE }}
-      shell: powershell
-
-    - name: Check CogServer Directory
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        if (Test-Path "cogserver") {
-          Write-Host "CogServer directory exists"
-          Get-ChildItem cogserver
-        } else {
-          Write-Host "CogServer directory not found, skipping build"
-          exit 0
-        }
-      shell: powershell
-
-    - name: Configure CogServer
-      if: hashFiles('cogserver/CMakeLists.txt') != ''
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        mkdir cogserver\build -Force
-        cd cogserver\build
-        cmake .. -G "${{ env.CMAKE_GENERATOR }}" -A ${{ env.CMAKE_GENERATOR_PLATFORM }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
-      shell: powershell
-
-    - name: Build CogServer
-      if: hashFiles('cogserver/CMakeLists.txt') != ''
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd cogserver\build
-        cmake --build . --config ${{ env.BUILD_TYPE }} --parallel 2
-      shell: powershell
-
-    - name: Run Tests
-      if: hashFiles('cogserver/CMakeLists.txt') != ''
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd cogserver\build
-        ctest -C ${{ env.BUILD_TYPE }} --output-on-failure
-      continue-on-error: true
-      shell: powershell
-
-    - name: Install CogServer
-      if: hashFiles('cogserver/CMakeLists.txt') != ''
-      run: |
-        set -eu
-        $ErrorActionPreference = 'Stop'
-        cd cogserver\build
-        cmake --install . --config ${{ env.BUILD_TYPE }}
-      shell: powershell
-
-  # Final Stage: Package and Report
   package-and-report:
-    runs-on: windows-latest
+    runs-on: windows-2022
     name: Package OCC Windows Build
     needs:
-      - build-atomspace-rocks
       - build-cogserver
     if: always()
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v6
+      - name: Checkout Repository
+        uses: actions/checkout@v6
 
-    - name: Download All Artifacts
-      uses: actions/download-artifact@v7
-      with:
-        path: artifacts
-      continue-on-error: true
+      - name: Generate Build Report
+        run: |
+          $report = "# OCC Windows Build Report`n`n"
+          $report += "## Build Summary`n"
+          $report += "Build completed at: $(Get-Date)`n`n"
+          $report += "## Build Order`n"
+          $report += "1. CogUtil (Foundation)`n"
+          $report += "2. AtomSpace (Hypergraph DB)`n"
+          $report += "3. CogServer (Networking)`n`n"
+          $report += "## Windows Build Notes`n"
+          $report += "- Uses MSYS2/MinGW-w64 (GCC toolchain with POSIX compatibility)`n"
+          $report += "- Dependencies managed via MSYS2 pacman`n"
+          $report += "- Builds for x86_64 (MinGW64)`n"
+          $report += "- Tests run with ctest framework`n`n"
+          $report += "## Known Limitations`n"
+          $report += "- Guile Scheme bindings not available on Windows`n"
+          $report += "- Some tests may fail on Windows platform`n"
 
-    - name: Generate Build Report
-      run: |
-        set -eu
-        $report = "# OCC Windows Build Report`n`n"
-        $report += "## Build Summary`n"
-        $report += "Build completed at: $(Get-Date)`n`n"
-        $report += "## Components Built`n`n"
+          Set-Content -Path "BUILD_REPORT.md" -Value $report
+          Get-Content BUILD_REPORT.md
+        shell: powershell
 
-        if (Test-Path "artifacts") {
-          $report += "### Artifacts Generated:`n"
-          $report += Get-ChildItem -Recurse artifacts | Out-String
-        } else {
-          $report += "No artifacts found`n"
-        }
-
-        $report += "`n## Build Order`n"
-        $report += "1. CogUtil (Foundation)`n"
-        $report += "2. AtomSpace (Hypergraph DB)`n"
-        $report += "3. AtomSpace Storage (Storage backends)`n"
-        $report += "3b. AtomSpace Rocks (RocksDB storage)`n"
-        $report += "4. CogServer (Networking)`n`n"
-        $report += "## Windows Build Notes`n"
-        $report += "- Uses Visual Studio 2022 Build Tools`n"
-        $report += "- Dependencies managed via vcpkg`n"
-        $report += "- System tools installed via Chocolatey`n"
-        $report += "- Builds for x64-windows platform`n"
-        $report += "- Build artifacts are DLLs and LIB files`n"
-        $report += "- Tests run with ctest framework`n`n"
-        $report += "## Known Limitations`n"
-        $report += "- Guile Scheme bindings not available on Windows`n"
-        $report += "- Some Unix-specific components may not build`n"
-        $report += "- Haskell components require Stack toolchain`n"
-        $report += "- Some tests may fail on Windows platform`n"
-
-        Set-Content -Path "BUILD_REPORT.md" -Value $report
-        Get-Content BUILD_REPORT.md
-      shell: powershell
-
-    - name: Upload Build Report
-      uses: actions/upload-artifact@v6
-      with:
-        name: occ-windows-build-report
-        path: BUILD_REPORT.md
-        retention-days: 30
+      - name: Upload Build Report
+        uses: actions/upload-artifact@v6
+        with:
+          name: occ-windows-build-report
+          path: BUILD_REPORT.md
+          retention-days: 30

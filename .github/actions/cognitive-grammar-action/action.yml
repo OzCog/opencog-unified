@@ -38,7 +38,7 @@ runs:
       run: |
         pip install numpy torch transformers PyGithub pyyaml
         npm install -g @octokit/graphql
-    
+
     - name: Calculate Tensor Shape
       id: tensor-calc
       shell: bash
@@ -46,7 +46,7 @@ runs:
         # Parse tensor dimensions from input
         IFS=',' read -ra DIMS <<< "${{ inputs.tensor-dimensions }}"
         SHAPE=$(printf "[%s]" "$(IFS=,; echo "${DIMS[*]}")")
-        
+
         echo "🔢 Calculated tensor shape: $SHAPE"
         echo "shape=$SHAPE" >> $GITHUB_OUTPUT
 
@@ -58,16 +58,16 @@ runs:
         import json
         import numpy as np
         from datetime import datetime
-        
+
         class EnterpriseScanner:
             def __init__(self, enterprise="cosmos"):
                 self.enterprise = enterprise
                 self.topology = {}
-                
+
             def scan_cognitive_topology(self):
                 """Scan the cognitive topology across the enterprise"""
                 print(f"🌐 Scanning cognitive topology for enterprise: {self.enterprise}")
-                
+
                 organizations = ['cogpilot', 'OzCog', 'cosmos']
                 topology = {
                     'enterprise': self.enterprise,
@@ -75,14 +75,14 @@ runs:
                     'organizations': {},
                     'tensor_mapping': {}
                 }
-                
+
                 for org_name in organizations:
                     topology['organizations'][org_name] = self.scan_organization(org_name)
-                    
+
                 topology['tensor_mapping'] = self.calculate_tensor_mapping(topology['organizations'])
                 self.topology = topology
                 return topology
-                
+
             def scan_organization(self, org_name):
                 """Scan organization for cognitive patterns"""
                 repo_configs = {
@@ -90,60 +90,58 @@ runs:
                     'OzCog': ['opencog-unified', 'atomspace-extensions'],
                     'cosmos': ['membrane-sync', 'cognitive-grammar']
                 }
-                
+
                 org_data = {
                     'name': org_name,
                     'prime_factor': {'cogpilot': 2, 'OzCog': 3, 'cosmos': 5}.get(org_name, 7),
                     'repositories': {},
                     'membrane_type': f"{org_name}_membrane"
                 }
-                
+
                 for repo_name in repo_configs.get(org_name, []):
                     complexity = len(repo_name) * 0.5 + np.random.random() * 2
                     shape = [2, 2, 2] if 'cognitive' in repo_name else [3, 1, 1]
-                    
+
                     org_data['repositories'][repo_name] = {
                         'tensor_shape': shape,
                         'complexity_score': complexity,
                         'membrane_permeability': 'bidirectional'
                     }
-                    
+
                 return org_data
-                
+
             def calculate_tensor_mapping(self, organizations):
                 """Calculate tensor field mapping"""
                 total_complexity = sum(
                     sum(repo['complexity_score'] for repo in org['repositories'].values())
                     for org in organizations.values()
                 )
-                
+
                 return {
                     'enterprise_tensor_shape': [7, len(organizations), 10, int(total_complexity), 100],
                     'total_complexity': total_complexity,
                     'memory_efficiency': min(1.0, 50.0 / total_complexity) if total_complexity > 0 else 1.0
                 }
-                
+
             def fold_to_markdown(self):
                 """Generate markdown representation"""
-                markdown = f"""# 🌌 {self.enterprise.title()} Enterprise Cognitive Topology
+                markdown = (
+                    f"# 🌌 {self.enterprise.title()} Enterprise Cognitive Topology\n\n"
+                    f"**Scan Timestamp**: {self.topology['scan_timestamp']}\n"
+                    f"**Enterprise Tensor Shape**: {self.topology['tensor_mapping']['enterprise_tensor_shape']}\n"
+                    f"**Total Complexity**: {self.topology['tensor_mapping']['total_complexity']:.2f}\n\n"
+                    "## Organizational Membranes\n\n"
+                )
 
-**Scan Timestamp**: {self.topology['scan_timestamp']}
-**Enterprise Tensor Shape**: {self.topology['tensor_mapping']['enterprise_tensor_shape']}
-**Total Complexity**: {self.topology['tensor_mapping']['total_complexity']:.2f}
-
-## Organizational Membranes
-
-"""
-                
                 for org_name, org_data in self.topology['organizations'].items():
                     markdown += f"### ({org_name}) - Prime: {org_data['prime_factor']}\n"
                     for repo_name, repo_data in org_data['repositories'].items():
                         shape_str = "×".join(map(str, repo_data['tensor_shape']))
                         markdown += f"#### [{repo_name}] - Shape: [{shape_str}]\n"
                     markdown += "\n"
-                
+
                 return markdown
-                
+
             def generate_ggml_grammar(self):
                 """Generate ggml-compatible grammar"""
                 return {
@@ -157,29 +155,29 @@ runs:
                         }
                     }
                 }
-        
+
         # Execute scanning
         if __name__ == "__main__":
             enterprise = os.getenv('INPUT_ENTERPRISE', 'cosmos')
             scanner = EnterpriseScanner(enterprise)
             topology = scanner.scan_cognitive_topology()
-            
+
             # Save results
             with open('enterprise-topology.json', 'w') as f:
                 json.dump(topology, f, indent=2)
-                
+
             markdown = scanner.fold_to_markdown()
             with open('enterprise-cognitive-topology.md', 'w') as f:
                 f.write(markdown)
-                
+
             grammar = scanner.generate_ggml_grammar()
             with open('cognitive-grammar-enterprise.ggml', 'w') as f:
                 json.dump(grammar, f, indent=2)
-                
+
             print("✅ Enterprise cognitive scanning completed")
         EOF
 
-    - name: Scan Cognitive Topology  
+    - name: Scan Cognitive Topology
       id: membrane-scan
       shell: bash
       env:
@@ -187,7 +185,7 @@ runs:
       run: |
         echo "🌐 Executing enterprise cognitive topology scan..."
         python enterprise_cognitive_scanner.py
-        
+
         if [ -f "enterprise-topology.json" ]; then
           echo "state=scanned" >> $GITHUB_OUTPUT
         else
@@ -201,12 +199,12 @@ runs:
         cat > grammar_enhancer.py << 'EOF'
         import json
         from pathlib import Path
-        
+
         def enhance_grammar():
             # Load existing grammar
             with open('cognitive-grammar-enterprise.ggml') as f:
                 grammar = json.load(f)
-                
+
             # Add cognitive primitives
             cognitive_primitives = {
                 'attention_mechanisms': {
@@ -215,7 +213,7 @@ runs:
                     'operations': ['attend', 'focus', 'distribute']
                 },
                 'memory_consolidation': {
-                    'tensor_shape': [5, 3, 2], 
+                    'tensor_shape': [5, 3, 2],
                     'complexity': 30,
                     'operations': ['store', 'retrieve', 'consolidate']
                 },
@@ -225,22 +223,22 @@ runs:
                     'operations': ['detect', 'classify', 'generalize']
                 }
             }
-            
+
             grammar['cognitive_grammar']['primitives'] = cognitive_primitives
             grammar['cognitive_grammar']['total_primitive_complexity'] = sum(p['complexity'] for p in cognitive_primitives.values())
-            
+
             return grammar
-            
+
         enhanced_grammar = enhance_grammar()
-        
+
         with open('cognitive-grammar-enhanced.ggml', 'w') as f:
             json.dump(enhanced_grammar, f, indent=2)
-            
+
         print("✅ Enhanced cognitive grammar generated")
         EOF
-        
+
         python grammar_enhancer.py
-        
+
         if [ -f "cognitive-grammar-enhanced.ggml" ]; then
           echo "file=cognitive-grammar-enhanced.ggml" >> $GITHUB_OUTPUT
         else
