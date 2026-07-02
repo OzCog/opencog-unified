@@ -63,7 +63,7 @@ jobs:
 
     - name: Setup MSVC
       uses: microsoft/setup-msbuild@v3
-    
+
     - name: Install Chocolatey
       run: |
         $ErrorActionPreference = 'Stop'

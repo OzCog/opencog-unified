@@ -46,7 +46,7 @@ jobs:
 
     - name: Setup MSVC
       uses: microsoft/setup-msbuild@v3
-    
+
     - name: Cache vcpkg
       uses: actions/cache@v5
       with:
@@ -59,7 +59,6 @@ jobs:
       run: |
         $ErrorActionPreference = 'Stop'
         choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System'
-        choco install -y visualstudio2022-workload-nativedesktop
       shell: powershell
 
     - name: Install Dependencies via vcpkg
@@ -122,7 +121,7 @@ jobs:
 
     - name: Setup MSVC
       uses: microsoft/setup-msbuild@v3
-    
+
     - name: Cache vcpkg
       uses: actions/cache@v5
       with:
@@ -208,7 +207,6 @@ jobs:
 
     - name: Setup MSVC
       uses: microsoft/setup-msbuild@v3
-    
     - name: Install Dependencies via vcpkg
       run: |
         $ErrorActionPreference = 'Stop'
@@ -296,7 +294,7 @@ jobs:
 
     - name: Setup MSVC
       uses: microsoft/setup-msbuild@v3
-    
+
     - name: Install Dependencies via vcpkg
       run: |
         $ErrorActionPreference = 'Stop'
@@ -395,7 +393,7 @@ jobs:
 
     - name: Setup MSVC
       uses: microsoft/setup-msbuild@v3
-    
+
     - name: Install Dependencies via vcpkg
       run: |
         $ErrorActionPreference = 'Stop'
