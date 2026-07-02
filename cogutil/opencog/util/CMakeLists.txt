@@ -1,8 +1,8 @@
-IF (WIN32 AND NOT UNIX)
+IF (WIN32 AND NOT UNIX AND NOT MINGW)
 	SET(WIN32_GETOPT_FILES getopt getopt_long)
-ELSE (WIN32 AND NOT UNIX)
+ELSE (WIN32 AND NOT UNIX AND NOT MINGW)
 	SET(WIN32_GETOPT_FILES)
-ENDIF (WIN32 AND NOT UNIX)
+ENDIF (WIN32 AND NOT UNIX AND NOT MINGW)
 
 IF (APPLE)
 	SET(APPLE_STRNDUP_FILES strndup strnlen)
@@ -14,9 +14,11 @@ include(CheckSymbolExists)
 include(CheckCSourceCompiles)
 
 # The below are used to automatically find module load paths
-ADD_DEFINITIONS(
-   -DCMAKE_INSTALL_PREFIX="\\"${CMAKE_INSTALL_PREFIX}\\""
-)
+IF (NOT MINGW)
+   ADD_DEFINITIONS(
+      -DCMAKE_INSTALL_PREFIX="\\"${CMAKE_INSTALL_PREFIX}\\""
+   )
+ENDIF (NOT MINGW)
 
 ADD_LIBRARY(cogutil SHARED
 	ansi.cc
@@ -47,6 +49,19 @@ ADD_LIBRARY(cogutil SHARED
 	${WIN32_GETOPT_FILES}
 	${APPLE_STRNDUP_FILES}
 )
+
+# On MinGW, ADD_DEFINITIONS with escaped quotes is broken (MSYS Makefiles
+# generator mangles backslash-quoted strings). Use target_compile_definitions
+# which handles quoting correctly for the generator.
+IF (MINGW)
+	TARGET_COMPILE_DEFINITIONS(cogutil PRIVATE
+		"CMAKE_INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\""
+		"CONFDIR=\"${CONFDIR}\""
+		"DATADIR=\"${DATADIR}\""
+		"PROJECT_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\""
+		"PROJECT_BINARY_DIR=\"${CMAKE_BINARY_DIR}\""
+	)
+ENDIF (MINGW)
 
 IF (HAVE_BOOST)
 	TARGET_SOURCES(cogutil PRIVATE Config.cc)
