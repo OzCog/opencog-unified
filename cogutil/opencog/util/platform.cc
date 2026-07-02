@@ -164,6 +164,8 @@ unsigned long long atoll(const char *str)
 // ==========================================================
 
 #include <stdlib.h>
+
+#ifndef _WIN32
 #include <unistd.h>   // for sbrk(), sysconf()
 
 // Return memory usage per sbrk system call.
@@ -179,6 +181,13 @@ size_t opencog::getMemUsage()
     size_t diff = (size_t)p - (size_t)old_sbrk;
     return diff;
 }
+#else
+// Windows (MinGW) - sbrk not available
+size_t opencog::getMemUsage()
+{
+    return 0;
+}
+#endif
 
 #ifdef __APPLE__
 #include <sys/sysctl.h>

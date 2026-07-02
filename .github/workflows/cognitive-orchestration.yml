@@ -220,7 +220,7 @@ jobs:
 
     steps:
       - name: "🌀 Initialize Hypergraph Substrate"
-        run: |
+        run: |  # pragma: allowlist secret
           set -eu
           {
             echo "COGNITIVE_LAYER=CORE"
