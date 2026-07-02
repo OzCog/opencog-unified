@@ -125,15 +125,13 @@ runs:
 
             def fold_to_markdown(self):
                 """Generate markdown representation"""
-                markdown = f"""# 🌌 {self.enterprise.title()} Enterprise Cognitive Topology
-
-**Scan Timestamp**: {self.topology['scan_timestamp']}
-**Enterprise Tensor Shape**: {self.topology['tensor_mapping']['enterprise_tensor_shape']}
-**Total Complexity**: {self.topology['tensor_mapping']['total_complexity']:.2f}
-
-## Organizational Membranes
-
-"""
+                markdown = (
+                    f"# 🌌 {self.enterprise.title()} Enterprise Cognitive Topology\n\n"
+                    f"**Scan Timestamp**: {self.topology['scan_timestamp']}\n"
+                    f"**Enterprise Tensor Shape**: {self.topology['tensor_mapping']['enterprise_tensor_shape']}\n"
+                    f"**Total Complexity**: {self.topology['tensor_mapping']['total_complexity']:.2f}\n\n"
+                    "## Organizational Membranes\n\n"
+                )
 
                 for org_name, org_data in self.topology['organizations'].items():
                     markdown += f"### ({org_name}) - Prime: {org_data['prime_factor']}\n"
