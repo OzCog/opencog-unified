@@ -20,7 +20,7 @@ ADD_LIBRARY (clearbox
 )
 
 # Without this, parallel make will race and crap up the generated files.
-ADD_DEPENDENCIES(clearbox atom_types atombase atomcore atomspace atomvalue cogutil opencog_atom_types truthvalue value)
+ADD_DEPENDENCIES(clearbox atom_types atombase atomcore atomvalue cogutil opencog_atom_types truthvalue value)
 
 TARGET_LINK_LIBRARIES(clearbox
 	atom_types

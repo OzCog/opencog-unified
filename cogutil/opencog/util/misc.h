@@ -32,7 +32,7 @@
 #include <functional>
 #include <string>
 
-#ifndef WIN32
+#if !defined(_MSC_VER)
 #include <cxxabi.h>
 #endif
 

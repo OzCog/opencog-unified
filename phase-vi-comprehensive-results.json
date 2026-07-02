@@ -24,8 +24,8 @@
   },
   "unified_tensor_signature": {
     "phase_integration": [1, 2, 3, 4, 5, 6],
-    "cognitive_coherence": .830,
-    "system_stability": .800,
+    "cognitive_coherence": 0.830,
+    "system_stability": 0.800,
     "unification_degree": "INTEGRATED",
     "transcendence_level": 1.600
   }

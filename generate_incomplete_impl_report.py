@@ -2,8 +2,9 @@
 """
 Generate a report on the work done for incomplete implementations.
 """
-import json
+
 from datetime import datetime
+
 
 def generate_report():
     """Generate the final Markdown report"""
@@ -12,7 +13,7 @@ def generate_report():
         {
             "component": "nlp",
             "file": "components/language/learn/scm/gram-class/singletons.scm",
-            "resolution": "Implemented the `delete-singles` function to correctly remove word-class nodes with only one member. The previous implementation was a non-functional placeholder."
+            "resolution": "Implemented the `delete-singles` function to correctly remove word-class nodes with only one member. The previous implementation was a non-functional placeholder.",
         }
     ]
 
@@ -20,33 +21,33 @@ def generate_report():
         {
             "component": "ure",
             "file": "ure/opencog/ure/forwardchainer/SourceRuleSet.h",
-            "summary": "Provided detailed implementation guidance for adding tournament selection as a low-complexity alternative to Thompson sampling."
+            "summary": "Provided detailed implementation guidance for adding tournament selection as a low-complexity alternative to Thompson sampling.",
         },
         {
             "component": "integration",
             "file": "components/integration/opencog/opencog/openpsi/dynamics/updater.scm",
-            "summary": "Outlined a clear architectural path for migrating temporary hash tables to a persistent AtomSpace representation using StateLink and AtTimeLink."
+            "summary": "Outlined a clear architectural path for migrating temporary hash tables to a persistent AtomSpace representation using StateLink and AtTimeLink.",
         },
         {
             "component": "chatbot",
             "file": "components/integration/opencog/opencog/eva/chatbot-eva/knowledge.scm",
-            "summary": "Clarified the requirement to integrate imperative commands with the self-model, ensuring the robot's internal state reflects its actions."
+            "summary": "Clarified the requirement to integrate imperative commands with the self-model, ensuring the robot's internal state reflects its actions.",
         },
         {
             "component": "nlp",
             "file": "components/language/learn/scm/attic/cluster/gram-pairwise.scm",
-            "summary": "Documented a refactoring strategy to consolidate redundant merge logic into a single `make-merge-majority` function, improving maintainability."
+            "summary": "Documented a refactoring strategy to consolidate redundant merge logic into a single `make-merge-majority` function, improving maintainability.",
         },
         {
             "component": "moses",
             "file": "moses/moses/comboreduct/table/table.h",
-            "summary": "Proposed a new architectural approach to support mixed-type columns in data tables, overcoming a key design limitation while preserving memory efficiency."
+            "summary": "Proposed a new architectural approach to support mixed-type columns in data tables, overcoming a key design limitation while preserving memory efficiency.",
         },
         {
             "component": "moses",
             "file": "moses/moses/comboreduct/table/table_io.h",
-            "summary": "Provided a clear refactoring plan to unify two separate `loadITable` implementations into a single, optimized function, reducing code duplication."
-        }
+            "summary": "Provided a clear refactoring plan to unify two separate `loadITable` implementations into a single, optimized function, reducing code duplication.",
+        },
     ]
 
     report = f"""
@@ -97,10 +98,11 @@ For the following complex items, the `TODO` comments were replaced with structur
 This task successfully addressed 7 of the most critical 'incomplete implementation' items. One function was fully implemented, and six others now have clear, actionable plans documented directly in the code. This work improves the codebase's maintainability and provides a solid foundation for future feature development.
 """
 
-    with open('incomplete_implementation_report.md', 'w') as f:
+    with open("incomplete_implementation_report.md", "w") as f:
         f.write(report)
 
     print("Incomplete implementation report generated successfully: incomplete_implementation_report.md")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     generate_report()

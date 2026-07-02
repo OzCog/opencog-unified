@@ -1,9 +1,9 @@
 # Python dependencies for OpenCog Unified
 # Cognitive computation and tensor operations
-numpy>=1.21.0,<2.0.0
+numpy>=2.4.6,<3.0.0
 
 # Additional dependencies used in workflows
-torch>=2.0.0
+torch>=2.12.0
 transformers>=4.30.0
-PyGithub>=1.59.0
+PyGithub>=2.9.1
 pyyaml>=6.0

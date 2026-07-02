@@ -6,7 +6,7 @@ ADD_LIBRARY (truthvalue
 )
 
 # Without this, parallel make will race and crap up the generated files.
-ADD_DEPENDENCIES(truthvalue atomspace cogutil opencog_atom_types value)
+ADD_DEPENDENCIES(truthvalue cogutil opencog_atom_types value)
 
 TARGET_LINK_LIBRARIES(truthvalue
 	value

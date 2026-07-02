@@ -2,20 +2,20 @@
 # -*- coding: utf-8 -*-
 
 
-TOKEN = 'YOUR_TOKEN'  # don't tell anyone!
+TOKEN = "YOUR_TOKEN"  # don't tell anyone!
 
 from opencog.scheme_wrapper import scheme_eval_as, scheme_eval
 
 python_atomspace = AtomSpace()
 scheme_eval(python_atomspace, "(use-modules (opencog) (opencog exec))")
-atomspace = scheme_eval_as('(cog-atomspace)')
-scheme_eval(atomspace, '(use-modules (ice-9 readline))')
-scheme_eval(atomspace, '(use-modules (opencog cogserver))')
-scheme_eval(atomspace, '(use-modules (opencog nlp))')
-scheme_eval(atomspace, '(use-modules (opencog nlp chatbot))')
-scheme_eval(atomspace, '(use-modules (opencog nlp relex2logic))')
-scheme_eval(atomspace, '(load-r2l-rulebase)')
-print ("starting cogserver...")
+atomspace = scheme_eval_as("(cog-atomspace)")
+scheme_eval(atomspace, "(use-modules (ice-9 readline))")
+scheme_eval(atomspace, "(use-modules (opencog cogserver))")
+scheme_eval(atomspace, "(use-modules (opencog nlp))")
+scheme_eval(atomspace, "(use-modules (opencog nlp chatbot))")
+scheme_eval(atomspace, "(use-modules (opencog nlp relex2logic))")
+scheme_eval(atomspace, "(load-r2l-rulebase)")
+print("starting cogserver...")
 scheme_eval(atomspace, '(start-cogserver "../lib/opencog-chatbot.conf")')
 
 
@@ -24,33 +24,35 @@ import logging
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 # Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
 
 # Define a few command handlers.
-# These usually take the two arguments: bot and update. 
+# These usually take the two arguments: bot and update.
 # Error handlers also receive the raised TelegramError object in error.
+
 
 def start(bot, update):
     """Send a message when the  /start command is issued."""
-    bot.send_message(chat_id=update.message.chat_id, text='Hello!')
+    bot.send_message(chat_id=update.message.chat_id, text="Hello!")
 
 
 def help(bot, update):
     """Send a message when the  /help command is issued."""
-    bot.send_message(chat_id=update.message.chat_id, text='Help!')
+    bot.send_message(chat_id=update.message.chat_id, text="Help!")
 
 
 def echo(bot, update):
     """Echo the user message."""
-    print ("Ok, we got message {}".format(update.message.text))
-    reply = scheme_eval(atomspace, '(process-query "{}" "{}")'.format(update.message.from_user.first_name, update.message.text))
-    print ("And now we have a reply {}".format(reply))
+    print("Ok, we got message {}".format(update.message.text))
+    reply = scheme_eval(
+        atomspace, '(process-query "{}" "{}")'.format(update.message.from_user.first_name, update.message.text)
+    )
+    print("And now we have a reply {}".format(reply))
     reply_decoded = reply.decode("utf-8")
-    print ("Decoding the reply: {}".format(reply_decoded))
+    print("Decoding the reply: {}".format(reply_decoded))
     bot.send_message(chat_id=update.message.chat_id, text=reply_decoded)
 
 
@@ -62,7 +64,7 @@ def error(bot, update):
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    
+
     updater = Updater(TOKEN)
 
     # Get the dispatcher to register handlers
@@ -87,5 +89,5 @@ def main():
     updater.idle()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

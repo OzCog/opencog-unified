@@ -10,7 +10,7 @@ ADD_LIBRARY (execution
 )
 
 # Without this, parallel make will race and crap up the generated files.
-ADD_DEPENDENCIES(execution atombase atomcore atomspace atomvalue clearbox cogutil opencog_atom_types truthvalue)
+ADD_DEPENDENCIES(execution atombase atomcore atomvalue clearbox cogutil opencog_atom_types truthvalue)
 
 TARGET_LINK_LIBRARIES(execution
 	parallel

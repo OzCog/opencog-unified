@@ -12,7 +12,7 @@ ADD_LIBRARY (atombase
 )
 
 # Without this, parallel make will race and crap up the generated files.
-ADD_DEPENDENCIES(atombase atom_types atomspace atomvalue cogutil opencog_atom_types truthvalue value)
+ADD_DEPENDENCIES(atombase atom_types atomvalue cogutil opencog_atom_types truthvalue value)
 
 TARGET_LINK_LIBRARIES(atombase
 	atom_types
