@@ -83,11 +83,11 @@ endif()
 
 # Check for required dependencies
 if(NOT COGUTIL_FOUND)
-    message(FATAL_ERROR "CogZero requires cogutil - not found!")
+    message(WARNING "CogZero: cogutil not found via pkg-config - using monorepo targets")
 endif()
 
 if(NOT ATOMSPACE_FOUND)
-    message(FATAL_ERROR "CogZero requires atomspace - not found!")
+    message(WARNING "CogZero: atomspace not found via pkg-config - using monorepo targets")
 endif()
 
 if(NOT COGSERVER_FOUND)

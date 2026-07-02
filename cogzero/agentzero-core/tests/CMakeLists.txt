@@ -9,8 +9,8 @@ find_package(GTest QUIET)
 find_package(Threads REQUIRED)
 
 # Find OpenCog packages for tests
-pkg_check_modules(COGUTIL REQUIRED cogutil)
-pkg_check_modules(ATOMSPACE REQUIRED atomspace)
+pkg_check_modules(COGUTIL cogutil)
+pkg_check_modules(ATOMSPACE atomspace)
 
 if(CXXTEST_FOUND)
     include_directories(${CXXTEST_INCLUDE_DIR})

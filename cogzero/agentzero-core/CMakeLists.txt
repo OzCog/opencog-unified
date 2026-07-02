@@ -16,19 +16,23 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(PkgConfig REQUIRED)
 
 # Find cogutil
-pkg_check_modules(COGUTIL REQUIRED cogutil)
+pkg_check_modules(COGUTIL cogutil)
 if (COGUTIL_FOUND)
     message(STATUS "Found cogutil version ${COGUTIL_VERSION}")
     include_directories(${COGUTIL_INCLUDE_DIRS})
     link_directories(${COGUTIL_LIBRARY_DIRS})
+else()
+    message(STATUS "CogUtil not found via pkg-config - using monorepo build")
 endif()
 
 # Find atomspace  
-pkg_check_modules(ATOMSPACE REQUIRED atomspace)
+pkg_check_modules(ATOMSPACE atomspace)
 if (ATOMSPACE_FOUND)
     message(STATUS "Found atomspace version ${ATOMSPACE_VERSION}")
     include_directories(${ATOMSPACE_INCLUDE_DIRS})
     link_directories(${ATOMSPACE_LIBRARY_DIRS})
+else()
+    message(STATUS "AtomSpace not found via pkg-config - using monorepo build")
 endif()
 
 # Find cogserver (optional)
