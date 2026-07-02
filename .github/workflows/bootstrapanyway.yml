@@ -297,8 +297,9 @@ jobs:
           fi
           success_rate=0; synergy="limited"
           if [[ -f "./cognitive-reports/neural-symbolic-integration-report.json" ]]; then
-            success_rate=$(jq -r '.neural_symbolic_integration.overall_metrics.overall_success_rate // 0' ./cognitive-reports/neural-symbolic-integration-report.json 2>/dev/null || echo "0")
-            synergy=$(jq -r '.neural_symbolic_integration.overall_metrics.neural_symbolic_synergy // "limited"' ./cognitive-reports/neural-symbolic-integration-report.json 2>/dev/null || echo "limited")
+            nsi=./cognitive-reports/neural-symbolic-integration-report.json
+            success_rate=$(jq -r '.neural_symbolic_integration.overall_metrics.overall_success_rate // 0' "$nsi" 2>/dev/null || echo "0")
+            synergy=$(jq -r '.neural_symbolic_integration.overall_metrics.neural_symbolic_synergy // "limited"' "$nsi" 2>/dev/null || echo "limited")
           fi
           synthesis_energy=0; field_coherence=0; meta_completeness=0
           if [[ -f "./cognitive-reports/tensor-field-analysis.json" ]]; then
@@ -313,8 +314,9 @@ jobs:
           fi
           overall_completeness=0; completeness_level="developing"
           if [[ -f "./cognitive-reports/meta-completeness-analysis.json" ]]; then
-            overall_completeness=$(jq -r '.meta_completeness_analysis.overall_meta_completeness.overall_percentage // 0' ./cognitive-reports/meta-completeness-analysis.json 2>/dev/null || echo "0")
-            completeness_level=$(jq -r '.meta_completeness_analysis.overall_meta_completeness.completeness_level // "developing"' ./cognitive-reports/meta-completeness-analysis.json 2>/dev/null || echo "developing")
+            mca=./cognitive-reports/meta-completeness-analysis.json
+            overall_completeness=$(jq -r '.meta_completeness_analysis.overall_meta_completeness.overall_percentage // 0' "$mca" 2>/dev/null || echo "0")
+            completeness_level=$(jq -r '.meta_completeness_analysis.overall_meta_completeness.completeness_level // "developing"' "$mca" 2>/dev/null || echo "developing")
           fi
           gaps_identified=0; priority_level="medium"
           if [[ -f "./cognitive-reports/recursive-feedback-report.json" ]]; then
