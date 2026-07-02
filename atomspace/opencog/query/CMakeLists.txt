@@ -18,7 +18,7 @@ ADD_LIBRARY(query-engine
 # Optionally enable multi-threaded pattern matcher. Experimental.
 # TARGET_COMPILE_OPTIONS(query-engine PRIVATE -DUSE_THREADED_PATTERN_ENGINE=1)
 
-ADD_DEPENDENCIES(query-engine atomspace execution opencog_atom_types)
+ADD_DEPENDENCIES(query-engine execution opencog_atom_types)
 
 TARGET_LINK_LIBRARIES(query-engine
 	execution

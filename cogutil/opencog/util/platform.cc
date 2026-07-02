@@ -208,9 +208,34 @@ void opencog::set_thread_name(const char* name)
     pthread_setname_np(name);
 }
 
-#else // __APPLE__
+#elif defined(_WIN32)
 
-// If not Apple, then Linux.
+// Windows (MinGW) implementations
+#include <windows.h>
+
+uint64_t opencog::getTotalRAM()
+{
+    MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+    GlobalMemoryStatusEx(&memInfo);
+    return memInfo.ullTotalPhys;
+}
+
+uint64_t opencog::getFreeRAM()
+{
+    MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+    GlobalMemoryStatusEx(&memInfo);
+    return memInfo.ullAvailPhys;
+}
+
+void opencog::set_thread_name(const char* name)
+{
+    (void)name;
+}
+
+#else // Linux
+
 #include <sys/sysinfo.h>
 #include <sys/prctl.h>
 
@@ -230,4 +255,4 @@ void opencog::set_thread_name(const char* name)
 {
     prctl(PR_SET_NAME, name, 0, 0, 0);
 }
-#endif // __APPLE__
+#endif
