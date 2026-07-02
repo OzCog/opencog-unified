@@ -9,7 +9,8 @@ Generate a one-page quick reference for developers working on placeholder resolu
 def print_quick_reference():
     """Print quick reference card"""
 
-    print("""
+    print(
+        """
 ╔══════════════════════════════════════════════════════════════════════╗
 ║         PLACEHOLDER RESOLUTION QUICK REFERENCE CARD                  ║
 ╚══════════════════════════════════════════════════════════════════════╝
@@ -134,7 +135,8 @@ def print_quick_reference():
 ║  Remember: Progress over perfection. Systematic reduction over      ║
 ║  complete elimination. Improve clarity, don't break functionality.  ║
 ╚══════════════════════════════════════════════════════════════════════╝
-""")
+"""
+    )
 
 
 if __name__ == "__main__":

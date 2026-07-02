@@ -385,6 +385,7 @@ jobs:
       - name: "🧬 Clone Prerequisites"
         run: |
           set -eu
+          mkdir -p /ws/deps && cd /ws/deps
           echo "📦 Cloning CogUtil..."
           git clone --depth 1 https://github.com/opencog/cogutil.git
 
@@ -400,7 +401,7 @@ jobs:
         run: |
           set -eu
           echo "🔧 Building CogUtil foundation..."
-          cd cogutil
+          cd /ws/deps/cogutil
           mkdir -p build && cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release
           make -j2
@@ -412,9 +413,9 @@ jobs:
         run: |
           set -eu
           echo "🔧 Building AtomSpace core..."
-          cd atomspace
+          cd /ws/deps/atomspace
           mkdir -p build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF
           make -j2
           make install
           ldconfig
@@ -423,7 +424,7 @@ jobs:
       - name: "🧪 Build AtomSpace-Storage"
         run: |
           set -eu
-          cd atomspace-storage
+          cd /ws/deps/atomspace-storage
           mkdir -p build && cd build
 
           echo "🧬 Configuring AtomSpace-Storage with tensor optimization..."

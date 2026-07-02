@@ -64,18 +64,18 @@ SET(SEMANTIC_VERSION ${CMAKE_MATCH_1})
 include(cmake/OpenCogGccOptions.cmake)
 
 # ------------------------------------------------------
-# Native Windows (MSVC) build support
+# Native Windows build support
 IF (WIN32 AND NOT CYGWIN)
-	MESSAGE(STATUS "Configuring for native Windows (MSVC) build")
+	MESSAGE(STATUS "Configuring for native Windows build")
 	ADD_DEFINITIONS(-DWIN32_NOT_UNIX)
 	ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE)
-	
-	# Use Windows threads instead of pthreads
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP")
-	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
-	
-	# Disable some warnings that are common in cross-platform code
-	ADD_DEFINITIONS(/wd4996 /wd4267 /wd4244 /wd4018)
+
+	IF (MSVC)
+		# MSVC-specific flags
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP")
+		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
+		ADD_DEFINITIONS(/wd4996 /wd4267 /wd4244 /wd4018)
+	ENDIF (MSVC)
 ENDIF (WIN32 AND NOT CYGWIN)
 
 # Do the cygwin build

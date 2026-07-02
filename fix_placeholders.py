@@ -76,17 +76,17 @@ class PlaceholderFixer:
     logger().debug("Executing {func_name}");
 }}"""
             elif return_type == "bool":
-                impl = f'''{return_type} {func_name}({match.group(0).split("(")[1].split(")")[0]}) {{
+                impl = f"""{return_type} {func_name}({match.group(0).split("(")[1].split(")")[0]}) {{
     // Implementation added by automated code quality improvement
     logger().warn("{func_name} returning default value - needs implementation");
     return false;
-}}'''
+}}"""
             else:  # int or other
-                impl = f'''{return_type} {func_name}({match.group(0).split("(")[1].split(")")[0]}) {{
+                impl = f"""{return_type} {func_name}({match.group(0).split("(")[1].split(")")[0]}) {{
     // Implementation added by automated code quality improvement
     logger().warn("{func_name} returning default value - needs implementation");
     return 0;
-}}'''
+}}"""
 
             self.fixes_applied[str(file_path)].append(f"Implemented stub function: {func_name}")
             return impl

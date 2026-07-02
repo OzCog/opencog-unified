@@ -16,9 +16,9 @@ def test_unify_dependency():
     with open(cmake_file) as f:
         content = f.read()
 
-    assert "find_package(AtomSpace" in content or "IF(TARGET atomspace)" in content, (
-        "unify must declare AtomSpace dependency"
-    )
+    assert (
+        "find_package(AtomSpace" in content or "IF(TARGET atomspace)" in content
+    ), "unify must declare AtomSpace dependency"
     assert "HAVE_ATOMSPACE" in content, "unify must check for HAVE_ATOMSPACE"
     assert "unify requires: atomspace" in content, "unify must explicitly declare atomspace requirement"
     print("✅ unify CMakeLists.txt properly declares atomspace dependency")
@@ -29,9 +29,9 @@ def test_unify_dependency():
     with open(main_cmake) as f:
         main_content = f.read()
 
-    assert "add_dependencies(unify atomspace)" in main_content, (
-        "Main CMakeLists.txt must declare unify depends on atomspace"
-    )
+    assert (
+        "add_dependencies(unify atomspace)" in main_content
+    ), "Main CMakeLists.txt must declare unify depends on atomspace"
     print("✅ Main CMakeLists.txt properly declares unify dependency on atomspace")
 
     # Test 3: Verify integration script knows about the dependency
@@ -40,9 +40,9 @@ def test_unify_dependency():
     with open(integration_script) as f:
         integration_content = f.read()
 
-    assert '["unify"]="logic:atomspace"' in integration_content, (
-        "Integration script must know unify depends on atomspace"
-    )
+    assert (
+        '["unify"]="logic:atomspace"' in integration_content
+    ), "Integration script must know unify depends on atomspace"
     print("✅ Integration script properly declares unify dependency on atomspace")
 
     # Test 4: Check that atomspace directory exists (dependency is satisfied)

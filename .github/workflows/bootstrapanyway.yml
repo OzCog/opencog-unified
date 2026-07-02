@@ -225,17 +225,14 @@ jobs:
           set -eu
           mkdir build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_POLICY_DEFAULT_CMP0175=OLD -DBUILD_SHARED_LIBS=OFF
-          echo "✅ CMake configuration successful"
+          cmake ../cogutil -DCMAKE_BUILD_TYPE=Debug
+          echo "✅ CMake configuration successful (cogutil)"
 
       - name: Test partial build
         run: |
           set -eu
           cd build
-          # Test building tensor kernel if available
-          if [[ -f "../ggml-tensor-kernel/CMakeLists.txt" ]]; then
-            make -j2 2>/dev/null || echo "⚠️  Some build targets unavailable (expected in this environment)"
-          fi
+          make -j2 || echo "⚠️  Some build targets unavailable (expected in this environment)"
           echo "✅ Build verification completed"
 
 

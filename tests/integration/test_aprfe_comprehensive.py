@@ -429,9 +429,9 @@ class APRFEIntegrationTest(unittest.TestCase):
         high_load_strategies = {s["selected_strategy"] for s in selections if s["cognitive_load"] > 0.7}
 
         # Should have different strategies for different loads
-        assert low_load_strategies != high_load_strategies, (
-            "Strategy selection should adapt to different cognitive loads"
-        )
+        assert (
+            low_load_strategies != high_load_strategies
+        ), "Strategy selection should adapt to different cognitive loads"
 
         # Should prefer efficient strategies under high load
         efficient_strategies = {"attention_guided", "neural_only"}
@@ -522,9 +522,9 @@ class APRFEIntegrationTest(unittest.TestCase):
 
         # Check that expected modalities are active
         for modality in expected_modalities:
-            assert contributions[modality] > 0.1, (
-                f"Expected modality '{modality}' should have significant contribution > 0.1"
-            )
+            assert (
+                contributions[modality] > 0.1
+            ), f"Expected modality '{modality}' should have significant contribution > 0.1"
 
         # Check integration quality
         assert result["integration_quality"] > 0.5, "Cross-modal integration quality should be > 0.5"

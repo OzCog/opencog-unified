@@ -65,9 +65,12 @@ def test_ontogenesis_integration():
 
     assert ontogenesis["can_self_generate"], "Self-generation not enabled"
     assert ontogenesis["can_self_optimize"], "Self-optimization not enabled"
-    assert ontogenesis["current_stage"] in ["EMBRYONIC", "JUVENILE", "MATURE", "SENESCENT"], (
-        f"Invalid ontogenetic stage: {ontogenesis['current_stage']}"
-    )
+    assert ontogenesis["current_stage"] in [
+        "EMBRYONIC",
+        "JUVENILE",
+        "MATURE",
+        "SENESCENT",
+    ], f"Invalid ontogenetic stage: {ontogenesis['current_stage']}"
 
     print("✓ ONTOGENESIS integration verified")
     return True
