@@ -18,11 +18,13 @@ def print_header(title):
     print(f" {title}")
     print(f"{'=' * 60}")
 
+
 def print_section(title):
     """Print a formatted section header"""
     print(f"\n{'-' * 40}")
     print(f" {title}")
     print(f"{'-' * 40}")
+
 
 def validate_file_structure():
     """Validate that all expected files are present"""
@@ -41,7 +43,7 @@ def validate_file_structure():
         "autonomous-agency/tests/integration-test.cpp",
         "autonomous-agency/examples/bootstrap-example.cpp",
         "autonomous-agency/docs/STAGE-1-IMPLEMENTATION-SUMMARY.md",
-        "autonomous-agency/config/autonomous-agency-config.json"
+        "autonomous-agency/config/autonomous-agency-config.json",
     ]
 
     missing_files = []
@@ -60,6 +62,7 @@ def validate_file_structure():
     print(f"Files missing: {len(missing_files)}")
 
     return len(missing_files) == 0
+
 
 def validate_configuration():
     """Validate the configuration file"""
@@ -90,7 +93,7 @@ def validate_configuration():
             "integration",
             "monitoring",
             "safety",
-            "future_stages"
+            "future_stages",
         ]
 
         missing_sections = []
@@ -119,6 +122,7 @@ def validate_configuration():
         print(f"✗ Error reading configuration: {e}")
         return False
 
+
 def validate_code_structure():
     """Validate the code structure and quality"""
     print_section("Validating Code Structure")
@@ -127,13 +131,13 @@ def validate_code_structure():
     header_files = [
         "autonomous-agency/bootstrap/entropic-drift-detector.hpp",
         "autonomous-agency/bootstrap/self-healing-atomspace.hpp",
-        "autonomous-agency/bootstrap/bootstrap-resource-manager.hpp"
+        "autonomous-agency/bootstrap/bootstrap-resource-manager.hpp",
     ]
 
     implementation_files = [
         "autonomous-agency/bootstrap/entropic-drift-detector.cpp",
         "autonomous-agency/bootstrap/self-healing-atomspace.cpp",
-        "autonomous-agency/bootstrap/bootstrap-resource-manager.cpp"
+        "autonomous-agency/bootstrap/bootstrap-resource-manager.cpp",
     ]
 
     # Validate headers
@@ -165,7 +169,7 @@ def validate_code_structure():
                 content = f.read()
 
             # Check for corresponding header include
-            header_name = impl.replace('.cpp', '.hpp').split('/')[-1]
+            header_name = impl.replace(".cpp", ".hpp").split("/")[-1]
             if f'#include "{header_name}"' in content:
                 print(f"✓ {impl} - includes corresponding header")
             else:
@@ -180,6 +184,7 @@ def validate_code_structure():
             print(f"✗ {impl} - file missing")
 
     return True
+
 
 def generate_validation_report():
     """Generate a comprehensive validation report"""
@@ -214,6 +219,7 @@ def generate_validation_report():
 
     return passed == total
 
+
 def main():
     """Main validation function"""
     print_header("AUTONOMOUS AGENCY BOOTSTRAP VALIDATION")
@@ -242,6 +248,7 @@ def main():
         return 0
     else:
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -10,7 +10,8 @@ import unittest
 
 
 # Add paths for component testing
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'components'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "components"))
+
 
 class TestLearnIntegration(unittest.TestCase):
     """Test learn integration with OpenCog Unified"""
@@ -26,6 +27,7 @@ class TestLearnIntegration(unittest.TestCase):
         try:
             # Attempt to import the component module
             import importlib
+
             module = importlib.import_module("learn")
             self.assertIsNotNone(module, "learn module should be importable")
         except ImportError as e:
@@ -37,11 +39,11 @@ class TestLearnIntegration(unittest.TestCase):
             # Test basic component functionality
             # This is a generic test that can be customized per component
             import importlib
+
             module = importlib.import_module("learn")
 
             # Check if module has expected attributes/methods
-            self.assertTrue(hasattr(module, '__file__'),
-                          "learn should have __file__ attribute")
+            self.assertTrue(hasattr(module, "__file__"), "learn should have __file__ attribute")
 
             # Additional component-specific tests can be added here
             # based on the component's expected interface
@@ -54,11 +56,12 @@ class TestLearnIntegration(unittest.TestCase):
         try:
             # Test component dependency integration
             import importlib
+
             module = importlib.import_module("learn")
 
             # Check if required dependencies are available
             # This can be customized based on component requirements
-            if hasattr(module, '__requires__'):
+            if hasattr(module, "__requires__"):
                 for dep in module.__requires__:
                     try:
                         importlib.import_module(dep)
@@ -72,5 +75,6 @@ class TestLearnIntegration(unittest.TestCase):
         except Exception as e:
             self.fail(f"Dependency integration test failed for learn: {e}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

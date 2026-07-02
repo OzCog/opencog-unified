@@ -2,6 +2,7 @@
 """
 Convert bug fix TODOs into well-documented NOTEs with context
 """
+
 import json
 import re
 
@@ -9,35 +10,37 @@ import re
 def read_file_lines(filepath):
     """Read file and return lines"""
     try:
-        with open(filepath, encoding='utf-8', errors='ignore') as f:
+        with open(filepath, encoding="utf-8", errors="ignore") as f:
             return f.readlines()
     except Exception as e:
         print(f"Error reading {filepath}: {e}")
         return None
 
+
 def write_file_lines(filepath, lines):
     """Write lines to file"""
     try:
-        with open(filepath, 'w', encoding='utf-8') as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             f.writelines(lines)
         return True
     except Exception as e:
         print(f"Error writing {filepath}: {e}")
         return False
 
+
 def convert_bug_comment(content, context):
     """Convert a bug fix comment to a well-documented NOTE"""
 
     # Extract the core issue
-    content_clean = re.sub(r'^[/;#]*\s*(XXX|TODO|FIXME)\s*', '', content).strip()
+    content_clean = re.sub(r"^[/;#]*\s*(XXX|TODO|FIXME)\s*", "", content).strip()
 
     # Determine the comment style
-    if content.strip().startswith('//'):
-        prefix = '// '
-    elif content.strip().startswith(';'):
-        prefix = '; '
+    if content.strip().startswith("//"):
+        prefix = "// "
+    elif content.strip().startswith(";"):
+        prefix = "; "
     else:
-        prefix = '// '
+        prefix = "// "
 
     # Create improved documentation
     note = f"{prefix}NOTE: {content_clean}\n"
@@ -45,11 +48,12 @@ def convert_bug_comment(content, context):
 
     return note
 
+
 # Load bug fixes
-with open('categorized_bug_fixes.json') as f:
+with open("categorized_bug_fixes.json") as f:
     data = json.load(f)
 
-documentation_fixes = data['documentation_fixes']
+documentation_fixes = data["documentation_fixes"]
 
 print(f"Processing {len(documentation_fixes)} documentation fixes...")
 
@@ -58,8 +62,8 @@ selected_fixes = documentation_fixes[:10]
 
 processed = []
 for item in selected_fixes:
-    filepath = item['file']
-    line_num = item['line']
+    filepath = item["file"]
+    line_num = item["line"]
 
     print(f"\nProcessing: {filepath}:{line_num}")
     print(f"  Content: {item['content'][:60]}...")
@@ -72,18 +76,15 @@ for item in selected_fixes:
     # Find and update the line
     if line_num <= len(lines):
         original_line = lines[line_num - 1]
-        new_comment = convert_bug_comment(item['content'], item['context'])
+        new_comment = convert_bug_comment(item["content"], item["context"])
 
         # Replace the line
         lines[line_num - 1] = new_comment
 
         if write_file_lines(filepath, lines):
-            processed.append({
-                'file': filepath,
-                'line': line_num,
-                'original': original_line.strip(),
-                'updated': new_comment.strip()
-            })
+            processed.append(
+                {"file": filepath, "line": line_num, "original": original_line.strip(), "updated": new_comment.strip()}
+            )
             print("  Updated successfully")
         else:
             print("  Failed to write")
@@ -91,7 +92,7 @@ for item in selected_fixes:
         print("  Skipped (line number out of range)")
 
 # Save report
-with open('bug_fix_documentation_report.json', 'w') as f:
+with open("bug_fix_documentation_report.json", "w") as f:
     json.dump(processed, f, indent=2)
 
 print(f"\n\nProcessed {len(processed)} bug fix documentation updates")

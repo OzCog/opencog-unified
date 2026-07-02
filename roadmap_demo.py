@@ -17,6 +17,7 @@ def print_banner():
     print("🎉" * 20)
     print()
 
+
 def print_achievement_summary():
     """Print the achievement summary"""
     print("📊 ACHIEVEMENT SUMMARY")
@@ -30,6 +31,7 @@ def print_achievement_summary():
     print("Tracking Tools:     Comprehensive suite ✅")
     print()
 
+
 def demonstrate_tools():
     """Demonstrate the implemented tools"""
     print("🛠️ IMPLEMENTATION TOOLS CREATED")
@@ -40,7 +42,7 @@ def demonstrate_tools():
         ("phase_builder.py", "Phased build system following roadmap"),
         ("validate_build.sh", "Automated build validation"),
         ("ROADMAP_STATUS.md", "Comprehensive status documentation"),
-        ("roadmap_status.json", "Automated JSON status reports")
+        ("roadmap_status.json", "Automated JSON status reports"),
     ]
 
     for tool, description in tools:
@@ -48,6 +50,7 @@ def demonstrate_tools():
         print(f"  {exists} {tool:<20} - {description}")
 
     print()
+
 
 def show_phase_completion():
     """Show completion status for all phases"""
@@ -60,7 +63,7 @@ def show_phase_completion():
         ("Phase 2 (Weeks 5-8)", ["unify", "ure", "language-learning"]),
         ("Phase 3 (Weeks 9-12)", ["attention", "spacetime"]),
         ("Phase 4 (Weeks 13-16)", ["pln", "miner", "asmoses"]),
-        ("Phase 5 (Weeks 17-20)", ["lg-atomese", "learn", "opencog"])
+        ("Phase 5 (Weeks 17-20)", ["lg-atomese", "learn", "opencog"]),
     ]
 
     for phase_name, components in phases:
@@ -73,6 +76,7 @@ def show_phase_completion():
             comp_status = "✅" if Path(component).exists() else "❌"
             print(f"    {comp_status} {component}")
         print()
+
 
 def show_roadmap_value():
     """Show the value delivered by the roadmap implementation"""
@@ -88,6 +92,7 @@ def show_roadmap_value():
     print("✅ Future Ready: Extensible architecture")
     print()
 
+
 def show_next_steps():
     """Show recommended next steps"""
     print("🔮 RECOMMENDED NEXT STEPS")
@@ -99,6 +104,7 @@ def show_next_steps():
     print("5. 📚 Documentation Enhancement - User guides and tutorials")
     print("6. 🎯 User Experience - Streamlined getting-started workflows")
     print()
+
 
 def main():
     """Main demonstration function"""
@@ -119,6 +125,7 @@ def main():
     print()
     print("🚀 Ready for next phase: Build optimization and testing!")
     print("🎉" * 20)
+
 
 if __name__ == "__main__":
     main()

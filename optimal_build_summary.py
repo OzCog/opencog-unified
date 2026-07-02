@@ -28,6 +28,7 @@ def load_reports() -> dict:
 
     return reports
 
+
 def generate_summary_report() -> str:
     """Generate comprehensive summary report"""
     reports = load_reports()
@@ -46,46 +47,54 @@ def generate_summary_report() -> str:
 
     if dep_analysis:
         summary = dep_analysis.get("analysis_summary", {})
-        lines.extend([
-            f"- **Total Components Analyzed**: {summary.get('total_components', 'N/A')}",
-            f"- **Available Components**: {build_opt.get('total_available', 'N/A')}",
-            f"- **External Dependencies**: {summary.get('external_dependencies', 'N/A')}",
-            f"- **Critical Path Length**: {summary.get('critical_path_length', 'N/A')}",
-            f"- **Parallelization Levels**: {summary.get('parallelization_levels', 'N/A')}",
-            f"- **Dependency Cycles**: {'None detected' if not summary.get('has_cycles', True) else 'Found'}",
-            "",
-        ])
+        lines.extend(
+            [
+                f"- **Total Components Analyzed**: {summary.get('total_components', 'N/A')}",
+                f"- **Available Components**: {build_opt.get('total_available', 'N/A')}",
+                f"- **External Dependencies**: {summary.get('external_dependencies', 'N/A')}",
+                f"- **Critical Path Length**: {summary.get('critical_path_length', 'N/A')}",
+                f"- **Parallelization Levels**: {summary.get('parallelization_levels', 'N/A')}",
+                f"- **Dependency Cycles**: {'None detected' if not summary.get('has_cycles', True) else 'Found'}",
+                "",
+            ]
+        )
 
     # Critical path analysis
     if dep_analysis and "build_sequence" in dep_analysis:
         critical_path = dep_analysis["build_sequence"].get("critical_path", [])
-        lines.extend([
-            "### Critical Path Analysis",
-            "",
-            f"**Complete Critical Path** ({len(critical_path)} components):",
-            "```",
-            f"{' → '.join(critical_path)}",
-            "```",
-            "",
-        ])
+        lines.extend(
+            [
+                "### Critical Path Analysis",
+                "",
+                f"**Complete Critical Path** ({len(critical_path)} components):",
+                "```",
+                f"{' → '.join(critical_path)}",
+                "```",
+                "",
+            ]
+        )
 
         if build_opt and "critical_path" in build_opt:
             available_critical = build_opt["critical_path"]
-            lines.extend([
-                f"**Available Critical Path** ({len(available_critical)} components):",
-                "```",
-                f"{' → '.join(available_critical)}",
-                "```",
-                "",
-            ])
+            lines.extend(
+                [
+                    f"**Available Critical Path** ({len(available_critical)} components):",
+                    "```",
+                    f"{' → '.join(available_critical)}",
+                    "```",
+                    "",
+                ]
+            )
 
     # Parallelization opportunities
     if build_opt and "parallel_groups" in build_opt:
         parallel_groups = build_opt["parallel_groups"]
-        lines.extend([
-            "### Parallelization Analysis",
-            "",
-        ])
+        lines.extend(
+            [
+                "### Parallelization Analysis",
+                "",
+            ]
+        )
 
         max_parallel = max(len(comps) for comps in parallel_groups.values()) if parallel_groups else 0
         lines.append(f"**Maximum Parallel Jobs**: {max_parallel} components simultaneously")
@@ -93,34 +102,42 @@ def generate_summary_report() -> str:
 
         for level, components in parallel_groups.items():
             if len(components) > 1:
-                lines.extend([
-                    f"**Level {level}**: {len(components)} parallel builds",
-                    f"- Components: {', '.join(components)}",
-                    "",
-                ])
+                lines.extend(
+                    [
+                        f"**Level {level}**: {len(components)} parallel builds",
+                        f"- Components: {', '.join(components)}",
+                        "",
+                    ]
+                )
 
     # Build phases
     if build_opt and "build_phases" in build_opt:
         phases = build_opt["build_phases"]
-        lines.extend([
-            "### Optimized Build Phases",
-            "",
-        ])
+        lines.extend(
+            [
+                "### Optimized Build Phases",
+                "",
+            ]
+        )
 
         for phase, components in phases.items():
-            lines.extend([
-                f"#### {phase}",
-                f"Components ({len(components)}): {', '.join(components)}",
-                "",
-            ])
+            lines.extend(
+                [
+                    f"#### {phase}",
+                    f"Components ({len(components)}): {', '.join(components)}",
+                    "",
+                ]
+            )
 
     # External dependencies analysis
     if build_opt and "external_dependencies" in build_opt:
         ext_deps = build_opt["external_dependencies"]
-        lines.extend([
-            "### External Dependencies Summary",
-            "",
-        ])
+        lines.extend(
+            [
+                "### External Dependencies Summary",
+                "",
+            ]
+        )
 
         # Count most common external dependencies
         dep_count = {}
@@ -130,19 +147,23 @@ def generate_summary_report() -> str:
 
         most_common = sorted(dep_count.items(), key=lambda x: x[1], reverse=True)[:10]
 
-        lines.extend([
-            "**Most Common External Dependencies**:",
-            "",
-        ])
+        lines.extend(
+            [
+                "**Most Common External Dependencies**:",
+                "",
+            ]
+        )
 
         for dep, count in most_common:
             lines.append(f"- **{dep}**: required by {count} components")
 
-        lines.extend([
-            "",
-            "**Per-Component External Dependencies**:",
-            "",
-        ])
+        lines.extend(
+            [
+                "",
+                "**Per-Component External Dependencies**:",
+                "",
+            ]
+        )
 
         for comp, deps in sorted(ext_deps.items()):
             lines.append(f"- **{comp}**: {', '.join(deps)}")
@@ -152,51 +173,58 @@ def generate_summary_report() -> str:
     # Recommendations
     if dep_analysis and "recommendations" in dep_analysis:
         recommendations = dep_analysis["recommendations"]
-        lines.extend([
-            "### Build Optimization Recommendations",
-            "",
-        ])
+        lines.extend(
+            [
+                "### Build Optimization Recommendations",
+                "",
+            ]
+        )
 
         for rec in recommendations:
             lines.append(f"- {rec}")
 
-        lines.extend([
-            "",
-            "### Additional Recommendations",
-            "",
-            "- **Containerization**: Use Docker for reproducible builds with all dependencies",
-            "- **CI/CD Pipeline**: Implement parallel builds based on dependency levels",
-            "- **Build Caching**: Cache builds at component level for faster iteration",
-            "- **Resource Allocation**: Allocate more build resources to critical path components",
-            "- **Dependency Management**: Monitor external dependencies for security updates",
-            "",
-        ])
+        lines.extend(
+            [
+                "",
+                "### Additional Recommendations",
+                "",
+                "- **Containerization**: Use Docker for reproducible builds with all dependencies",
+                "- **CI/CD Pipeline**: Implement parallel builds based on dependency levels",
+                "- **Build Caching**: Cache builds at component level for faster iteration",
+                "- **Resource Allocation**: Allocate more build resources to critical path components",
+                "- **Dependency Management**: Monitor external dependencies for security updates",
+                "",
+            ]
+        )
 
     # Implementation files
-    lines.extend([
-        "### Generated Artifacts",
-        "",
-        "The analysis has generated the following optimization files:",
-        "",
-        "1. **dependency_analysis_report.json** - Complete dependency analysis",
-        "2. **build_optimization_report.json** - Available components optimization",
-        "3. **OPTIMAL_BUILD_SEQUENCE.md** - Step-by-step build instructions",
-        "4. **CMakeLists_available.txt** - Optimized CMake configuration",
-        "5. **CMakeLists_optimized.txt** - Complete optimized CMake configuration",
-        "6. **dependency_graph.png** - Visual dependency graph",
-        "",
-        "### Integration with Existing Build System",
-        "",
-        "The optimization integrates with the existing OpenCog unified build system:",
-        "",
-        "- Uses existing `validate-integration.py` for validation",
-        "- Extends `integrate-components.sh` functionality",
-        "- Compatible with current CMakeLists.txt structure",
-        "- Preserves existing dependency relationships",
-        "",
-    ])
+    lines.extend(
+        [
+            "### Generated Artifacts",
+            "",
+            "The analysis has generated the following optimization files:",
+            "",
+            "1. **dependency_analysis_report.json** - Complete dependency analysis",
+            "2. **build_optimization_report.json** - Available components optimization",
+            "3. **OPTIMAL_BUILD_SEQUENCE.md** - Step-by-step build instructions",
+            "4. **CMakeLists_available.txt** - Optimized CMake configuration",
+            "5. **CMakeLists_optimized.txt** - Complete optimized CMake configuration",
+            "6. **dependency_graph.png** - Visual dependency graph",
+            "",
+            "### Integration with Existing Build System",
+            "",
+            "The optimization integrates with the existing OpenCog unified build system:",
+            "",
+            "- Uses existing `validate-integration.py` for validation",
+            "- Extends `integrate-components.sh` functionality",
+            "- Compatible with current CMakeLists.txt structure",
+            "- Preserves existing dependency relationships",
+            "",
+        ]
+    )
 
-    return '\n'.join(lines)
+    return "\n".join(lines)
+
 
 def validate_analysis() -> bool:
     """Validate that the analysis files were generated correctly"""
@@ -205,7 +233,7 @@ def validate_analysis() -> bool:
         "build_optimization_report.json",
         "OPTIMAL_BUILD_SEQUENCE.md",
         "CMakeLists_available.txt",
-        "CMakeLists_optimized.txt"
+        "CMakeLists_optimized.txt",
     ]
 
     missing_files = []
@@ -220,6 +248,7 @@ def validate_analysis() -> bool:
     print("✅ All analysis files generated successfully")
     return True
 
+
 def main():
     """Generate and display summary report"""
     print("Generating OpenCog Complete Dependency Analysis Summary...")
@@ -233,7 +262,7 @@ def main():
     summary = generate_summary_report()
 
     # Save summary
-    with open("DEPENDENCY_ANALYSIS_SUMMARY.md", 'w') as f:
+    with open("DEPENDENCY_ANALYSIS_SUMMARY.md", "w") as f:
         f.write(summary)
 
     print("Summary saved to DEPENDENCY_ANALYSIS_SUMMARY.md")
@@ -246,14 +275,15 @@ def main():
         print(f"   Available Components: {build_opt.get('total_available', 'N/A')}")
         print(f"   Critical Path: {' → '.join(build_opt.get('critical_path', []))}")
 
-        if build_opt.get('parallel_groups'):
-            max_parallel = max(len(comps) for comps in build_opt['parallel_groups'].values())
+        if build_opt.get("parallel_groups"):
+            max_parallel = max(len(comps) for comps in build_opt["parallel_groups"].values())
             print(f"   Max Parallel Jobs: {max_parallel}")
 
-        phases = build_opt.get('build_phases', {})
+        phases = build_opt.get("build_phases", {})
         print(f"   Build Phases: {len(phases)}")
 
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -4,12 +4,12 @@ import re
 
 
 test_files = [
-    'tests/integration/test_atomspace-restful.py',
-    'tests/integration/test_atomspace-rocks.py',
-    'tests/integration/test_learn.py',
-    'tests/integration/test_lg-atomese.py',
-    'tests/integration/test_moses.py',
-    'tests/integration/test_opencog.py'
+    "tests/integration/test_atomspace-restful.py",
+    "tests/integration/test_atomspace-rocks.py",
+    "tests/integration/test_learn.py",
+    "tests/integration/test_lg-atomese.py",
+    "tests/integration/test_moses.py",
+    "tests/integration/test_opencog.py",
 ]
 
 results = []
@@ -29,11 +29,11 @@ for filepath in test_files:
         # Initialize test fixtures
         self.test_data = {}
         self.temp_files = []''',
-        content
+        content,
     )
 
     if new_content != content:
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             f.write(new_content)
         results.append(filepath)
         print(f"✓ Implemented setUp in {filepath}")

@@ -22,114 +22,110 @@ class RoadmapTracker:
                 "week": 1,
                 "priority": "HIGH",
                 "dependencies": ["atomspace"],
-                "repository": "https://github.com/opencog/atomspace-rocks"
+                "repository": "https://github.com/opencog/atomspace-rocks",
             },
             "atomspace-restful": {
                 "phase": 1,
                 "week": 2,
                 "priority": "HIGH",
                 "dependencies": ["atomspace"],
-                "repository": "https://github.com/opencog/atomspace-restful"
+                "repository": "https://github.com/opencog/atomspace-restful",
             },
             "moses": {
                 "phase": 1,
                 "week": 3,
                 "priority": "MEDIUM",
                 "dependencies": ["cogutil"],
-                "repository": "https://github.com/opencog/moses"
+                "repository": "https://github.com/opencog/moses",
             },
-
             # Phase 2: Logic Systems (Weeks 5-8)
             "unify": {
                 "phase": 2,
                 "week": 5,
                 "priority": "HIGH",
                 "dependencies": ["atomspace"],
-                "repository": "https://github.com/opencog/unify"
+                "repository": "https://github.com/opencog/unify",
             },
             "ure": {
                 "phase": 2,
                 "week": 6,
                 "priority": "HIGH",
                 "dependencies": ["atomspace", "unify"],
-                "repository": "https://github.com/opencog/ure"
+                "repository": "https://github.com/opencog/ure",
             },
             "language-learning": {
                 "phase": 2,
                 "week": 7,
                 "priority": "MEDIUM",
                 "dependencies": ["cogutil"],
-                "repository": "https://github.com/opencog/language-learning"
+                "repository": "https://github.com/opencog/language-learning",
             },
-
             # Phase 3: Cognitive Systems (Weeks 9-12)
             "attention": {
                 "phase": 3,
                 "week": 9,
                 "priority": "HIGH",
                 "dependencies": ["atomspace", "cogserver"],
-                "repository": "https://github.com/opencog/attention"
+                "repository": "https://github.com/opencog/attention",
             },
             "spacetime": {
                 "phase": 3,
                 "week": 10,
                 "priority": "MEDIUM",
                 "dependencies": ["atomspace"],
-                "repository": "https://github.com/opencog/spacetime"
+                "repository": "https://github.com/opencog/spacetime",
             },
-
             # Phase 4: Advanced & Learning Systems (Weeks 13-16)
             "pln": {
                 "phase": 4,
                 "week": 13,
                 "priority": "HIGH",
                 "dependencies": ["atomspace", "ure", "spacetime"],
-                "repository": "https://github.com/opencog/pln"
+                "repository": "https://github.com/opencog/pln",
             },
             "miner": {
                 "phase": 4,
                 "week": 14,
                 "priority": "MEDIUM",
                 "dependencies": ["atomspace", "ure"],
-                "repository": "https://github.com/opencog/miner"
+                "repository": "https://github.com/opencog/miner",
             },
             "asmoses": {
                 "phase": 4,
                 "week": 15,
                 "priority": "MEDIUM",
                 "dependencies": ["atomspace", "ure"],
-                "repository": "https://github.com/opencog/asmoses"
+                "repository": "https://github.com/opencog/asmoses",
             },
-
             # Phase 5: Language & Final Integration (Weeks 17-20)
             "lg-atomese": {
                 "phase": 5,
                 "week": 17,
                 "priority": "HIGH",
                 "dependencies": ["atomspace"],
-                "repository": "https://github.com/opencog/lg-atomese"
+                "repository": "https://github.com/opencog/lg-atomese",
             },
             "learn": {
                 "phase": 5,
                 "week": 18,
                 "priority": "HIGH",
                 "dependencies": ["atomspace", "cogserver"],
-                "repository": "https://github.com/opencog/learn"
+                "repository": "https://github.com/opencog/learn",
             },
             "opencog": {
                 "phase": 5,
                 "week": 19,
                 "priority": "CRITICAL",
                 "dependencies": ["atomspace", "cogserver", "attention", "ure", "lg-atomese"],
-                "repository": "https://github.com/opencog/opencog"
-            }
+                "repository": "https://github.com/opencog/opencog",
+            },
         }
 
         # Foundation components (already integrated)
         self.foundation = {
             "cogutil": {"present": True, "has_cmake": True},
             "atomspace": {"present": True, "has_cmake": True},
-            "cogserver": {"present": True, "has_cmake": True}
+            "cogserver": {"present": True, "has_cmake": True},
         }
 
     def check_component_status(self, component_name):
@@ -140,7 +136,7 @@ class RoadmapTracker:
             "present": component_dir.exists() and component_dir.is_dir(),
             "has_cmake": False,
             "has_git": False,
-            "buildable": False
+            "buildable": False,
         }
 
         if status["present"]:
@@ -154,10 +150,7 @@ class RoadmapTracker:
 
     def get_phase_status(self, phase_num):
         """Get status of all components in a specific phase"""
-        phase_components = {
-            name: info for name, info in self.components.items()
-            if info["phase"] == phase_num
-        }
+        phase_components = {name: info for name, info in self.components.items() if info["phase"] == phase_num}
 
         status = {}
         for component_name in phase_components:
@@ -171,7 +164,7 @@ class RoadmapTracker:
             "timestamp": datetime.now().isoformat(),
             "foundation_status": {},
             "phase_status": {},
-            "overall_progress": {}
+            "overall_progress": {},
         }
 
         # Check foundation components
@@ -208,7 +201,7 @@ class RoadmapTracker:
             "present_components": present_components,
             "buildable_components": buildable_components,
             "present_percentage": (present_components / total_components) * 100,
-            "buildable_percentage": (buildable_components / total_components) * 100
+            "buildable_percentage": (buildable_components / total_components) * 100,
         }
 
         return report
@@ -218,7 +211,7 @@ class RoadmapTracker:
         report = self.generate_status_report()
         output_file = self.base_dir / filename
 
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             json.dump(report, f, indent=2)
 
         return output_file
@@ -232,8 +225,12 @@ class RoadmapTracker:
 
         print("\n📊 Overall Progress:")
         progress = report["overall_progress"]
-        print(f"   Components Present: {progress['present_components']}/{progress['total_components']} ({progress['present_percentage']:.1f}%)")
-        print(f"   Components Buildable: {progress['buildable_components']}/{progress['total_components']} ({progress['buildable_percentage']:.1f}%)")
+        print(
+            f"   Components Present: {progress['present_components']}/{progress['total_components']} ({progress['present_percentage']:.1f}%)"
+        )
+        print(
+            f"   Components Buildable: {progress['buildable_components']}/{progress['total_components']} ({progress['buildable_percentage']:.1f}%)"
+        )
 
         print("\n🏗️ Foundation Layer Status:")
         for component, status in report["foundation_status"].items():
@@ -242,15 +239,18 @@ class RoadmapTracker:
 
         print("\n📅 Phase-by-Phase Status:")
         for phase_key, phase_data in report["phase_status"].items():
-            phase_num = int(phase_key.split('_')[1])
+            phase_num = int(phase_key.split("_")[1])
             present_count = sum(1 for status in phase_data.values() if status["present"])
             buildable_count = sum(1 for status in phase_data.values() if status["has_cmake"])
             total_count = len(phase_data)
 
-            print(f"\n   Phase {phase_num}: {present_count}/{total_count} present, {buildable_count}/{total_count} buildable")
+            print(
+                f"\n   Phase {phase_num}: {present_count}/{total_count} present, {buildable_count}/{total_count} buildable"
+            )
             for component, status in phase_data.items():
                 icon = "✅" if status["present"] and status["has_cmake"] else "❌"
                 print(f"     {icon} {component} - Present: {status['present']}, CMake: {status['has_cmake']}")
+
 
 def main():
     """Main entry point"""
@@ -263,6 +263,7 @@ def main():
         # Output human-readable summary
         tracker = RoadmapTracker()
         tracker.print_status_summary()
+
 
 if __name__ == "__main__":
     main()

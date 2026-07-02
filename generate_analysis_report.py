@@ -2,6 +2,7 @@
 """
 Generate a comprehensive analysis report for actionable TODOs
 """
+
 import json
 from datetime import datetime
 
@@ -9,11 +10,11 @@ from datetime import datetime
 def generate_report():
     """Generate the final Markdown report"""
 
-    with open('actionable_todos_analysis.json') as f:
+    with open("actionable_todos_analysis.json") as f:
         analysis = json.load(f)
 
-    analysis['statistics']
-    items = analysis['analyzed_items']
+    analysis["statistics"]
+    items = analysis["analyzed_items"]
 
     # --- Report Header ---
     report = f"""
@@ -129,19 +130,19 @@ The following table provides the complete list of 98 actionable items, categoriz
 """
 
     # Add the full list of items to the report
-    sorted_items = sorted(items, key=lambda x: (x['component'], x['complexity']))
+    sorted_items = sorted(items, key=lambda x: (x["component"], x["complexity"]))
 
     for item in sorted_items:
-        desc = item['content'][:60].strip().replace('|', '\\|')
-        work_type = item['work_type'].replace('_', ' ').title()
+        desc = item["content"][:60].strip().replace("|", "\\|")
+        work_type = item["work_type"].replace("_", " ").title()
         report += f"| {item['component']} | `{item['file']}` | {item['line']} | {item['complexity']} | {item['time_estimate']} | {work_type} | {desc}... |\n"
 
     # Save the final report
-    with open('actionable_todos_report.md', 'w') as f:
+    with open("actionable_todos_report.md", "w") as f:
         f.write(report)
 
     print("Analysis report generated successfully: actionable_todos_report.md")
 
-if __name__ == '__main__':
-    generate_report()
 
+if __name__ == "__main__":
+    generate_report()

@@ -42,9 +42,12 @@ collect_analysis_data() {
     if [[ -f "attention-metrics.json" ]]; then
         echo "  ✅ Attention metrics found"
         export ATTENTION_METRICS_AVAILABLE=true
-        export TOTAL_ATTENTION=$(sanitize_int "$(jq -r '.ecan_attention_metrics.cognitive_workload_distribution.total_attention // 0' attention-metrics.json 2>/dev/null)" 0)
-        export ATTENTION_BALANCE=$(jq -r '.meta_analysis.attention_balance // "unknown"' attention-metrics.json 2>/dev/null || echo "unknown")
-        export SYSTEM_URGENCY=$(sanitize_int "$(jq -r '.ecan_attention_metrics.urgency_metrics.total_urgency // 0' attention-metrics.json 2>/dev/null)" 0)
+        TOTAL_ATTENTION=$(sanitize_int "$(jq -r '.ecan_attention_metrics.cognitive_workload_distribution.total_attention // 0' attention-metrics.json 2>/dev/null)" 0)
+        export TOTAL_ATTENTION
+        ATTENTION_BALANCE=$(jq -r '.meta_analysis.attention_balance // "unknown"' attention-metrics.json 2>/dev/null || echo "unknown")
+        export ATTENTION_BALANCE
+        SYSTEM_URGENCY=$(sanitize_int "$(jq -r '.ecan_attention_metrics.urgency_metrics.total_urgency // 0' attention-metrics.json 2>/dev/null)" 0)
+        export SYSTEM_URGENCY
     else
         echo "  ⚠️  Attention metrics not available"
         export TOTAL_ATTENTION=0
@@ -56,8 +59,10 @@ collect_analysis_data() {
     if [[ -f "neural-symbolic-integration-report.json" ]]; then
         echo "  ✅ Neural-symbolic integration metrics found"
         export INTEGRATION_METRICS_AVAILABLE=true
-        export INTEGRATION_SUCCESS_RATE=$(sanitize_int "$(jq -r '.neural_symbolic_integration.overall_metrics.overall_success_rate // 0' neural-symbolic-integration-report.json 2>/dev/null)" 0)
-        export NEURAL_SYMBOLIC_SYNERGY=$(jq -r '.neural_symbolic_integration.overall_metrics.neural_symbolic_synergy // "limited"' neural-symbolic-integration-report.json 2>/dev/null || echo "limited")
+        INTEGRATION_SUCCESS_RATE=$(sanitize_int "$(jq -r '.neural_symbolic_integration.overall_metrics.overall_success_rate // 0' neural-symbolic-integration-report.json 2>/dev/null)" 0)
+        export INTEGRATION_SUCCESS_RATE
+        NEURAL_SYMBOLIC_SYNERGY=$(jq -r '.neural_symbolic_integration.overall_metrics.neural_symbolic_synergy // "limited"' neural-symbolic-integration-report.json 2>/dev/null || echo "limited")
+        export NEURAL_SYMBOLIC_SYNERGY
     else
         echo "  ⚠️  Integration metrics not available"
         export INTEGRATION_SUCCESS_RATE=0
@@ -68,9 +73,12 @@ collect_analysis_data() {
     if [[ -f "tensor-field-analysis.json" ]]; then
         echo "  ✅ Tensor field metrics found"
         export TENSOR_METRICS_AVAILABLE=true
-        export SYNTHESIS_ENERGY=$(sanitize_int "$(jq -r '.tensor_field_analysis.tensor_field_synthesis.synthesis_energy // 0' tensor-field-analysis.json 2>/dev/null)" 0)
-        export FIELD_COHERENCE=$(sanitize_int "$(jq -r '.tensor_field_analysis.tensor_field_synthesis.field_coherence_percentage // 0' tensor-field-analysis.json 2>/dev/null)" 0)
-        export META_COMPLETENESS=$(sanitize_int "$(jq -r '.tensor_field_analysis.meta_completeness_metrics.meta_completeness_percentage // 0' tensor-field-analysis.json 2>/dev/null)" 0)
+        SYNTHESIS_ENERGY=$(sanitize_int "$(jq -r '.tensor_field_analysis.tensor_field_synthesis.synthesis_energy // 0' tensor-field-analysis.json 2>/dev/null)" 0)
+        export SYNTHESIS_ENERGY
+        FIELD_COHERENCE=$(sanitize_int "$(jq -r '.tensor_field_analysis.tensor_field_synthesis.field_coherence_percentage // 0' tensor-field-analysis.json 2>/dev/null)" 0)
+        export FIELD_COHERENCE
+        META_COMPLETENESS=$(sanitize_int "$(jq -r '.tensor_field_analysis.meta_completeness_metrics.meta_completeness_percentage // 0' tensor-field-analysis.json 2>/dev/null)" 0)
+        export META_COMPLETENESS
     else
         echo "  ⚠️  Tensor field metrics not available"
         export SYNTHESIS_ENERGY=0
@@ -82,8 +90,10 @@ collect_analysis_data() {
     if [[ -f "hypergraph-patterns.json" ]]; then
         echo "  ✅ Hypergraph pattern metrics found"
         export HYPERGRAPH_METRICS_AVAILABLE=true
-        export TOTAL_NODES=$(sanitize_int "$(jq -r '.hypergraph_patterns.hypergraph_metrics.total_nodes // 0' hypergraph-patterns.json 2>/dev/null)" 0)
-        export INTEGRATION_STRENGTH=$(jq -r '.hypergraph_patterns.hypergraph_metrics.integration_strength // "low"' hypergraph-patterns.json 2>/dev/null || echo "low")
+        TOTAL_NODES=$(sanitize_int "$(jq -r '.hypergraph_patterns.hypergraph_metrics.total_nodes // 0' hypergraph-patterns.json 2>/dev/null)" 0)
+        export TOTAL_NODES
+        INTEGRATION_STRENGTH=$(jq -r '.hypergraph_patterns.hypergraph_metrics.integration_strength // "low"' hypergraph-patterns.json 2>/dev/null || echo "low")
+        export INTEGRATION_STRENGTH
     else
         echo "  ⚠️  Hypergraph pattern metrics not available"
         export TOTAL_NODES=0
@@ -94,8 +104,10 @@ collect_analysis_data() {
     if [[ -f "meta-completeness-analysis.json" ]]; then
         echo "  ✅ Meta-completeness metrics found"
         export COMPLETENESS_METRICS_AVAILABLE=true
-        export OVERALL_COMPLETENESS=$(sanitize_int "$(jq -r '.meta_completeness_analysis.overall_meta_completeness.overall_percentage // 0' meta-completeness-analysis.json 2>/dev/null)" 0)
-        export COMPLETENESS_LEVEL=$(jq -r '.meta_completeness_analysis.overall_meta_completeness.completeness_level // "developing"' meta-completeness-analysis.json 2>/dev/null || echo "developing")
+        OVERALL_COMPLETENESS=$(sanitize_int "$(jq -r '.meta_completeness_analysis.overall_meta_completeness.overall_percentage // 0' meta-completeness-analysis.json 2>/dev/null)" 0)
+        export OVERALL_COMPLETENESS
+        COMPLETENESS_LEVEL=$(jq -r '.meta_completeness_analysis.overall_meta_completeness.completeness_level // "developing"' meta-completeness-analysis.json 2>/dev/null || echo "developing")
+        export COMPLETENESS_LEVEL
     else
         echo "  ⚠️  Meta-completeness metrics not available"
         export OVERALL_COMPLETENESS=0

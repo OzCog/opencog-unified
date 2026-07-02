@@ -23,6 +23,7 @@ from typing import Any
 @dataclass
 class ComponentInfo:
     """Information about a cognitive component"""
+
     name: str
     path: Path
     phase: int
@@ -34,9 +35,11 @@ class ComponentInfo:
     tensor_signatures: dict[str, Any]
     integration_status: str
 
+
 @dataclass
 class CognitivePattern:
     """Detected cognitive pattern"""
+
     pattern_type: str
     components_involved: list[str]
     emergence_level: float
@@ -44,6 +47,7 @@ class CognitivePattern:
     description: str
     first_detected: str
     evolution_history: list[dict]
+
 
 class CognitiveArchitectureExplorer:
     """Interactive explorer for cognitive architecture"""
@@ -78,14 +82,27 @@ class CognitiveArchitectureExplorer:
     def _discover_components(self):
         """Discover all cognitive components"""
         component_dirs = [
-            ('cogutil', 1), ('atomspace', 1), ('cogserver', 1),
-            ('atomspace-rocks', 1), ('atomspace-restful', 1), ('moses', 1),
-            ('unify', 2), ('ure', 2), ('language-learning', 2),
-            ('attention', 3), ('spacetime', 3),
-            ('pln', 4), ('miner', 4), ('asmoses', 4),
-            ('lg-atomese', 5), ('learn', 5), ('opencog', 5),
-            ('ggml-tensor-kernel', 6), ('cognitive-patterns', 6),
-            ('cognitive-visualization', 6), ('distributed-cognition', 6)
+            ("cogutil", 1),
+            ("atomspace", 1),
+            ("cogserver", 1),
+            ("atomspace-rocks", 1),
+            ("atomspace-restful", 1),
+            ("moses", 1),
+            ("unify", 2),
+            ("ure", 2),
+            ("language-learning", 2),
+            ("attention", 3),
+            ("spacetime", 3),
+            ("pln", 4),
+            ("miner", 4),
+            ("asmoses", 4),
+            ("lg-atomese", 5),
+            ("learn", 5),
+            ("opencog", 5),
+            ("ggml-tensor-kernel", 6),
+            ("cognitive-patterns", 6),
+            ("cognitive-visualization", 6),
+            ("distributed-cognition", 6),
         ]
 
         for component_name, phase in component_dirs:
@@ -99,7 +116,7 @@ class CognitiveArchitectureExplorer:
         """Analyze a single component"""
         try:
             # Count files and calculate size
-            files = list(path.rglob('*'))
+            files = list(path.rglob("*"))
             file_count = len([f for f in files if f.is_file()])
             total_size = sum(f.stat().st_size for f in files if f.is_file())
 
@@ -113,9 +130,15 @@ class CognitiveArchitectureExplorer:
             if extensions:
                 primary_ext = max(extensions, key=extensions.get)
                 lang_map = {
-                    '.cc': 'C++', '.cpp': 'C++', '.h': 'C++', '.hpp': 'C++',
-                    '.scm': 'Scheme', '.py': 'Python', '.sh': 'Shell',
-                    '.cmake': 'CMake', '.txt': 'CMake'
+                    ".cc": "C++",
+                    ".cpp": "C++",
+                    ".h": "C++",
+                    ".hpp": "C++",
+                    ".scm": "Scheme",
+                    ".py": "Python",
+                    ".sh": "Shell",
+                    ".cmake": "CMake",
+                    ".txt": "CMake",
                 }
                 primary_language = lang_map.get(primary_ext, primary_ext[1:].upper())
 
@@ -126,8 +149,10 @@ class CognitiveArchitectureExplorer:
             tensor_signatures = self._extract_tensor_signatures(path)
 
             # Determine integration status
-            cmake_file = Path('CMakeLists.txt')
-            integration_status = "integrated" if cmake_file.exists() and name in cmake_file.read_text() else "standalone"
+            cmake_file = Path("CMakeLists.txt")
+            integration_status = (
+                "integrated" if cmake_file.exists() and name in cmake_file.read_text() else "standalone"
+            )
 
             # Extract dependencies (simplified)
             dependencies = self._extract_dependencies(path)
@@ -142,7 +167,7 @@ class CognitiveArchitectureExplorer:
                 primary_language=primary_language,
                 cognitive_functions=cognitive_functions,
                 tensor_signatures=tensor_signatures,
-                integration_status=integration_status
+                integration_status=integration_status,
             )
         except Exception as e:
             print(f"   Warning: Could not analyze {name}: {e}")
@@ -154,15 +179,26 @@ class CognitiveArchitectureExplorer:
 
         # Look for key cognitive function indicators
         cognitive_keywords = [
-            'attention', 'memory', 'learning', 'reasoning', 'perception',
-            'pattern', 'tensor', 'cognitive', 'neural', 'symbolic',
-            'unified', 'integration', 'emergence', 'recursive'
+            "attention",
+            "memory",
+            "learning",
+            "reasoning",
+            "perception",
+            "pattern",
+            "tensor",
+            "cognitive",
+            "neural",
+            "symbolic",
+            "unified",
+            "integration",
+            "emergence",
+            "recursive",
         ]
 
         try:
-            for file_path in path.rglob('*.cc'):
+            for file_path in path.rglob("*.cc"):
                 if file_path.is_file():
-                    content = file_path.read_text(encoding='utf-8', errors='ignore')
+                    content = file_path.read_text(encoding="utf-8", errors="ignore")
                     for keyword in cognitive_keywords:
                         if keyword in content.lower():
                             functions.append(keyword)
@@ -177,16 +213,16 @@ class CognitiveArchitectureExplorer:
 
         try:
             # Look for tensor-related files
-            for file_path in path.rglob('*.h'):
-                if file_path.is_file() and 'tensor' in file_path.name.lower():
-                    content = file_path.read_text(encoding='utf-8', errors='ignore')
+            for file_path in path.rglob("*.h"):
+                if file_path.is_file() and "tensor" in file_path.name.lower():
+                    content = file_path.read_text(encoding="utf-8", errors="ignore")
 
                     # Extract dimensions (simplified pattern matching)
-                    if 'dimension' in content.lower():
+                    if "dimension" in content.lower():
                         signatures[file_path.name] = {
-                            'type': 'header',
-                            'has_dimensions': True,
-                            'estimated_complexity': content.count('class') + content.count('struct')
+                            "type": "header",
+                            "has_dimensions": True,
+                            "estimated_complexity": content.count("class") + content.count("struct"),
                         }
         except Exception:
             pass
@@ -199,17 +235,17 @@ class CognitiveArchitectureExplorer:
 
         try:
             # Check CMakeLists.txt for dependencies
-            cmake_file = path / 'CMakeLists.txt'
+            cmake_file = path / "CMakeLists.txt"
             if cmake_file.exists():
                 content = cmake_file.read_text()
 
                 # Look for find_package and target_link_libraries
-                for line in content.split('\n'):
+                for line in content.split("\n"):
                     line = line.strip()
-                    if line.startswith('find_package'):
-                        dep = line.split('(')[1].split()[0]
+                    if line.startswith("find_package"):
+                        dep = line.split("(")[1].split()[0]
                         dependencies.append(dep)
-                    elif 'target_link_libraries' in line:
+                    elif "target_link_libraries" in line:
                         # Extract library names (simplified)
                         parts = line.split()
                         if len(parts) > 2:
@@ -252,7 +288,7 @@ class CognitiveArchitectureExplorer:
                     stability_score=0.8 + (phase * 0.02),  # Later phases more stable
                     description=f"Phase {phase} cognitive integration pattern involving {len(components)} components",
                     first_detected=time.strftime("%Y-%m-%d"),
-                    evolution_history=[]
+                    evolution_history=[],
                 )
                 patterns.append(pattern)
 
@@ -273,7 +309,7 @@ class CognitiveArchitectureExplorer:
                     stability_score=0.75,
                     description=f"{lang} language specialization pattern with {len(components)} components",
                     first_detected=time.strftime("%Y-%m-%d"),
-                    evolution_history=[]
+                    evolution_history=[],
                 )
                 patterns.append(pattern)
 
@@ -294,7 +330,7 @@ class CognitiveArchitectureExplorer:
                     stability_score=0.7,
                     description=f"Functional clustering around '{func}' with {len(components)} components",
                     first_detected=time.strftime("%Y-%m-%d"),
-                    evolution_history=[]
+                    evolution_history=[],
                 )
                 patterns.append(pattern)
 
@@ -302,7 +338,7 @@ class CognitiveArchitectureExplorer:
 
     def _index_documentation(self):
         """Index all documentation files"""
-        doc_patterns = ['*.md', '*.rst', '*.txt', '*.org']
+        doc_patterns = ["*.md", "*.rst", "*.txt", "*.org"]
 
         for pattern in doc_patterns:
             for doc_file in Path().rglob(pattern):
@@ -317,20 +353,20 @@ class CognitiveArchitectureExplorer:
         """Categorize documentation file"""
         name_lower = doc_file.name.lower()
 
-        if 'readme' in name_lower:
-            return 'readme'
-        elif 'phase' in name_lower:
-            return 'phase_documentation'
-        elif 'implementation' in name_lower:
-            return 'implementation'
-        elif 'test' in name_lower:
-            return 'testing'
-        elif 'todo' in name_lower or 'fixme' in name_lower:
-            return 'development_notes'
-        elif 'roadmap' in name_lower:
-            return 'roadmap'
+        if "readme" in name_lower:
+            return "readme"
+        elif "phase" in name_lower:
+            return "phase_documentation"
+        elif "implementation" in name_lower:
+            return "implementation"
+        elif "test" in name_lower:
+            return "testing"
+        elif "todo" in name_lower or "fixme" in name_lower:
+            return "development_notes"
+        elif "roadmap" in name_lower:
+            return "roadmap"
         else:
-            return 'general'
+            return "general"
 
     def generate_architecture_flowchart(self) -> str:
         """Generate ASCII flowchart of the architecture"""
@@ -528,26 +564,28 @@ class CognitiveArchitectureExplorer:
             try:
                 command = input("\n🔍 Enter command: ").strip().lower()
 
-                if command == 'quit':
+                if command == "quit":
                     break
-                elif command == 'list':
+                elif command == "list":
                     self._handle_list_command()
-                elif command.startswith('component '):
+                elif command.startswith("component "):
                     comp_name = command[10:].strip()
                     self._handle_component_command(comp_name)
-                elif command == 'flowchart':
+                elif command == "flowchart":
                     print("\n" + self.generate_architecture_flowchart())
-                elif command == 'patterns':
+                elif command == "patterns":
                     self._handle_patterns_command()
-                elif command == 'emergence':
+                elif command == "emergence":
                     print("\n" + self.generate_cognitive_emergence_report())
-                elif command == 'docs':
+                elif command == "docs":
                     print("\n" + self.generate_living_documentation_index())
-                elif command.startswith('search '):
+                elif command.startswith("search "):
                     search_term = command[7:].strip()
                     self._handle_search_command(search_term)
                 else:
-                    print("❌ Unknown command. Try 'list', 'component <name>', 'flowchart', 'patterns', 'emergence', 'docs', 'search <term>', or 'quit'")
+                    print(
+                        "❌ Unknown command. Try 'list', 'component <name>', 'flowchart', 'patterns', 'emergence', 'docs', 'search <term>', or 'quit'"
+                    )
 
             except KeyboardInterrupt:
                 print("\n👋 Goodbye!")
@@ -571,7 +609,9 @@ class CognitiveArchitectureExplorer:
             print(f"\n   Phase {phase_num}:")
             for comp_name, comp_info in phases[phase_num]:
                 size_mb = comp_info.total_size / (1024 * 1024)
-                print(f"      • {comp_name} ({comp_info.primary_language}, {size_mb:.1f}MB, {comp_info.file_count} files)")
+                print(
+                    f"      • {comp_name} ({comp_info.primary_language}, {size_mb:.1f}MB, {comp_info.file_count} files)"
+                )
 
     def _handle_component_command(self, comp_name: str):
         """Handle component detail command"""
@@ -596,9 +636,11 @@ class CognitiveArchitectureExplorer:
 
         # Search components
         for comp_name, comp_info in self.components.items():
-            if (search_term in comp_name.lower() or
-                search_term in comp_info.primary_language.lower() or
-                any(search_term in func.lower() for func in comp_info.cognitive_functions)):
+            if (
+                search_term in comp_name.lower()
+                or search_term in comp_info.primary_language.lower()
+                or any(search_term in func.lower() for func in comp_info.cognitive_functions)
+            ):
                 found_components.append(comp_name)
 
         # Search documentation
@@ -622,13 +664,15 @@ class CognitiveArchitectureExplorer:
         if not found_components and not found_docs:
             print("   No results found.")
 
+
 def main():
     """Main function"""
     parser = argparse.ArgumentParser(description="Interactive Cognitive Architecture Explorer")
-    parser.add_argument('--mode', choices=['interactive', 'report', 'flowchart'],
-                       default='interactive', help='Exploration mode')
-    parser.add_argument('--component', help='Generate report for specific component')
-    parser.add_argument('--output', help='Output file for reports')
+    parser.add_argument(
+        "--mode", choices=["interactive", "report", "flowchart"], default="interactive", help="Exploration mode"
+    )
+    parser.add_argument("--component", help="Generate report for specific component")
+    parser.add_argument("--output", help="Output file for reports")
 
     args = parser.parse_args()
 
@@ -638,15 +682,15 @@ def main():
     print("🔍 Discovering Cognitive Architecture...")
     explorer.discover_architecture()
 
-    if args.mode == 'interactive':
+    if args.mode == "interactive":
         explorer.interactive_explore()
-    elif args.mode == 'flowchart':
+    elif args.mode == "flowchart":
         flowchart = explorer.generate_architecture_flowchart()
         print("\n" + flowchart)
         if args.output:
             Path(args.output).write_text(flowchart)
             print(f"\nFlowchart saved to {args.output}")
-    elif args.mode == 'report':
+    elif args.mode == "report":
         if args.component:
             report = explorer.generate_component_report(args.component)
         else:
@@ -656,6 +700,7 @@ def main():
         if args.output:
             Path(args.output).write_text(report)
             print(f"\nReport saved to {args.output}")
+
 
 if __name__ == "__main__":
     main()

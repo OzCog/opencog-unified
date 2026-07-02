@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Generate a progress report on placeholder implementation"""
+
 import json
 from datetime import datetime
 from pathlib import Path
@@ -10,31 +11,38 @@ def generate_report():
     repo_root = Path("/home/ubuntu/opencog-unified")
 
     # Load all data
-    with open(repo_root / 'placeholder_analysis.json') as f:
+    with open(repo_root / "placeholder_analysis.json") as f:
         analysis = json.load(f)
-    with open(repo_root / 'stub_implementations.json') as f:
+    with open(repo_root / "stub_implementations.json") as f:
         stubs = json.load(f)
-    with open(repo_root / 'implementation_report.json') as f:
+    with open(repo_root / "implementation_report.json") as f:
         impl_report = json.load(f)
-    with open(repo_root / 'feature_implementation_report.json') as f:
+    with open(repo_root / "feature_implementation_report.json") as f:
         feature_report = json.load(f)
-    with open(repo_root / 'actionable_items.json') as f:
+    with open(repo_root / "actionable_items.json") as f:
         actionable = json.load(f)
 
     # --- Define variables for the report ---
-    date=datetime.utcnow().strftime("%Y-%m-%d")
-    total_placeholders=analysis['total_placeholders']
-    fixme_count=analysis['by_type'].get('FIXME', 0)
-    todo_count=analysis['by_type'].get('TODO', 0)
-    stub_comment_count=analysis['by_type'].get('stub', 0)
-    ni_count=analysis['by_type'].get('NotImplementedError', 0)
-    stub_func_count=len(stubs)
-    total_fixes=impl_report['summary']['total_fixes_applied'] + feature_report['summary']['total_implementations']
-    obsolete_fixes_count=impl_report['summary']['by_type'].get('obsolete_comment', 0)
-    obsolete_examples='\n'.join([f"- `{fix['file']}:{fix['line']}`" for fix in impl_report.get('by_type', {}).get('obsolete_comment', [])[:3]])
-    clarification_fixes_count=impl_report['summary']['by_type'].get('clarification_added', 0)
-    clarification_examples='\n'.join([f"- `{fix['file']}:{fix['line']}`" for fix in impl_report.get('by_type', {}).get('clarification_added', [])[:3]])
-    actionable_count=len(actionable)
+    date = datetime.utcnow().strftime("%Y-%m-%d")
+    total_placeholders = analysis["total_placeholders"]
+    fixme_count = analysis["by_type"].get("FIXME", 0)
+    todo_count = analysis["by_type"].get("TODO", 0)
+    stub_comment_count = analysis["by_type"].get("stub", 0)
+    ni_count = analysis["by_type"].get("NotImplementedError", 0)
+    stub_func_count = len(stubs)
+    total_fixes = impl_report["summary"]["total_fixes_applied"] + feature_report["summary"]["total_implementations"]
+    obsolete_fixes_count = impl_report["summary"]["by_type"].get("obsolete_comment", 0)
+    obsolete_examples = "\n".join(
+        [f"- `{fix['file']}:{fix['line']}`" for fix in impl_report.get("by_type", {}).get("obsolete_comment", [])[:3]]
+    )
+    clarification_fixes_count = impl_report["summary"]["by_type"].get("clarification_added", 0)
+    clarification_examples = "\n".join(
+        [
+            f"- `{fix['file']}:{fix['line']}`"
+            for fix in impl_report.get("by_type", {}).get("clarification_added", [])[:3]
+        ]
+    )
+    actionable_count = len(actionable)
 
     # --- Report Content ---
     report = f"""
@@ -120,10 +128,11 @@ This initial phase of work has successfully addressed a number of low-hanging fr
 """
 
     # Save the report
-    with open(repo_root / 'progress_report.md', 'w') as f:
+    with open(repo_root / "progress_report.md", "w") as f:
         f.write(report)
 
     print("Progress report generated successfully: progress_report.md")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     generate_report()

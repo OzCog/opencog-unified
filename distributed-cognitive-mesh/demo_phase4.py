@@ -32,16 +32,16 @@ class EmbodimentTensorDemo:
         return {
             "agent_id": self.agent_id,
             "sensory_modality": [0.0, 0.0, 0.0, 0.0],  # [visual, auditory, tactile, proprioceptive]
-            "motor_command": [0.0, 0.0, 0.0],           # [position, velocity, force]
-            "spatial_coordinates": [0.0, 0.0, 0.0, 0.0], # [x, y, z, orientation]
-            "temporal_context": [0.0, 1.0, 0.0],        # [past, present, future]
+            "motor_command": [0.0, 0.0, 0.0],  # [position, velocity, force]
+            "spatial_coordinates": [0.0, 0.0, 0.0, 0.0],  # [x, y, z, orientation]
+            "temporal_context": [0.0, 1.0, 0.0],  # [past, present, future]
             "action_confidence": 0.5,
-            "embodiment_state": [0.0, 1.0, 0.0],        # [virtual, physical, hybrid]
-            "interaction_mode": [1.0, 0.0, 0.0],        # [passive, active, adaptive]
-            "feedback_loop": [0.0, 1.0, 0.0],           # [open, closed, predictive]
+            "embodiment_state": [0.0, 1.0, 0.0],  # [virtual, physical, hybrid]
+            "interaction_mode": [1.0, 0.0, 0.0],  # [passive, active, adaptive]
+            "feedback_loop": [0.0, 1.0, 0.0],  # [open, closed, predictive]
             "timestamp": datetime.utcnow().isoformat(),
             "cognitive_load": 0.0,
-            "tensor_validity": 1.0
+            "tensor_validity": 1.0,
         }
 
     def simulate_sensory_input(self):
@@ -140,6 +140,7 @@ class EmbodimentTensorDemo:
             f"Confidence: {self.tensor_data['action_confidence']:.3f}"
         )
 
+
 class CognitiveMeshAPIDemo:
     """Demonstrates the Cognitive Mesh API functionality"""
 
@@ -167,14 +168,12 @@ class CognitiveMeshAPIDemo:
             "cognitive_load": agent_tensor.tensor_data["cognitive_load"],
             "active_atoms": [f"atom_{i}" for i in range(random.randint(5, 15))],
             "state_description": "Demo agent for Phase 4 testing",
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
         try:
             response = requests.put(
-                f"{self.api_base_url}/agents/{agent_tensor.agent_id}/state",
-                json=agent_data,
-                timeout=5
+                f"{self.api_base_url}/agents/{agent_tensor.agent_id}/state", json=agent_data, timeout=5
             )
 
             if response.status_code == 200:
@@ -194,14 +193,12 @@ class CognitiveMeshAPIDemo:
             "agent_id": agent_tensor.agent_id,
             "tensor_signature": agent_tensor.tensor_data,
             "cognitive_load": agent_tensor.tensor_data["cognitive_load"],
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
         try:
             response = requests.put(
-                f"{self.api_base_url}/agents/{agent_tensor.agent_id}/state",
-                json=agent_data,
-                timeout=2
+                f"{self.api_base_url}/agents/{agent_tensor.agent_id}/state", json=agent_data, timeout=2
             )
             return response.status_code == 200
         except Exception:
@@ -226,6 +223,7 @@ class CognitiveMeshAPIDemo:
         except Exception:
             pass
         return {}
+
 
 class WebSocketStreamDemo:
     """Demonstrates real-time WebSocket streaming"""
@@ -267,12 +265,13 @@ class WebSocketStreamDemo:
         subscription = {
             "type": "subscribe",
             "message_types": ["cognitive_state_update", "embodiment_tensor_update"],
-            "filters": {}
+            "filters": {},
         }
         ws.send(json.dumps(subscription))
 
     def start_websocket_client(self):
         """Start WebSocket client in background thread"""
+
         def run_websocket():
             try:
                 ws = websocket.WebSocketApp(
@@ -280,7 +279,7 @@ class WebSocketStreamDemo:
                     on_open=self.on_open,
                     on_message=self.on_message,
                     on_error=self.on_error,
-                    on_close=self.on_close
+                    on_close=self.on_close,
                 )
                 ws.run_forever()
             except Exception as e:
@@ -289,6 +288,7 @@ class WebSocketStreamDemo:
         thread = threading.Thread(target=run_websocket, daemon=True)
         thread.start()
         time.sleep(2)  # Give WebSocket time to connect
+
 
 def demonstrate_unity3d_integration():
     """Demonstrate Unity3D integration concepts"""
@@ -310,12 +310,13 @@ def demonstrate_unity3d_integration():
 
         # Simulate Unity3D specific data
         unity_agent.tensor_data["embodiment_state"] = [0.0, 1.0, 0.0]  # Always physical
-        unity_agent.tensor_data["feedback_loop"] = [0.0, 1.0, 0.0]     # Always closed-loop
+        unity_agent.tensor_data["feedback_loop"] = [0.0, 1.0, 0.0]  # Always closed-loop
 
-        print(f"  Frame {i+1}: {unity_agent.get_tensor_summary()}")
+        print(f"  Frame {i + 1}: {unity_agent.get_tensor_summary()}")
         time.sleep(0.5)
 
     print("✓ Unity3D integration simulation complete")
+
 
 def demonstrate_ros_integration():
     """Demonstrate ROS integration concepts"""
@@ -341,11 +342,12 @@ def demonstrate_ros_integration():
         active_sensor = sensors[i % len(sensors)]
         sensor_data = random.uniform(0.1, 0.9)
 
-        print(f"  Cycle {i+1}: Processing {active_sensor} (intensity: {sensor_data:.3f})")
+        print(f"  Cycle {i + 1}: Processing {active_sensor} (intensity: {sensor_data:.3f})")
         print(f"    State: {ros_agent.get_tensor_summary()}")
         time.sleep(0.5)
 
     print("✓ ROS integration simulation complete")
+
 
 def main():
     """Main demonstration function"""
@@ -360,7 +362,7 @@ def main():
     agents = [
         EmbodimentTensorDemo("demo_agent_001"),
         EmbodimentTensorDemo("demo_agent_002"),
-        EmbodimentTensorDemo("demo_agent_003")
+        EmbodimentTensorDemo("demo_agent_003"),
     ]
 
     print(f"Created {len(agents)} cognitive agents with 8D embodiment tensors")
@@ -392,7 +394,7 @@ def main():
                 success = api_demo.update_agent_state(agent)
                 if i % 5 == 0:  # Log every 5th update
                     status = "✓" if success else "✗"
-                    print(f"  {status} Update {i+1}: {agent.get_tensor_summary()}")
+                    print(f"  {status} Update {i + 1}: {agent.get_tensor_summary()}")
             time.sleep(0.2)
     else:
         print("API server not available - using local simulation mode")
@@ -422,14 +424,17 @@ def main():
     print("\n📊 Phase 4 Demo Summary")
     print("=" * 50)
 
-    total_tensor_elements = sum(len(agent.tensor_data["sensory_modality"]) +
-                               len(agent.tensor_data["motor_command"]) +
-                               len(agent.tensor_data["spatial_coordinates"]) +
-                               len(agent.tensor_data["temporal_context"]) + 1 +  # action_confidence
-                               len(agent.tensor_data["embodiment_state"]) +
-                               len(agent.tensor_data["interaction_mode"]) +
-                               len(agent.tensor_data["feedback_loop"])
-                               for agent in agents)
+    total_tensor_elements = sum(
+        len(agent.tensor_data["sensory_modality"])
+        + len(agent.tensor_data["motor_command"])
+        + len(agent.tensor_data["spatial_coordinates"])
+        + len(agent.tensor_data["temporal_context"])
+        + 1  # action_confidence
+        + len(agent.tensor_data["embodiment_state"])
+        + len(agent.tensor_data["interaction_mode"])
+        + len(agent.tensor_data["feedback_loop"])
+        for agent in agents
+    )
 
     print(f"✓ Demonstrated {len(agents)} agents with 8D embodiment tensors")
     print(f"✓ Processed {total_tensor_elements} tensor elements total")
@@ -439,6 +444,7 @@ def main():
 
     print("\n🎯 Phase 4 Implementation Status: OPERATIONAL")
     print("Ready for distributed cognitive mesh deployment!")
+
 
 if __name__ == "__main__":
     try:

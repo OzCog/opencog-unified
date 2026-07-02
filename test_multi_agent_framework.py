@@ -56,7 +56,7 @@ class MultiAgentTestSuite:
             "messages_sent": 0,
             "messages_received": 0,
             "latency_ms": 0,
-            "success": False
+            "success": False,
         }
 
         try:
@@ -100,7 +100,7 @@ class MultiAgentTestSuite:
             "resource_cycles": 0,
             "fairness_score": 0.0,
             "efficiency_score": 0.0,
-            "success": False
+            "success": False,
         }
 
         try:
@@ -118,7 +118,7 @@ class MultiAgentTestSuite:
             resource_allocations = [random.uniform(5, 15) for _ in range(num_agents)]
             mean_allocation = statistics.mean(resource_allocations)
             variance = statistics.variance(resource_allocations)
-            fairness_score = 1.0 - (variance / (mean_allocation ** 2))
+            fairness_score = 1.0 - (variance / (mean_allocation**2))
             test_data["fairness_score"] = max(0.0, min(1.0, fairness_score))
 
             # Simulate efficiency (resource utilization)
@@ -149,7 +149,7 @@ class MultiAgentTestSuite:
             "compression_ratio": 0.0,
             "throughput_msg_per_sec": 0.0,
             "tensor_size_avg": 0,
-            "success": False
+            "success": False,
         }
 
         try:
@@ -199,7 +199,7 @@ class MultiAgentTestSuite:
             "sync_latency_ms": 0.0,
             "consistency_score": 0.0,
             "conflicts_resolved": 0,
-            "success": False
+            "success": False,
         }
 
         try:
@@ -248,7 +248,7 @@ class MultiAgentTestSuite:
             "peak_throughput": 0.0,
             "memory_usage_mb": 0.0,
             "stability_score": 0.0,
-            "success": False
+            "success": False,
         }
 
         try:
@@ -306,7 +306,7 @@ class MultiAgentTestSuite:
             "collective_intelligence": 0.0,
             "adaptation_rate": 0.0,
             "emergent_patterns": [],
-            "success": False
+            "success": False,
         }
 
         try:
@@ -357,7 +357,7 @@ class MultiAgentTestSuite:
             "recovery_time_ms": 0.0,
             "data_consistency_maintained": False,
             "graceful_degradation": False,
-            "success": False
+            "success": False,
         }
 
         try:
@@ -450,6 +450,7 @@ class MultiAgentTestSuite:
 
         print("\n🚀 Multi-Agent Distributed Cognition Testing Complete!")
 
+
 def main():
     """Main test execution"""
     print("🧠 OpenCog Unified: Multi-Agent Distributed Cognition Test Suite")
@@ -463,6 +464,7 @@ def main():
     test_suite.run_comprehensive_tests()
 
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

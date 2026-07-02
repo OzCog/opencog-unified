@@ -31,6 +31,7 @@ def run_command(cmd, description):
     print(f"✅ {description} - Success")
     return result.stdout
 
+
 def test_recursive_todo_resolution():
     """Test the complete recursive TODO resolution workflow"""
 
@@ -44,7 +45,7 @@ def test_recursive_todo_resolution():
         return False
 
     # Extract status info
-    lines = output.strip().split('\n')
+    lines = output.strip().split("\n")
     unchecked_line = next(l for l in lines if "Unchecked:" in l)
     unchecked_count = int(unchecked_line.split(":")[1].strip())
     print(f"   📊 Found {unchecked_count} unchecked TODOs")
@@ -74,7 +75,7 @@ def test_recursive_todo_resolution():
         "## 🧩 Batch",
         "## 🔄 Next Steps",
         "## 🧬 Meta-Pathway",
-        "## 🕰️ Progress Log"
+        "## 🕰️ Progress Log",
     ]
 
     missing_sections = []
@@ -114,7 +115,7 @@ def test_recursive_todo_resolution():
     print(f"   🎯 Testing completion of: {test_todo}")
 
     # Mark as completed
-    cmd = f"python scripts/recursive_todo_resolver.py --mark-completed \"{test_todo}\" \"https://github.com/test/pr/125\""
+    cmd = f'python scripts/recursive_todo_resolver.py --mark-completed "{test_todo}" "https://github.com/test/pr/125"'
     output = run_command(cmd, "Mark TODO as completed")
 
     if not output:
@@ -161,6 +162,7 @@ def test_recursive_todo_resolution():
 
     return True
 
+
 def main():
     """Main test execution"""
 
@@ -172,5 +174,6 @@ def main():
     success = test_recursive_todo_resolution()
     return 0 if success else 1
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     sys.exit(main())

@@ -20,15 +20,18 @@ import numpy as np
 @dataclass
 class GraphNode:
     """Neural graph node representation"""
+
     id: str
     embedding: np.ndarray
     coordinates: tuple[int, int, int]
     attention_score: float = 0.5
     layer: int = 0
 
+
 @dataclass
 class GraphEdge:
     """Neural graph edge representation"""
+
     id: str
     source: str
     target: str
@@ -36,9 +39,11 @@ class GraphEdge:
     message_vector: np.ndarray
     attention_weight: float = 1.0
 
+
 @dataclass
 class NeuralGraph:
     """Complete neural graph structure"""
+
     nodes: dict[str, GraphNode]
     edges: dict[str, GraphEdge]
     tensor_shape: tuple[int, int, int] = (7, 7, 7)
@@ -48,6 +53,7 @@ class NeuralGraph:
     def __post_init__(self):
         if self.attention_matrix is None:
             self.attention_matrix = np.eye(7)  # Default attention matrix
+
 
 class MessagePassingEngine:
     """
@@ -100,7 +106,9 @@ class MessagePassingEngine:
 
         return updated_graph
 
-    def _message_pass_layer(self, graph: NeuralGraph, layer: int, query_embedding: np.ndarray | None = None) -> NeuralGraph:
+    def _message_pass_layer(
+        self, graph: NeuralGraph, layer: int, query_embedding: np.ndarray | None = None
+    ) -> NeuralGraph:
         """
         Perform message passing for a single layer
 
@@ -120,10 +128,7 @@ class MessagePassingEngine:
             futures = {}
 
             for node_id, _node in graph.nodes.items():
-                future = executor.submit(
-                    self._compute_node_messages,
-                    graph, node_id, layer, query_embedding
-                )
+                future = executor.submit(self._compute_node_messages, graph, node_id, layer, query_embedding)
                 futures[node_id] = future
 
             # Collect results
@@ -138,8 +143,9 @@ class MessagePassingEngine:
 
         return graph
 
-    def _compute_node_messages(self, graph: NeuralGraph, node_id: str, layer: int,
-                              query_embedding: np.ndarray | None = None) -> list[np.ndarray]:
+    def _compute_node_messages(
+        self, graph: NeuralGraph, node_id: str, layer: int, query_embedding: np.ndarray | None = None
+    ) -> list[np.ndarray]:
         """
         Compute incoming messages for a specific node
 
@@ -161,22 +167,24 @@ class MessagePassingEngine:
                 source_node = graph.nodes[edge.source]
 
                 # Compute message from source to target
-                message = self._compute_message(
-                    source_node, target_node, edge, layer, query_embedding
-                )
+                message = self._compute_message(source_node, target_node, edge, layer, query_embedding)
 
                 # Apply attention weighting
-                attention_weight = self._compute_attention_weight(
-                    source_node, target_node, layer
-                )
+                attention_weight = self._compute_attention_weight(source_node, target_node, layer)
 
                 weighted_message = message * attention_weight
                 messages.append(weighted_message)
 
         return messages
 
-    def _compute_message(self, source: GraphNode, target: GraphNode, edge: GraphEdge,
-                        layer: int, query_embedding: np.ndarray | None = None) -> np.ndarray:
+    def _compute_message(
+        self,
+        source: GraphNode,
+        target: GraphNode,
+        edge: GraphEdge,
+        layer: int,
+        query_embedding: np.ndarray | None = None,
+    ) -> np.ndarray:
         """
         Compute message vector between two nodes
 
@@ -200,8 +208,12 @@ class MessagePassingEngine:
         # Add query context if provided
         if query_embedding is not None:
             # Compute attention between source embedding and query
-            query_attention = np.dot(source.embedding, query_embedding) / np.linalg.norm(source.embedding) / np.linalg.norm(query_embedding)
-            message *= (1.0 + query_attention)
+            query_attention = (
+                np.dot(source.embedding, query_embedding)
+                / np.linalg.norm(source.embedding)
+                / np.linalg.norm(query_embedding)
+            )
+            message *= 1.0 + query_attention
 
         # Apply positional encoding based on coordinates
         pos_encoding = self._positional_encoding(source.coordinates, target.coordinates)
@@ -226,7 +238,7 @@ class MessagePassingEngine:
         tgt_x, tgt_y, tgt_z = target.coordinates
 
         # Distance-based attention (closer nodes have higher attention)
-        coord_distance = np.sqrt((src_x - tgt_x)**2 + (src_y - tgt_y)**2 + (src_z - tgt_z)**2)
+        coord_distance = np.sqrt((src_x - tgt_x) ** 2 + (src_y - tgt_y) ** 2 + (src_z - tgt_z) ** 2)
         distance_attention = 1.0 / (1.0 + coord_distance)
 
         # Layer-specific attention weights
@@ -238,8 +250,9 @@ class MessagePassingEngine:
         # Apply softmax normalization within reasonable bounds
         return min(max(combined_attention, 0.01), 2.0)
 
-    def _positional_encoding(self, source_coords: tuple[int, int, int],
-                           target_coords: tuple[int, int, int]) -> np.ndarray:
+    def _positional_encoding(
+        self, source_coords: tuple[int, int, int], target_coords: tuple[int, int, int]
+    ) -> np.ndarray:
         """
         Generate positional encoding based on 3D coordinates
 
@@ -325,7 +338,7 @@ class MessagePassingEngine:
             embedding_magnitude = np.linalg.norm(node.embedding)
 
             # Position-based attention (center positions get higher attention)
-            center_distance = np.sqrt(sum((c - 3)**2 for c in node.coordinates))
+            center_distance = np.sqrt(sum((c - 3) ** 2 for c in node.coordinates))
             position_attention = 1.0 / (1.0 + center_distance)
 
             # Combine factors
@@ -366,7 +379,7 @@ class MessagePassingEngine:
                 embedding=node.embedding.copy(),
                 coordinates=node.coordinates,
                 attention_score=node.attention_score,
-                layer=node.layer
+                layer=node.layer,
             )
 
         # Copy edges
@@ -377,7 +390,7 @@ class MessagePassingEngine:
                 target=edge.target,
                 weight=edge.weight,
                 message_vector=edge.message_vector.copy(),
-                attention_weight=edge.attention_weight
+                attention_weight=edge.attention_weight,
             )
 
         return NeuralGraph(
@@ -385,7 +398,7 @@ class MessagePassingEngine:
             edges=new_edges,
             tensor_shape=graph.tensor_shape,
             current_state=graph.current_state,
-            attention_matrix=graph.attention_matrix.copy()
+            attention_matrix=graph.attention_matrix.copy(),
         )
 
     def create_test_graph(self) -> NeuralGraph:
@@ -410,11 +423,7 @@ class MessagePassingEngine:
                     embedding = embedding / np.linalg.norm(embedding)
 
                     nodes[node_id] = GraphNode(
-                        id=node_id,
-                        embedding=embedding,
-                        coordinates=(x, y, z),
-                        attention_score=0.5,
-                        layer=0
+                        id=node_id, embedding=embedding, coordinates=(x, y, z), attention_score=0.5, layer=0
                     )
                     node_count += 1
 
@@ -426,7 +435,7 @@ class MessagePassingEngine:
                     current_id = f"node_{x}_{y}_{z}"
 
                     # Connect to adjacent nodes (6-connectivity)
-                    for dx, dy, dz in [(1,0,0), (-1,0,0), (0,1,0), (0,-1,0), (0,0,1), (0,0,-1)]:
+                    for dx, dy, dz in [(1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)]:
                         nx, ny, nz = x + dx, y + dy, z + dz
 
                         if 0 <= nx < 7 and 0 <= ny < 7 and 0 <= nz < 7:
@@ -442,18 +451,14 @@ class MessagePassingEngine:
                                 target=neighbor_id,
                                 weight=weight,
                                 message_vector=np.zeros(self.embedding_dim),
-                                attention_weight=1.0
+                                attention_weight=1.0,
                             )
                             edge_count += 1
 
         print(f"Created test graph with {node_count} nodes and {edge_count} edges")
 
         return NeuralGraph(
-            nodes=nodes,
-            edges=edges,
-            tensor_shape=(7, 7, 7),
-            current_state=0,
-            attention_matrix=np.eye(7)
+            nodes=nodes, edges=edges, tensor_shape=(7, 7, 7), current_state=0, attention_matrix=np.eye(7)
         )
 
 
@@ -487,12 +492,11 @@ def main():
     print(f"  Max:  {np.max(attention_scores):.4f}")
 
     # Find top attention nodes
-    top_nodes = sorted(updated_graph.nodes.values(),
-                      key=lambda n: n.attention_score, reverse=True)[:5]
+    top_nodes = sorted(updated_graph.nodes.values(), key=lambda n: n.attention_score, reverse=True)[:5]
 
     print("\nTop 5 attention nodes:")
     for i, node in enumerate(top_nodes):
-        print(f"  {i+1}. {node.id}: attention={node.attention_score:.4f}, coords={node.coordinates}")
+        print(f"  {i + 1}. {node.id}: attention={node.attention_score:.4f}, coords={node.coordinates}")
 
     # Validate 343 states
     total_states = len(updated_graph.nodes)
@@ -511,13 +515,9 @@ def main():
             "mean": float(np.mean(attention_scores)),
             "std": float(np.std(attention_scores)),
             "min": float(np.min(attention_scores)),
-            "max": float(np.max(attention_scores))
+            "max": float(np.max(attention_scores)),
         },
-        "validation": {
-            "expected_states": 343,
-            "actual_states": total_states,
-            "passed": total_states == 343
-        }
+        "validation": {"expected_states": 343, "actual_states": total_states, "passed": total_states == 343},
     }
 
     with open("message_passing_results.json", "w") as f:

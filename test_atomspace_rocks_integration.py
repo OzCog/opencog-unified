@@ -17,7 +17,7 @@ def test_atomspace_rocks_guile():
         db_path = os.path.join(tmpdir, "test.rdb")
 
         # Create a test Scheme script
-        test_script = f'''
+        test_script = f"""
 (use-modules (opencog))
 (use-modules (opencog persist))
 (use-modules (opencog persist-rocks))
@@ -42,16 +42,15 @@ def test_atomspace_rocks_guile():
 (if (not (null? (cog-node 'Concept "TestConcept")))
     (display "SUCCESS: AtomSpace-Rocks integration test passed!\\n")
     (display "FAILED: AtomSpace-Rocks integration test failed!\\n"))
-'''
+"""
 
         script_path = os.path.join(tmpdir, "test_rocks.scm")
-        with open(script_path, 'w') as f:
+        with open(script_path, "w") as f:
             f.write(test_script)
 
         try:
             # Run the test
-            result = subprocess.run(['guile', '-l', script_path],
-                                  capture_output=True, text=True, timeout=30)
+            result = subprocess.run(["guile", "-l", script_path], capture_output=True, text=True, timeout=30)
 
             if result.returncode == 0 and "SUCCESS" in result.stdout:
                 print("✓ AtomSpace-Rocks integration test PASSED")
@@ -70,20 +69,19 @@ def test_atomspace_rocks_guile():
             print("✗ Guile not found - cannot run AtomSpace-Rocks test")
             return False
 
+
 def test_rocksdb_library():
     """Test that RocksDB library is accessible"""
     try:
         # Check if RocksDB library is installed
-        result = subprocess.run(['pkg-config', '--exists', 'rocksdb'],
-                               capture_output=True)
+        result = subprocess.run(["pkg-config", "--exists", "rocksdb"], capture_output=True)
         if result.returncode == 0:
             print("✓ RocksDB library found")
             return True
         else:
             # Try alternative check
-            result = subprocess.run(['ldconfig', '-p'],
-                                   capture_output=True, text=True)
-            if 'rocksdb' in result.stdout:
+            result = subprocess.run(["ldconfig", "-p"], capture_output=True, text=True)
+            if "rocksdb" in result.stdout:
                 print("✓ RocksDB library found via ldconfig")
                 return True
             else:
@@ -92,6 +90,7 @@ def test_rocksdb_library():
     except Exception:
         print("✗ Error checking RocksDB library")
         return False
+
 
 def main():
     """Run integration tests for Week 1: AtomSpace-Rocks"""
@@ -116,6 +115,7 @@ def main():
     else:
         print("❌ Some integration tests FAILED!")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

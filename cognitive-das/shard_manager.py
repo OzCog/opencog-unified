@@ -22,6 +22,7 @@ from typing import Any
 @dataclass
 class ShardTask:
     """Task to be executed on a shard"""
+
     task_id: str
     shard_id: int
     pattern: str
@@ -30,9 +31,11 @@ class ShardTask:
     priority: int = 1
     timeout: float = 5.0
 
+
 @dataclass
 class ShardResult:
     """Result from shard execution"""
+
     task_id: str
     shard_id: int
     success: bool
@@ -41,9 +44,11 @@ class ShardResult:
     error_message: str | None = None
     truth_values: list[tuple[float, float]] = None  # (strength, confidence) pairs
 
+
 @dataclass
 class ShardMetrics:
     """Performance metrics for a shard"""
+
     shard_id: int
     total_tasks: int
     successful_tasks: int
@@ -52,6 +57,7 @@ class ShardMetrics:
     total_execution_time: float
     queue_length: int
     cpu_utilization: float = 0.0
+
 
 class DistributedShardExecutor:
     """
@@ -90,7 +96,7 @@ class DistributedShardExecutor:
             "total_tasks_submitted": 0,
             "total_tasks_completed": 0,
             "total_execution_time": 0.0,
-            "average_throughput": 0.0
+            "average_throughput": 0.0,
         }
 
         # Performance monitoring
@@ -117,17 +123,13 @@ class DistributedShardExecutor:
                 failed_tasks=0,
                 average_execution_time=0.0,
                 total_execution_time=0.0,
-                queue_length=0
+                queue_length=0,
             )
 
             # Start worker threads for shard
             self.shard_workers[shard_id] = []
             for worker_id in range(self.max_workers_per_shard):
-                worker = threading.Thread(
-                    target=self._shard_worker,
-                    args=(shard_id, worker_id),
-                    daemon=True
-                )
+                worker = threading.Thread(target=self._shard_worker, args=(shard_id, worker_id), daemon=True)
                 worker.start()
                 self.shard_workers[shard_id].append(worker)
 
@@ -152,7 +154,7 @@ class DistributedShardExecutor:
                 pattern=pattern.get("pattern", ""),
                 variables=pattern.get("variables", []),
                 constraints=pattern.get("constraints", []),
-                priority=pattern.get("priority", 1)
+                priority=pattern.get("priority", 1),
             )
             tasks.append(task)
 
@@ -186,7 +188,7 @@ class DistributedShardExecutor:
         base_shard = int(hashlib.md5(pattern_str.encode()).hexdigest(), 16) % self.num_shards
 
         # Load balancing: check queue lengths
-        min_queue_length = float('inf')
+        min_queue_length = float("inf")
         optimal_shard = base_shard
 
         for offset in range(self.num_shards):
@@ -220,11 +222,7 @@ class DistributedShardExecutor:
             self.shard_queues[task.shard_id].put(task)
 
             # Track active task
-            self.active_tasks[task.task_id] = {
-                "task": task,
-                "submit_time": time.time(),
-                "completed": False
-            }
+            self.active_tasks[task.task_id] = {"task": task, "submit_time": time.time(), "completed": False}
 
             submitted_task_ids.append(task.task_id)
 
@@ -275,7 +273,7 @@ class DistributedShardExecutor:
                     success=False,
                     matches=[],
                     execution_time=timeout,
-                    error_message="Task timeout"
+                    error_message="Task timeout",
                 )
                 results.append(timeout_result)
 
@@ -301,7 +299,7 @@ class DistributedShardExecutor:
             "average_execution_time": 0.0,
             "shard_utilization": {},
             "truth_values_summary": {},
-            "error_summary": {}
+            "error_summary": {},
         }
 
         # Calculate average execution time
@@ -376,14 +374,14 @@ class DistributedShardExecutor:
                 # Handle worker errors
                 print(f"Worker {worker_id} on shard {shard_id} error: {e}")
 
-                if 'task' in locals():
+                if "task" in locals():
                     error_result = ShardResult(
                         task_id=task.task_id,
                         shard_id=shard_id,
                         success=False,
                         matches=[],
                         execution_time=0.0,
-                        error_message=str(e)
+                        error_message=str(e),
                     )
                     self.results_cache[task.task_id] = error_result
 
@@ -415,7 +413,7 @@ class DistributedShardExecutor:
                 success=True,
                 matches=matches,
                 execution_time=execution_time,
-                truth_values=truth_values
+                truth_values=truth_values,
             )
 
         except Exception as e:
@@ -427,7 +425,7 @@ class DistributedShardExecutor:
                 success=False,
                 matches=[],
                 execution_time=execution_time,
-                error_message=str(e)
+                error_message=str(e),
             )
 
     def _simulate_pattern_execution(self, shard_id: int, task: ShardTask) -> list[dict[str, Any]]:
@@ -454,7 +452,7 @@ class DistributedShardExecutor:
                     "name": f"concept_{shard_id}_{i}",
                     "shard_id": shard_id,
                     "link_index": i,
-                    "coordinates": (shard_id, i, 0)
+                    "coordinates": (shard_id, i, 0),
                 }
                 matches.append(match)
 
@@ -467,7 +465,7 @@ class DistributedShardExecutor:
                     "arguments": [f"arg1_{shard_id}_{i}", f"arg2_{shard_id}_{i}"],
                     "shard_id": shard_id,
                     "link_index": i,
-                    "coordinates": (shard_id, i, 1)
+                    "coordinates": (shard_id, i, 1),
                 }
                 matches.append(match)
 
@@ -479,17 +477,20 @@ class DistributedShardExecutor:
                     "variable": var,
                     "value": f"value_{shard_id}_{var}",
                     "shard_id": shard_id,
-                    "coordinates": (shard_id, len(task.variables) % self.links_per_shard, 0)
+                    "coordinates": (shard_id, len(task.variables) % self.links_per_shard, 0),
                 }
                 matches.append(match)
 
         # Apply simulated execution delay
         import time
+
         time.sleep(0.001 * len(matches))  # 1ms per match
 
         return matches
 
-    def _compute_truth_values(self, shard_id: int, task: ShardTask, matches: list[dict[str, Any]]) -> list[tuple[float, float]]:
+    def _compute_truth_values(
+        self, shard_id: int, task: ShardTask, matches: list[dict[str, Any]]
+    ) -> list[tuple[float, float]]:
         """
         Compute truth values for matches
 
@@ -584,10 +585,10 @@ class DistributedShardExecutor:
                 "truth_dimensions": self.truth_dimensions,
                 "total_states": self.total_states,
                 "active_tasks": len([t for t in self.active_tasks.values() if not t["completed"]]),
-                "cached_results": len(self.results_cache)
+                "cached_results": len(self.results_cache),
             },
             "load_distribution": {},
-            "performance_summary": {}
+            "performance_summary": {},
         }
 
         # Collect shard metrics
@@ -608,16 +609,17 @@ class DistributedShardExecutor:
                 report["load_distribution"][shard_id] = {
                     "queue_length": shard_metrics["queue_length"],
                     "cpu_utilization": shard_metrics["cpu_utilization"],
-                    "task_ratio": shard_metrics["total_tasks"] / max(1, self.global_metrics["total_tasks_submitted"])
+                    "task_ratio": shard_metrics["total_tasks"] / max(1, self.global_metrics["total_tasks_submitted"]),
                 }
 
         # Performance summary
         report["performance_summary"] = {
             "overall_success_rate": successful_tasks / max(1, total_tasks),
-            "average_shard_utilization": sum(m["cpu_utilization"] for m in report["shard_metrics"].values()) / self.num_shards,
+            "average_shard_utilization": sum(m["cpu_utilization"] for m in report["shard_metrics"].values())
+            / self.num_shards,
             "load_balance_coefficient": self._calculate_load_balance_coefficient(),
             "throughput_per_shard": total_tasks / self.num_shards if total_tasks > 0 else 0,
-            "system_efficiency": successful_tasks / max(1, self.global_metrics["total_tasks_submitted"])
+            "system_efficiency": successful_tasks / max(1, self.global_metrics["total_tasks_submitted"]),
         }
 
         return report
@@ -654,24 +656,14 @@ def main():
 
     # Create test patterns
     test_patterns = [
-        {
-            "pattern": "ConceptNode search",
-            "variables": ["$x"],
-            "constraints": [],
-            "priority": 1
-        },
+        {"pattern": "ConceptNode search", "variables": ["$x"], "constraints": [], "priority": 1},
         {
             "pattern": "EvaluationLink match",
             "variables": ["$pred", "$arg1", "$arg2"],
             "constraints": ["strength > 0.5"],
-            "priority": 2
+            "priority": 2,
         },
-        {
-            "pattern": "BindLink execution",
-            "variables": ["$var"],
-            "constraints": [],
-            "priority": 1
-        }
+        {"pattern": "BindLink execution", "variables": ["$var"], "constraints": [], "priority": 1},
     ] * 10  # 30 total patterns
 
     print(f"Executing {len(test_patterns)} patterns across {executor.num_shards} shards...")
@@ -712,7 +704,11 @@ def main():
     for shard in range(executor.num_shards):
         for link in range(executor.links_per_shard):
             for truth in range(executor.truth_dimensions):
-                state_index = shard * executor.links_per_shard * executor.truth_dimensions + link * executor.truth_dimensions + truth
+                state_index = (
+                    shard * executor.links_per_shard * executor.truth_dimensions
+                    + link * executor.truth_dimensions
+                    + truth
+                )
                 if 0 <= state_index < 110:
                     states_verified += 1
 
@@ -726,13 +722,13 @@ def main():
         "validation": {
             "expected_states": 110,
             "verified_states": states_verified,
-            "validation_passed": states_verified == 110
+            "validation_passed": states_verified == 110,
         },
         "test_metadata": {
             "num_patterns": len(test_patterns),
             "execution_time": execution_time,
-            "patterns_per_second": len(test_patterns) / execution_time
-        }
+            "patterns_per_second": len(test_patterns) / execution_time,
+        },
     }
 
     with open("distributed_execution_results.json", "w") as f:

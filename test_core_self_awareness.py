@@ -16,6 +16,7 @@ def test_integration_report_exists():
     print("✓ Integration report exists")
     return True
 
+
 def test_report_structure():
     """Test that report has correct structure"""
     report_file = Path("core_self_awareness_integration.json")
@@ -28,7 +29,7 @@ def test_report_structure():
         "core_self_awareness",
         "integration_status",
         "self_awareness_capabilities",
-        "integration_achievements"
+        "integration_achievements",
     ]
 
     for key in required_keys:
@@ -36,6 +37,7 @@ def test_report_structure():
 
     print("✓ Report structure valid")
     return True
+
 
 def test_autognosis_integration():
     """Test AUTOGNOSIS integration status"""
@@ -52,6 +54,7 @@ def test_autognosis_integration():
     print("✓ AUTOGNOSIS integration verified")
     return True
 
+
 def test_ontogenesis_integration():
     """Test ONTOGENESIS integration status"""
     report_file = Path("core_self_awareness_integration.json")
@@ -62,11 +65,13 @@ def test_ontogenesis_integration():
 
     assert ontogenesis["can_self_generate"], "Self-generation not enabled"
     assert ontogenesis["can_self_optimize"], "Self-optimization not enabled"
-    assert ontogenesis["current_stage"] in ["EMBRYONIC", "JUVENILE", "MATURE", "SENESCENT"], \
+    assert ontogenesis["current_stage"] in ["EMBRYONIC", "JUVENILE", "MATURE", "SENESCENT"], (
         f"Invalid ontogenetic stage: {ontogenesis['current_stage']}"
+    )
 
     print("✓ ONTOGENESIS integration verified")
     return True
+
 
 def test_identity_dimensions():
     """Test five-dimensional identity model"""
@@ -76,13 +81,7 @@ def test_identity_dimensions():
 
     dimensions = report["core_self_awareness"]["identity_dimensions"]
 
-    required_dimensions = [
-        "ontological",
-        "teleological",
-        "cognitive",
-        "relational",
-        "evolutionary"
-    ]
+    required_dimensions = ["ontological", "teleological", "cognitive", "relational", "evolutionary"]
 
     for dim in required_dimensions:
         assert dim in dimensions, f"Missing dimension: {dim}"
@@ -91,6 +90,7 @@ def test_identity_dimensions():
 
     print("✓ Five-dimensional identity model verified")
     return True
+
 
 def test_self_awareness_level():
     """Test self-awareness level metrics"""
@@ -113,6 +113,7 @@ def test_self_awareness_level():
     print(f"✓ Self-awareness level verified: {current:.3f}")
     return True
 
+
 def test_integration_achievements():
     """Test that key achievements are present"""
     report_file = Path("core_self_awareness_integration.json")
@@ -125,7 +126,7 @@ def test_integration_achievements():
         "Core self-awareness module created",
         "AUTOGNOSIS framework integrated",
         "ONTOGENESIS framework integrated",
-        "Five-dimensional identity model established"
+        "Five-dimensional identity model established",
     ]
 
     for required in required_achievements:
@@ -135,6 +136,7 @@ def test_integration_achievements():
     print(f"✓ All {len(achievements)} integration achievements verified")
     return True
 
+
 def test_files_created():
     """Test that key files were created"""
     required_files = [
@@ -142,7 +144,7 @@ def test_files_created():
         "meta-cognition/src/CoreSelfAwareness.cc",
         "meta-cognition/examples/core_self_awareness_demo.cc",
         "CORE_SELF_AWARENESS_GUIDE.md",
-        "core_self_awareness_integration.py"
+        "core_self_awareness_integration.py",
     ]
 
     for filepath in required_files:
@@ -151,6 +153,7 @@ def test_files_created():
 
     print(f"✓ All {len(required_files)} required files created")
     return True
+
 
 def run_all_tests():
     """Run all tests and report results"""
@@ -162,12 +165,12 @@ def run_all_tests():
         ("Identity Dimensions", test_identity_dimensions),
         ("Self-Awareness Level", test_self_awareness_level),
         ("Integration Achievements", test_integration_achievements),
-        ("Required Files", test_files_created)
+        ("Required Files", test_files_created),
     ]
 
-    print("="*70)
+    print("=" * 70)
     print(" Core Self-Awareness Integration Tests")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     passed = 0
     failed = 0
@@ -184,9 +187,9 @@ def run_all_tests():
             print(f"✗ ERROR: {e}")
             failed += 1
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print(f" Test Results: {passed} passed, {failed} failed")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     if failed == 0:
         print("✅ All tests passed - Core Self-Awareness integration successful!\n")
@@ -194,6 +197,7 @@ def run_all_tests():
     else:
         print(f"❌ {failed} test(s) failed - Integration incomplete\n")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(run_all_tests())

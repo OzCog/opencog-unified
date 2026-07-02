@@ -50,7 +50,7 @@ class FIXMEDevEnvironment:
 
         # Pre-commit hook to check for new FIXMEs
         pre_commit_hook = self.git_hooks_dir / "pre-commit"
-        pre_commit_content = dedent('''
+        pre_commit_content = dedent("""
             #!/bin/bash
             # Pre-commit hook to prevent new FIXMEs
 
@@ -86,15 +86,15 @@ class FIXMEDevEnvironment:
 
             echo "✅ No new FIXMEs detected"
             exit 0
-        ''').strip()
+        """).strip()
 
-        with open(pre_commit_hook, 'w') as f:
+        with open(pre_commit_hook, "w") as f:
             f.write(pre_commit_content)
         pre_commit_hook.chmod(0o755)
 
         # Post-commit hook to update progress
         post_commit_hook = self.git_hooks_dir / "post-commit"
-        post_commit_content = dedent('''
+        post_commit_content = dedent("""
             #!/bin/bash
             # Post-commit hook to update FIXME progress
 
@@ -106,9 +106,9 @@ class FIXMEDevEnvironment:
                     python3 fixme_resolution_tracker.py --report > /dev/null 2>&1 || true
                 fi
             fi
-        ''').strip()
+        """).strip()
 
-        with open(post_commit_hook, 'w') as f:
+        with open(post_commit_hook, "w") as f:
             f.write(post_commit_content)
         post_commit_hook.chmod(0o755)
 
@@ -117,7 +117,7 @@ class FIXMEDevEnvironment:
         print("⚙️  Setting up pre-commit configuration...")
 
         pre_commit_config = self.repo_root / ".pre-commit-config.yaml"
-        config_content = dedent('''
+        config_content = dedent("""
             # Pre-commit configuration for FIXME management
             repos:
               - repo: local
@@ -135,9 +135,9 @@ class FIXMEDevEnvironment:
                     files: .*
                     pass_filenames: false
                     always_run: false
-        ''').strip()
+        """).strip()
 
-        with open(pre_commit_config, 'w') as f:
+        with open(pre_commit_config, "w") as f:
             f.write(config_content)
 
     def _setup_ci_integration(self):
@@ -149,7 +149,7 @@ class FIXMEDevEnvironment:
         github_dir.mkdir(parents=True, exist_ok=True)
 
         workflow_file = github_dir / "fixme-tracking.yml"
-        workflow_content = dedent('''
+        workflow_content = dedent("""
             name: FIXME Tracking
 
             on:
@@ -195,9 +195,9 @@ class FIXMEDevEnvironment:
                   with:
                     name: fixme-progress-report
                     path: FIXME_RESOLUTION_PROGRESS_REPORT.md
-        ''').strip()
+        """).strip()
 
-        with open(workflow_file, 'w') as f:
+        with open(workflow_file, "w") as f:
             f.write(workflow_content)
 
     def _setup_weekly_reports(self):
@@ -209,7 +209,7 @@ class FIXMEDevEnvironment:
         scripts_dir.mkdir(exist_ok=True)
 
         weekly_script = scripts_dir / "weekly_fixme_report.sh"
-        script_content = dedent('''
+        script_content = dedent("""
             #!/bin/bash
             # Weekly FIXME progress report generator
 
@@ -229,9 +229,9 @@ class FIXMEDevEnvironment:
             python3 fixme_resolution_tracker.py --easy-wins >> "reports/weekly_report_$date_stamp.md"
 
             echo "✅ Weekly report generated: reports/weekly_report_$date_stamp.md"
-        ''').strip()
+        """).strip()
 
-        with open(weekly_script, 'w') as f:
+        with open(weekly_script, "w") as f:
             f.write(script_content)
         weekly_script.chmod(0o755)
 
@@ -244,7 +244,7 @@ class FIXMEDevEnvironment:
         print("🔨 Creating Makefile targets...")
 
         makefile = self.repo_root / "Makefile.fixme"
-        makefile_content = dedent('''
+        makefile_content = dedent("""
             # FIXME Resolution Makefile Targets
             # Include this in your main Makefile with: include Makefile.fixme
 
@@ -283,10 +283,11 @@ class FIXMEDevEnvironment:
             	@echo "  fixme-dry-run     - Preview automated fixes"
             	@echo "  fixme-apply-easy  - Apply automated easy fixes"
             	@echo "  fixme-setup       - Set up development environment"
-        ''').strip()
+        """).strip()
 
-        with open(makefile, 'w') as f:
+        with open(makefile, "w") as f:
             f.write(makefile_content)
+
 
 def main():
     """Main entry point for environment setup."""
@@ -299,6 +300,7 @@ def main():
 
     env_setup = FIXMEDevEnvironment(args.repo)
     env_setup.setup_environment()
+
 
 if __name__ == "__main__":
     main()

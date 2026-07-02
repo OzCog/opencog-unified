@@ -36,9 +36,22 @@ class EnhancedJSONEncoder(json.JSONEncoder):
             TypeError: If object type is not supported
         """
         # Handle NumPy integers (NumPy 2.0 compatible)
-        if isinstance(obj, (np.integer, np.intc, np.intp, np.int8,
-                           np.int16, np.int32, np.int64,
-                           np.uint8, np.uint16, np.uint32, np.uint64)):
+        if isinstance(
+            obj,
+            (
+                np.integer,
+                np.intc,
+                np.intp,
+                np.int8,
+                np.int16,
+                np.int32,
+                np.int64,
+                np.uint8,
+                np.uint16,
+                np.uint32,
+                np.uint64,
+            ),
+        ):
             return int(obj)
 
         # Handle NumPy floats (NumPy 2.0 compatible)
@@ -81,9 +94,22 @@ def deep_convert(obj: Any) -> Any:
         return [deep_convert(item) for item in obj]
 
     # Handle NumPy integers (NumPy 2.0 compatible)
-    if isinstance(obj, (np.integer, np.intc, np.intp, np.int8,
-                       np.int16, np.int32, np.int64,
-                       np.uint8, np.uint16, np.uint32, np.uint64)):
+    if isinstance(
+        obj,
+        (
+            np.integer,
+            np.intc,
+            np.intp,
+            np.int8,
+            np.int16,
+            np.int32,
+            np.int64,
+            np.uint8,
+            np.uint16,
+            np.uint32,
+            np.uint64,
+        ),
+    ):
         return int(obj)
 
     # Handle NumPy floats (NumPy 2.0 compatible)
@@ -116,8 +142,8 @@ def safe_json_dump(obj: Any, fp, **kwargs) -> None:
         **kwargs: Additional arguments to pass to json.dump
     """
     # Ensure 'cls' parameter is set to our enhanced encoder if not provided
-    if 'cls' not in kwargs:
-        kwargs['cls'] = EnhancedJSONEncoder
+    if "cls" not in kwargs:
+        kwargs["cls"] = EnhancedJSONEncoder
 
     json.dump(obj, fp, **kwargs)
 
@@ -134,8 +160,8 @@ def safe_json_dumps(obj: Any, **kwargs) -> str:
         JSON string representation
     """
     # Ensure 'cls' parameter is set to our enhanced encoder if not provided
-    if 'cls' not in kwargs:
-        kwargs['cls'] = EnhancedJSONEncoder
+    if "cls" not in kwargs:
+        kwargs["cls"] = EnhancedJSONEncoder
 
     return json.dumps(obj, **kwargs)
 
@@ -158,9 +184,22 @@ def enhanced_json_encoder(obj: Any) -> Any:
         TypeError: If object type is not supported
     """
     # Handle NumPy integers (NumPy 2.0 compatible)
-    if isinstance(obj, (np.integer, np.intc, np.intp, np.int8,
-                       np.int16, np.int32, np.int64,
-                       np.uint8, np.uint16, np.uint32, np.uint64)):
+    if isinstance(
+        obj,
+        (
+            np.integer,
+            np.intc,
+            np.intp,
+            np.int8,
+            np.int16,
+            np.int32,
+            np.int64,
+            np.uint8,
+            np.uint16,
+            np.uint32,
+            np.uint64,
+        ),
+    ):
         return int(obj)
 
     # Handle NumPy floats (NumPy 2.0 compatible)
@@ -179,4 +218,4 @@ def enhanced_json_encoder(obj: Any) -> Any:
     if isinstance(obj, np.generic):
         return obj.item()
 
-    raise TypeError(f'Object of type {obj.__class__.__name__} is not JSON serializable')
+    raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")

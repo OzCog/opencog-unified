@@ -22,6 +22,7 @@ from pathlib import Path
 @dataclass
 class UpstreamFix:
     """Represents a fix found in upstream repos."""
+
     repo: str
     commit_sha: str
     commit_date: str
@@ -31,9 +32,11 @@ class UpstreamFix:
     diff_snippet: str
     applicable: bool = False
 
+
 @dataclass
 class SyncReport:
     """Report of upstream sync results."""
+
     timestamp: str
     repos_checked: list[str]
     fixes_found: int
@@ -46,38 +49,38 @@ class UpstreamSyncAssistant:
     """Manages syncing with upstream OpenCog repositories."""
 
     OPENCOG_REPOS = [
-        'atomspace',
-        'cogutil',
-        'cogserver',
-        'atomspace-rocks',
-        'atomspace-restful',
-        'ure',
-        'pln',
-        'moses',
-        'attention',
-        'spacetime',
-        'unify',
-        'miner',
-        'lg-atomese',
-        'learn',
-        'language-learning',
-        'opencog'
+        "atomspace",
+        "cogutil",
+        "cogserver",
+        "atomspace-rocks",
+        "atomspace-restful",
+        "ure",
+        "pln",
+        "moses",
+        "attention",
+        "spacetime",
+        "unify",
+        "miner",
+        "lg-atomese",
+        "learn",
+        "language-learning",
+        "opencog",
     ]
 
     MARKER_PATTERNS = [
-        r'\bTODO\b',
-        r'\bFIXME\b',
-        r'\bXXX\b',
-        r'\bHACK\b',
-        r'\bSTUB\b',
-        r'\bMOCK\b',
-        r'\bNOT[_\s]?IMPLEMENTED\b',
-        r'\bPLACEHOLDER\b'
+        r"\bTODO\b",
+        r"\bFIXME\b",
+        r"\bXXX\b",
+        r"\bHACK\b",
+        r"\bSTUB\b",
+        r"\bMOCK\b",
+        r"\bNOT[_\s]?IMPLEMENTED\b",
+        r"\bPLACEHOLDER\b",
     ]
 
-    def __init__(self, repo_root: str = '.'):
+    def __init__(self, repo_root: str = "."):
         self.repo_root = Path(repo_root).resolve()
-        self.cache_dir = self.repo_root / '.upstream_cache'
+        self.cache_dir = self.repo_root / ".upstream_cache"
         self.cache_dir.mkdir(exist_ok=True)
         self.fixes: list[UpstreamFix] = []
 
@@ -103,15 +106,11 @@ class UpstreamSyncAssistant:
             # Clone or update cache
             if repo_cache.exists():
                 print("  Updating cache...")
-                subprocess.run(
-                    ['git', '-C', str(repo_cache), 'fetch', 'origin'],
-                    capture_output=True, check=True
-                )
+                subprocess.run(["git", "-C", str(repo_cache), "fetch", "origin"], capture_output=True, check=True)
             else:
                 print("  Cloning (this may take a moment)...")
                 subprocess.run(
-                    ['git', 'clone', '--depth=100', repo_url, str(repo_cache)],
-                    capture_output=True, check=True
+                    ["git", "clone", "--depth=100", repo_url, str(repo_cache)], capture_output=True, check=True
                 )
 
             # Get commits that touch markers
@@ -120,9 +119,9 @@ class UpstreamSyncAssistant:
             # Search for commits that removed markers
             for pattern in self.MARKER_PATTERNS:
                 result = subprocess.run(
-                    ['git', '-C', str(repo_cache), 'log',
-                     since_date, '--all', '-p', f'-G{pattern}'],
-                    capture_output=True, text=True
+                    ["git", "-C", str(repo_cache), "log", since_date, "--all", "-p", f"-G{pattern}"],
+                    capture_output=True,
+                    text=True,
                 )
 
                 if result.returncode == 0 and result.stdout:
@@ -143,38 +142,34 @@ class UpstreamSyncAssistant:
         fixes = []
 
         # Split into commits
-        commits = re.split(r'^commit ', log_output, flags=re.MULTILINE)[1:]
+        commits = re.split(r"^commit ", log_output, flags=re.MULTILINE)[1:]
 
         for commit_text in commits:
-            lines = commit_text.split('\n')
+            lines = commit_text.split("\n")
             if not lines:
                 continue
 
             sha = lines[0].strip()
 
             # Extract date
-            date_match = re.search(r'^Date:\s+(.+)$', commit_text, re.MULTILINE)
-            date = date_match.group(1).strip() if date_match else 'Unknown'
+            date_match = re.search(r"^Date:\s+(.+)$", commit_text, re.MULTILINE)
+            date = date_match.group(1).strip() if date_match else "Unknown"
 
             # Extract message
-            msg_match = re.search(r'^\s{4,}(.+)$', commit_text, re.MULTILINE)
-            description = msg_match.group(1).strip() if msg_match else 'No description'
+            msg_match = re.search(r"^\s{4,}(.+)$", commit_text, re.MULTILINE)
+            description = msg_match.group(1).strip() if msg_match else "No description"
 
             # Check if markers were removed (lines with -)
-            removed_markers = re.findall(
-                rf'^-.*?({marker_pattern}).*?$',
-                commit_text,
-                re.MULTILINE | re.IGNORECASE
-            )
+            removed_markers = re.findall(rf"^-.*?({marker_pattern}).*?$", commit_text, re.MULTILINE | re.IGNORECASE)
 
             if removed_markers:
                 # Extract file path
-                file_match = re.search(r'^diff --git a/(\S+)', commit_text, re.MULTILINE)
-                file_path = file_match.group(1) if file_match else 'unknown'
+                file_match = re.search(r"^diff --git a/(\S+)", commit_text, re.MULTILINE)
+                file_path = file_match.group(1) if file_match else "unknown"
 
                 # Get diff snippet
-                diff_lines = [l for l in lines if l.startswith(('-', '+')) and len(l) > 1]
-                diff_snippet = '\n'.join(diff_lines[:10])  # First 10 lines
+                diff_lines = [l for l in lines if l.startswith(("-", "+")) and len(l) > 1]
+                diff_snippet = "\n".join(diff_lines[:10])  # First 10 lines
 
                 fix = UpstreamFix(
                     repo=repo,
@@ -183,7 +178,7 @@ class UpstreamSyncAssistant:
                     file_path=file_path,
                     marker_type=marker_pattern,
                     fix_description=description[:200],
-                    diff_snippet=diff_snippet
+                    diff_snippet=diff_snippet,
                 )
                 fixes.append(fix)
 
@@ -221,12 +216,12 @@ class UpstreamSyncAssistant:
         recommendations = self._generate_recommendations(all_fixes)
 
         report = SyncReport(
-            timestamp=datetime.utcnow().isoformat() + 'Z',
+            timestamp=datetime.utcnow().isoformat() + "Z",
             repos_checked=repos_to_check,
             fixes_found=len(all_fixes),
             applicable_fixes=applicable_count,
             markers_resolved_upstream=len({f.file_path for f in all_fixes}),
-            recommendations=recommendations
+            recommendations=recommendations,
         )
 
         self.fixes = all_fixes
@@ -241,12 +236,17 @@ class UpstreamSyncAssistant:
             return True
 
         # Check in components
-        component_match = re.match(r'^([\w-]+)/', fix.file_path)
+        component_match = re.match(r"^([\w-]+)/", fix.file_path)
         if component_match:
             component_match.group(1)
-            for comp_dir in ['components/core', 'components/logic',
-                            'components/cognitive', 'components/advanced',
-                            'components/learning', 'components/language']:
+            for comp_dir in [
+                "components/core",
+                "components/logic",
+                "components/cognitive",
+                "components/advanced",
+                "components/learning",
+                "components/language",
+            ]:
                 potential = self.repo_root / comp_dir / fix.file_path
                 if potential.exists():
                     return True
@@ -264,16 +264,10 @@ class UpstreamSyncAssistant:
                 by_repo.setdefault(fix.repo, []).append(fix)
 
         if by_repo:
-            recommendations.append(
-                f"Found applicable fixes in {len(by_repo)} upstream repos"
-            )
+            recommendations.append(f"Found applicable fixes in {len(by_repo)} upstream repos")
 
-            for repo, repo_fixes in sorted(by_repo.items(),
-                                          key=lambda x: len(x[1]),
-                                          reverse=True)[:3]:
-                recommendations.append(
-                    f"- {repo}: {len(repo_fixes)} fixes to review"
-                )
+            for repo, repo_fixes in sorted(by_repo.items(), key=lambda x: len(x[1]), reverse=True)[:3]:
+                recommendations.append(f"- {repo}: {len(repo_fixes)} fixes to review")
 
         # Pattern analysis
         marker_counts = {}
@@ -282,27 +276,24 @@ class UpstreamSyncAssistant:
 
         if marker_counts:
             top_marker = max(marker_counts.items(), key=lambda x: x[1])
-            recommendations.append(
-                f"Most frequently resolved upstream: {top_marker[0]} "
-                f"({top_marker[1]} times)"
-            )
+            recommendations.append(f"Most frequently resolved upstream: {top_marker[0]} ({top_marker[1]} times)")
 
         return recommendations
 
-    def export_report(self, output_file: str = 'upstream_sync_report.json'):
+    def export_report(self, output_file: str = "upstream_sync_report.json"):
         """Export sync results to JSON."""
         output_path = self.repo_root / output_file
 
         data = {
-            'fixes': [asdict(f) for f in self.fixes],
-            'summary': {
-                'total_fixes': len(self.fixes),
-                'applicable_fixes': len([f for f in self.fixes if f.applicable]),
-                'repos_with_fixes': len({f.repo for f in self.fixes}),
-            }
+            "fixes": [asdict(f) for f in self.fixes],
+            "summary": {
+                "total_fixes": len(self.fixes),
+                "applicable_fixes": len([f for f in self.fixes if f.applicable]),
+                "repos_with_fixes": len({f.repo for f in self.fixes}),
+            },
         }
 
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(data, f, indent=2)
 
         print(f"\n✓ Report exported to {output_file}")
@@ -325,7 +316,7 @@ class UpstreamSyncAssistant:
             print(f"   Fix: {fix.fix_description[:100]}")
             if fix.diff_snippet:
                 print("   Preview:")
-                for line in fix.diff_snippet.split('\n')[:3]:
+                for line in fix.diff_snippet.split("\n")[:3]:
                     print(f"     {line}")
 
 
@@ -333,29 +324,12 @@ def main():
     """Main entry point."""
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description='Sync with upstream OpenCog repos for repair guidance'
-    )
-    parser.add_argument(
-        '--repo', default='.',
-        help='Repository root path'
-    )
-    parser.add_argument(
-        '--days', type=int, default=90,
-        help='Days of history to check (default: 90)'
-    )
-    parser.add_argument(
-        '--max-repos', type=int, default=5,
-        help='Maximum repos to check (default: 5)'
-    )
-    parser.add_argument(
-        '--export', default='upstream_sync_report.json',
-        help='Export file name'
-    )
-    parser.add_argument(
-        '--show', action='store_true',
-        help='Show applicable fixes interactively'
-    )
+    parser = argparse.ArgumentParser(description="Sync with upstream OpenCog repos for repair guidance")
+    parser.add_argument("--repo", default=".", help="Repository root path")
+    parser.add_argument("--days", type=int, default=90, help="Days of history to check (default: 90)")
+    parser.add_argument("--max-repos", type=int, default=5, help="Maximum repos to check (default: 5)")
+    parser.add_argument("--export", default="upstream_sync_report.json", help="Export file name")
+    parser.add_argument("--show", action="store_true", help="Show applicable fixes interactively")
 
     args = parser.parse_args()
 
@@ -385,5 +359,5 @@ def main():
     print("\n✓ Sync complete!")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

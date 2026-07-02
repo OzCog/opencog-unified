@@ -18,11 +18,13 @@ import numpy as np
 @dataclass
 class NeuralGraphQLConfig:
     """Configuration for neural GraphQL schema generation"""
+
     attention_heads: int = 7
     hidden_layers: int = 7
     message_passes: int = 7
     tensor_shape: tuple[int, int, int] = (7, 7, 7)
     total_states: int = 343  # 7³
+
 
 class NeuralSchemaGenerator:
     """
@@ -49,14 +51,14 @@ class NeuralSchemaGenerator:
             self._generate_neural_directives(),
             self._generate_cognitive_queries(),
             self._generate_attention_mutations(),
-            self._generate_tensor_subscriptions()
+            self._generate_tensor_subscriptions(),
         ]
 
         return "\n\n".join(schema_parts)
 
     def _generate_base_types(self) -> str:
         """Generate base GraphQL types for neural graphs"""
-        return '''
+        return """
 # Neural Graph Base Types
 scalar Float32Array
 scalar TensorShape
@@ -93,11 +95,11 @@ type AttentionHead {
   key_projection: Float32Array!
   value_projection: Float32Array!
 }
-'''
+"""
 
     def _generate_neural_directives(self) -> str:
         """Generate neural-specific GraphQL directives"""
-        return '''
+        return """
 # Neural Directives for Self-Modification
 directive @neural_attention(
   head: Int!
@@ -118,11 +120,11 @@ directive @cognitive_primitive(
   depth: String!
   context: String!
 ) on FIELD | FIELD_DEFINITION
-'''
+"""
 
     def _generate_cognitive_queries(self) -> str:
         """Generate cognitive query operations"""
-        return '''
+        return """
 type Query {
   # Neural Graph Queries
   getNeuralGraph(id: ID!): NeuralGraph
@@ -166,11 +168,11 @@ type Query {
     target: Int!
   ): [Int!]!
 }
-'''
+"""
 
     def _generate_attention_mutations(self) -> str:
         """Generate attention allocation mutations"""
-        return '''
+        return """
 type Mutation {
   # Attention allocation
   allocateAttention(
@@ -201,11 +203,11 @@ type Mutation {
     new_directives: String!
   ): String
 }
-'''
+"""
 
     def _generate_tensor_subscriptions(self) -> str:
         """Generate real-time tensor subscriptions"""
-        return '''
+        return """
 type Subscription {
   # Real-time attention updates
   attentionUpdates(
@@ -230,7 +232,7 @@ type Subscription {
     modality: String!
   ): NeuralNode
 }
-'''
+"""
 
     def encode_attention_state(self, layer: int, head: int) -> np.ndarray:
         """
@@ -331,7 +333,7 @@ type Subscription {
     def save_schema(self, filepath: str) -> None:
         """Save generated schema to file"""
         schema = self.generate_schema()
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             f.write(schema)
 
     def get_state_metadata(self) -> dict:
@@ -342,7 +344,7 @@ type Subscription {
             "attention_heads": self.config.attention_heads,
             "hidden_layers": self.config.hidden_layers,
             "message_passes": self.config.message_passes,
-            "prime_factorization": self.validate_prime_factorization(343)
+            "prime_factorization": self.validate_prime_factorization(343),
         }
 
 

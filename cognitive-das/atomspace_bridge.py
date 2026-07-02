@@ -21,6 +21,7 @@ from typing import Any
 # Mock AtomSpace classes for development (will be replaced with real imports)
 class MockAtomSpace:
     """Mock AtomSpace for development purposes"""
+
     def __init__(self):
         self.atoms = {}
         self.links = {}
@@ -44,25 +45,31 @@ class MockAtomSpace:
     def get_all_atoms(self) -> list[dict]:
         return list(self.atoms.values()) + list(self.links.values())
 
+
 @dataclass
 class AtomSpaceQuery:
     """Structured AtomSpace query representation"""
+
     pattern: str
     variables: list[str]
     constraints: list[str]
     shard_hint: int | None = None
 
+
 @dataclass
 class HypergraphPattern:
     """Hypergraph pattern for distributed matching"""
+
     nodes: list[dict[str, Any]]
     edges: list[dict[str, Any]]
     variables: dict[str, str]
     tensor_coordinates: tuple[int, int, int]  # (shard, link, truth) for 11×5×2
 
+
 @dataclass
 class DistributedShard:
     """Represents one shard in the 11-shard distributed system"""
+
     shard_id: int
     atomspace: MockAtomSpace
     links_per_shard: int = 5
@@ -72,6 +79,7 @@ class DistributedShard:
     def __post_init__(self):
         if self.lock is None:
             self.lock = threading.Lock()
+
 
 class AtomSpaceGraphQLBridge:
     """
@@ -94,7 +102,7 @@ class AtomSpaceGraphQLBridge:
                 shard_id=i,
                 atomspace=MockAtomSpace(),
                 links_per_shard=self.links_per_shard,
-                truth_dimensions=self.truth_dimensions
+                truth_dimensions=self.truth_dimensions,
             )
 
         # GraphQL to AtomSpace mapping
@@ -105,7 +113,7 @@ class AtomSpaceGraphQLBridge:
             "ListLink": "ListLink",
             "VariableNode": "VariableNode",
             "BindLink": "BindLink",
-            "ExecutionOutputLink": "ExecutionOutputLink"
+            "ExecutionOutputLink": "ExecutionOutputLink",
         }
 
         # Initialize sample data for testing
@@ -147,12 +155,7 @@ class AtomSpaceGraphQLBridge:
         Returns:
             Dict[str, Any]: Aggregated results from all shards
         """
-        results = {
-            "total_matches": 0,
-            "shard_results": {},
-            "execution_time": 0,
-            "pattern_matches": []
-        }
+        results = {"total_matches": 0, "shard_results": {}, "execution_time": 0, "pattern_matches": []}
 
         start_time = time.time()
 
@@ -170,7 +173,7 @@ class AtomSpaceGraphQLBridge:
 
             # Collect results
             for future_id, future in futures.items():
-                shard_id = int(future_id.split('_')[0])
+                shard_id = int(future_id.split("_")[0])
                 shard_result = future.result()
 
                 results["shard_results"][shard_id] = shard_result
@@ -200,7 +203,7 @@ class AtomSpaceGraphQLBridge:
                 "id": node_spec.get("id"),
                 "type": node_spec.get("type", "ConceptNode"),
                 "name": node_spec.get("name"),
-                "is_variable": node_spec.get("name", "").startswith("$")
+                "is_variable": node_spec.get("name", "").startswith("$"),
             }
             nodes.append(node)
 
@@ -214,7 +217,7 @@ class AtomSpaceGraphQLBridge:
                 "type": edge_spec.get("type", "EvaluationLink"),
                 "source": edge_spec.get("source"),
                 "target": edge_spec.get("target"),
-                "targets": edge_spec.get("targets", [])
+                "targets": edge_spec.get("targets", []),
             }
             edges.append(edge)
 
@@ -224,12 +227,7 @@ class AtomSpaceGraphQLBridge:
         link = (pattern_hash // self.num_shards) % self.links_per_shard
         truth = (pattern_hash // (self.num_shards * self.links_per_shard)) % self.truth_dimensions
 
-        return HypergraphPattern(
-            nodes=nodes,
-            edges=edges,
-            variables=variables,
-            tensor_coordinates=(shard, link, truth)
-        )
+        return HypergraphPattern(nodes=nodes, edges=edges, variables=variables, tensor_coordinates=(shard, link, truth))
 
     def _parse_graphql_structure(self, graphql_query: str) -> dict[str, Any]:
         """Parse GraphQL query into structured format"""
@@ -237,7 +235,7 @@ class AtomSpaceGraphQLBridge:
         structure = {"fields": []}
 
         # Extract field patterns
-        field_pattern = r'(\w+)(?:\s*\([^)]*\))?\s*\{([^}]*)\}'
+        field_pattern = r"(\w+)(?:\s*\([^)]*\))?\s*\{([^}]*)\}"
         matches = re.finditer(field_pattern, graphql_query)
 
         for match in matches:
@@ -247,7 +245,7 @@ class AtomSpaceGraphQLBridge:
             field = {
                 "name": field_name,
                 "arguments": self._extract_arguments(match.group(0)),
-                "selections": self._extract_selections(field_body)
+                "selections": self._extract_selections(field_body),
             }
             structure["fields"].append(field)
 
@@ -258,19 +256,19 @@ class AtomSpaceGraphQLBridge:
         arguments = {}
 
         # Find arguments in parentheses
-        arg_match = re.search(r'\(([^)]+)\)', field_text)
+        arg_match = re.search(r"\(([^)]+)\)", field_text)
         if arg_match:
             arg_string = arg_match.group(1)
 
             # Parse key-value pairs
-            pairs = re.findall(r'(\w+):\s*([^,\s]+)', arg_string)
+            pairs = re.findall(r"(\w+):\s*([^,\s]+)", arg_string)
             for key, value in pairs:
                 # Simple value parsing
                 if value.startswith('"') and value.endswith('"'):
                     arguments[key] = value[1:-1]  # Remove quotes
                 elif value.isdigit():
                     arguments[key] = int(value)
-                elif value.replace('.', '').isdigit():
+                elif value.replace(".", "").isdigit():
                     arguments[key] = float(value)
                 else:
                     arguments[key] = value
@@ -284,8 +282,8 @@ class AtomSpaceGraphQLBridge:
         # Split by whitespace and filter
         parts = field_body.split()
         for part in parts:
-            clean_part = part.strip().rstrip(',')
-            if clean_part and not clean_part.startswith('{') and not clean_part.endswith('}'):
+            clean_part = part.strip().rstrip(",")
+            if clean_part and not clean_part.startswith("{") and not clean_part.endswith("}"):
                 selections.append(clean_part)
 
         return selections
@@ -300,12 +298,8 @@ class AtomSpaceGraphQLBridge:
         target_name = args.get("target", "unknown")
 
         if pattern_type == "concept":
-            pattern = f"(ConceptNode \"{target_name}\")"
-            queries.append(AtomSpaceQuery(
-                pattern=pattern,
-                variables=[],
-                constraints=[]
-            ))
+            pattern = f'(ConceptNode "{target_name}")'
+            queries.append(AtomSpaceQuery(pattern=pattern, variables=[], constraints=[]))
 
         elif pattern_type == "evaluation":
             pattern = f"""
@@ -313,11 +307,7 @@ class AtomSpaceGraphQLBridge:
                 (PredicateNode "{target_name}")
                 (ListLink $X $Y))
             """
-            queries.append(AtomSpaceQuery(
-                pattern=pattern,
-                variables=["$X", "$Y"],
-                constraints=[]
-            ))
+            queries.append(AtomSpaceQuery(pattern=pattern, variables=["$X", "$Y"], constraints=[]))
 
         return queries
 
@@ -331,7 +321,7 @@ class AtomSpaceGraphQLBridge:
         # Create pattern with variables
         pattern = f"""
         (BindLink
-            (VariableList {' '.join(f'(VariableNode "{var}")' for var in variables)})
+            (VariableList {" ".join(f'(VariableNode "{var}")' for var in variables)})
             (AndLink
                 (ConceptNode $concept)
                 (EvaluationLink
@@ -342,11 +332,7 @@ class AtomSpaceGraphQLBridge:
                 (ListLink $concept $target)))
         """
 
-        queries.append(AtomSpaceQuery(
-            pattern=pattern,
-            variables=variables,
-            constraints=[]
-        ))
+        queries.append(AtomSpaceQuery(pattern=pattern, variables=variables, constraints=[]))
 
         return queries
 
@@ -365,11 +351,9 @@ class AtomSpaceGraphQLBridge:
                 $X)
             """
 
-            queries.append(AtomSpaceQuery(
-                pattern=pattern,
-                variables=["$X"],
-                constraints=["(> (cog-tv-confidence $X) 0.5)"]
-            ))
+            queries.append(
+                AtomSpaceQuery(pattern=pattern, variables=["$X"], constraints=["(> (cog-tv-confidence $X) 0.5)"])
+            )
 
         return queries
 
@@ -402,7 +386,7 @@ class AtomSpaceGraphQLBridge:
                 "matches": len(matches),
                 "patterns": matches,
                 "query_pattern": query.pattern,
-                "execution_time": 0.01  # Simulated execution time
+                "execution_time": 0.01,  # Simulated execution time
             }
 
     def _simulate_pattern_matching(self, shard: DistributedShard, query: AtomSpaceQuery) -> list[dict[str, Any]]:
@@ -425,8 +409,19 @@ class AtomSpaceGraphQLBridge:
 
     def _populate_test_data(self):
         """Populate shards with test data"""
-        concepts = ["knowledge", "learning", "reasoning", "memory", "attention",
-                   "perception", "action", "goal", "belief", "desire", "emotion"]
+        concepts = [
+            "knowledge",
+            "learning",
+            "reasoning",
+            "memory",
+            "attention",
+            "perception",
+            "action",
+            "goal",
+            "belief",
+            "desire",
+            "emotion",
+        ]
         predicates = ["related-to", "is-a", "part-of", "causes", "enables"]
 
         for shard_id, shard in self.shards.items():
@@ -458,7 +453,7 @@ class AtomSpaceGraphQLBridge:
             "links_per_shard": self.links_per_shard,
             "truth_dimensions": self.truth_dimensions,
             "total_states": self.total_states,
-            "shard_details": {}
+            "shard_details": {},
         }
 
         for shard_id, shard in self.shards.items():
@@ -470,31 +465,28 @@ class AtomSpaceGraphQLBridge:
                 "total_atoms": len(atoms),
                 "nodes": len(nodes),
                 "links": len(links),
-                "tensor_coordinate": (shard_id, len(links) % self.links_per_shard, 0)
+                "tensor_coordinate": (shard_id, len(links) % self.links_per_shard, 0),
             }
 
         return stats
 
     def validate_110_states(self) -> dict[str, Any]:
         """Validate that all 110 states are accessible"""
-        validation = {
-            "total_expected": 110,
-            "states_found": 0,
-            "coordinate_mapping": {},
-            "validation_passed": False
-        }
+        validation = {"total_expected": 110, "states_found": 0, "coordinate_mapping": {}, "validation_passed": False}
 
         # Enumerate all possible coordinates
         for shard in range(self.num_shards):
             for link in range(self.links_per_shard):
                 for truth in range(self.truth_dimensions):
-                    state_index = shard * self.links_per_shard * self.truth_dimensions + link * self.truth_dimensions + truth
+                    state_index = (
+                        shard * self.links_per_shard * self.truth_dimensions + link * self.truth_dimensions + truth
+                    )
 
                     validation["coordinate_mapping"][state_index] = {
                         "shard": shard,
                         "link": link,
                         "truth": truth,
-                        "coordinate": (shard, link, truth)
+                        "coordinate": (shard, link, truth),
                     }
                     validation["states_found"] += 1
 
@@ -551,11 +543,9 @@ def main():
     pattern_spec = {
         "nodes": [
             {"id": "n1", "type": "ConceptNode", "name": "knowledge"},
-            {"id": "n2", "type": "ConceptNode", "name": "$target"}
+            {"id": "n2", "type": "ConceptNode", "name": "$target"},
         ],
-        "edges": [
-            {"id": "e1", "type": "EvaluationLink", "targets": ["n1", "n2"]}
-        ]
+        "edges": [{"id": "e1", "type": "EvaluationLink", "targets": ["n1", "n2"]}],
     }
 
     pattern = bridge.create_hypergraph_pattern(pattern_spec)
@@ -573,8 +563,10 @@ def main():
     # Show per-shard stats
     print("\nPer-shard statistics:")
     for shard_id, shard_stats in list(stats["shard_details"].items())[:5]:
-        print(f"  Shard {shard_id}: {shard_stats['total_atoms']} atoms "
-              f"({shard_stats['nodes']} nodes, {shard_stats['links']} links)")
+        print(
+            f"  Shard {shard_id}: {shard_stats['total_atoms']} atoms "
+            f"({shard_stats['nodes']} nodes, {shard_stats['links']} links)"
+        )
 
     # Validate 110 states
     print("\nValidating 110 states...")
@@ -591,8 +583,8 @@ def main():
         "sample_pattern": {
             "nodes": len(pattern.nodes),
             "edges": len(pattern.edges),
-            "coordinates": pattern.tensor_coordinates
-        }
+            "coordinates": pattern.tensor_coordinates,
+        },
     }
 
     with open("atomspace_bridge_results.json", "w") as f:

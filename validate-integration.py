@@ -18,12 +18,7 @@ class IntegrationValidator:
     def __init__(self, root_dir: str = "."):
         self.root_dir = Path(root_dir).resolve()
         self.components_dir = self.root_dir / "components"
-        self.results = {
-            "timestamp": time.time(),
-            "validations": {},
-            "summary": {},
-            "errors": []
-        }
+        self.results = {"timestamp": time.time(), "validations": {}, "summary": {}, "errors": []}
 
         # Component dependency map
         self.dependency_map = {
@@ -41,7 +36,7 @@ class IntegrationValidator:
             "lg-atomese": ["atomspace"],
             "learn": ["atomspace", "cogserver"],
             "language-learning": ["cogutil"],
-            "opencog": ["atomspace", "cogserver", "attention", "ure", "lg-atomese"]
+            "opencog": ["atomspace", "cogserver", "attention", "ure", "lg-atomese"],
         }
 
         # Phase organization
@@ -50,7 +45,7 @@ class IntegrationValidator:
             2: ["unify", "ure", "language-learning"],
             3: ["attention", "spacetime"],
             4: ["pln", "miner", "asmoses"],
-            5: ["lg-atomese", "learn", "opencog"]
+            5: ["lg-atomese", "learn", "opencog"],
         }
 
     def log(self, level: str, message: str):
@@ -61,7 +56,7 @@ class IntegrationValidator:
             "SUCCESS": "\033[0;32m",
             "WARNING": "\033[1;33m",
             "ERROR": "\033[0;31m",
-            "RESET": "\033[0m"
+            "RESET": "\033[0m",
         }
 
         color = color_codes.get(level, "")
@@ -82,7 +77,7 @@ class IntegrationValidator:
             "components/integration",
             "tests/integration",
             "tests/performance",
-            "tests/end_to_end"
+            "tests/end_to_end",
         ]
 
         missing_dirs = []
@@ -123,7 +118,7 @@ class IntegrationValidator:
             "dependencies": self.dependency_map.get(component, []),
             "satisfied": [],
             "missing": [],
-            "status": "unknown"
+            "status": "unknown",
         }
 
         for dep in result["dependencies"]:
@@ -146,12 +141,7 @@ class IntegrationValidator:
         """Validate CMake integration for component"""
         self.log("INFO", f"Validating CMake integration for {component}...")
 
-        result = {
-            "component": component,
-            "cmake_file_exists": False,
-            "integrated_in_main": False,
-            "status": "unknown"
-        }
+        result = {"component": component, "cmake_file_exists": False, "integrated_in_main": False, "status": "unknown"}
 
         # Check if component has CMakeLists.txt
         is_present, component_path = self.check_component_presence(component)
@@ -188,7 +178,7 @@ class IntegrationValidator:
             "build_successful": False,
             "cmake_successful": False,
             "errors": [],
-            "status": "unknown"
+            "status": "unknown",
         }
 
         build_dir = self.root_dir / "build_test"
@@ -196,18 +186,13 @@ class IntegrationValidator:
             # Create clean build directory
             if build_dir.exists():
                 import shutil
+
                 shutil.rmtree(build_dir)
             build_dir.mkdir()
 
             # Run cmake
             self.log("INFO", "Running cmake configuration...")
-            cmake_process = subprocess.run(
-                ["cmake", ".."],
-                cwd=build_dir,
-                capture_output=True,
-                text=True,
-                timeout=120
-            )
+            cmake_process = subprocess.run(["cmake", ".."], cwd=build_dir, capture_output=True, text=True, timeout=120)
 
             result["build_attempted"] = True
             result["cmake_successful"] = cmake_process.returncode == 0
@@ -225,7 +210,7 @@ class IntegrationValidator:
                 cwd=build_dir,
                 capture_output=True,
                 text=True,
-                timeout=300  # 5 minutes timeout
+                timeout=300,  # 5 minutes timeout
             )
 
             result["build_successful"] = make_process.returncode == 0
@@ -250,6 +235,7 @@ class IntegrationValidator:
             # Clean up build directory
             if build_dir.exists():
                 import shutil
+
                 shutil.rmtree(build_dir)
 
         return result
@@ -258,13 +244,7 @@ class IntegrationValidator:
         """Run integration tests if they exist"""
         self.log("INFO", "Validating integration tests...")
 
-        result = {
-            "tests_found": [],
-            "tests_run": [],
-            "tests_passed": [],
-            "tests_failed": [],
-            "status": "unknown"
-        }
+        result = {"tests_found": [], "tests_run": [], "tests_passed": [], "tests_failed": [], "status": "unknown"}
 
         test_dir = self.root_dir / "tests" / "integration"
         if test_dir.exists():
@@ -275,10 +255,7 @@ class IntegrationValidator:
                 try:
                     self.log("INFO", f"Running test: {test_file.name}")
                     test_process = subprocess.run(
-                        [sys.executable, str(test_file)],
-                        capture_output=True,
-                        text=True,
-                        timeout=60
+                        [sys.executable, str(test_file)], capture_output=True, text=True, timeout=60
                     )
 
                     result["tests_run"].append(test_file.name)
@@ -287,23 +264,14 @@ class IntegrationValidator:
                         result["tests_passed"].append(test_file.name)
                         self.log("SUCCESS", f"Test passed: {test_file.name}")
                     else:
-                        result["tests_failed"].append({
-                            "test": test_file.name,
-                            "error": test_process.stderr
-                        })
+                        result["tests_failed"].append({"test": test_file.name, "error": test_process.stderr})
                         self.log("ERROR", f"Test failed: {test_file.name}")
 
                 except subprocess.TimeoutExpired:
-                    result["tests_failed"].append({
-                        "test": test_file.name,
-                        "error": "Test timed out"
-                    })
+                    result["tests_failed"].append({"test": test_file.name, "error": "Test timed out"})
                     self.log("WARNING", f"Test timed out: {test_file.name}")
                 except Exception as e:
-                    result["tests_failed"].append({
-                        "test": test_file.name,
-                        "error": str(e)
-                    })
+                    result["tests_failed"].append({"test": test_file.name, "error": str(e)})
                     self.log("ERROR", f"Test error: {test_file.name} - {e}")
 
         if result["tests_found"]:
@@ -322,24 +290,21 @@ class IntegrationValidator:
         self.log("INFO", f"Validating Phase {phase_num}...")
 
         phase_components = self.phases.get(phase_num, [])
-        result = {
-            "phase": phase_num,
-            "components": phase_components,
-            "validations": {},
-            "status": "unknown"
-        }
+        result = {"phase": phase_num, "components": phase_components, "validations": {}, "status": "unknown"}
 
         all_valid = True
         for component in phase_components:
             component_result = {
                 "dependencies": self.validate_dependencies(component),
-                "cmake": self.validate_cmake_integration(component)
+                "cmake": self.validate_cmake_integration(component),
             }
 
             result["validations"][component] = component_result
 
-            if (component_result["dependencies"]["status"] != "satisfied" or
-                component_result["cmake"]["status"] != "integrated"):
+            if (
+                component_result["dependencies"]["status"] != "satisfied"
+                or component_result["cmake"]["status"] != "integrated"
+            ):
                 all_valid = False
 
         result["status"] = "valid" if all_valid else "invalid"
@@ -357,9 +322,7 @@ class IntegrationValidator:
 
         # Validate directory structure
         structure_valid = self.validate_directory_structure()
-        self.results["validations"]["directory_structure"] = {
-            "status": "valid" if structure_valid else "invalid"
-        }
+        self.results["validations"]["directory_structure"] = {"status": "valid" if structure_valid else "invalid"}
 
         # Validate each phase
         for phase_num in range(1, 6):
@@ -388,7 +351,7 @@ class IntegrationValidator:
             "phases_valid": 0,
             "build_status": validations.get("build", {}).get("status", "unknown"),
             "test_status": validations.get("integration_tests", {}).get("status", "unknown"),
-            "overall_status": "unknown"
+            "overall_status": "unknown",
         }
 
         # Count valid phases
@@ -416,7 +379,7 @@ class IntegrationValidator:
     def save_results(self, output_file: str = "integration_validation.json"):
         """Save validation results to file"""
         output_path = self.root_dir / output_file
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(self.results, f, indent=2)
 
         self.log("INFO", f"Validation results saved to {output_path}")
@@ -425,9 +388,9 @@ class IntegrationValidator:
         """Print validation summary"""
         summary = self.results["summary"]
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("OPENCOG UNIFIED INTEGRATION VALIDATION SUMMARY")
-        print("="*60)
+        print("=" * 60)
 
         print(f"Overall Status: {summary['overall_status'].upper()}")
         print(f"Phases Valid: {summary['phases_valid']}/{summary['total_phases']}")
@@ -447,18 +410,15 @@ class IntegrationValidator:
             for error in self.results["errors"]:
                 print(f"  - {error}")
 
-        print("="*60)
+        print("=" * 60)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Validate OpenCog Unified integration")
-    parser.add_argument("--phase", type=int, choices=[1,2,3,4,5],
-                       help="Validate specific phase only")
-    parser.add_argument("--output", default="integration_validation.json",
-                       help="Output file for results")
-    parser.add_argument("--no-build", action="store_true",
-                       help="Skip build validation")
-    parser.add_argument("--root-dir", default=".",
-                       help="Root directory of OpenCog Unified repository")
+    parser.add_argument("--phase", type=int, choices=[1, 2, 3, 4, 5], help="Validate specific phase only")
+    parser.add_argument("--output", default="integration_validation.json", help="Output file for results")
+    parser.add_argument("--no-build", action="store_true", help="Skip build validation")
+    parser.add_argument("--root-dir", default=".", help="Root directory of OpenCog Unified repository")
 
     args = parser.parse_args()
 
@@ -473,6 +433,7 @@ def main():
         validator.run_full_validation()
         validator.print_summary()
         validator.save_results(args.output)
+
 
 if __name__ == "__main__":
     main()

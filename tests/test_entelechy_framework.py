@@ -35,7 +35,7 @@ class TestEntelechyTypes(unittest.TestCase):
             coherence_score=0.70,
             vitality_score=0.80,
             completeness_score=0.72,
-            alignment_score=0.85
+            alignment_score=0.85,
         )
 
         self.assertEqual(metrics.actualization_score, 0.75)
@@ -48,7 +48,7 @@ class TestEntelechyTypes(unittest.TestCase):
             coherence_score=0.5,
             vitality_score=0.5,
             completeness_score=0.5,
-            alignment_score=0.5
+            alignment_score=0.5,
         )
 
         stage = metrics.determine_stage()
@@ -76,20 +76,20 @@ class TestEntelechyIntrospector(unittest.TestCase):
         introspector = EntelechyIntrospector(str(self.repo_path))
         report = introspector.perform_deep_introspection()
 
-        self.assertIn('entelechy_assessment', report)
-        self.assertIn('dimensional_insights', report)
-        self.assertIn('fragmentation_analysis', report)
-        self.assertIn('repair_roadmap', report)
+        self.assertIn("entelechy_assessment", report)
+        self.assertIn("dimensional_insights", report)
+        self.assertIn("fragmentation_analysis", report)
+        self.assertIn("repair_roadmap", report)
 
         # Check metrics
-        assessment = report['entelechy_assessment']
-        self.assertIn('actualization_score', assessment)
-        self.assertIn('fitness', assessment)
-        self.assertIn('development_stage', assessment)
+        assessment = report["entelechy_assessment"]
+        self.assertIn("actualization_score", assessment)
+        self.assertIn("fitness", assessment)
+        self.assertIn("development_stage", assessment)
 
         # Validate score ranges
-        self.assertGreaterEqual(assessment['actualization_score'], 0.0)
-        self.assertLessEqual(assessment['actualization_score'], 1.0)
+        self.assertGreaterEqual(assessment["actualization_score"], 0.0)
+        self.assertLessEqual(assessment["actualization_score"], 1.0)
 
 
 class TestEntelechyGenome(unittest.TestCase):
@@ -102,7 +102,7 @@ class TestEntelechyGenome(unittest.TestCase):
             coherence_score=0.70,
             vitality_score=0.80,
             completeness_score=0.72,
-            alignment_score=0.85
+            alignment_score=0.85,
         )
 
         genome = EntelechyGenome.from_metrics(metrics)
@@ -119,7 +119,7 @@ class TestEntelechyGenome(unittest.TestCase):
             coherence_score=0.60,
             vitality_score=0.60,
             completeness_score=0.60,
-            alignment_score=0.60
+            alignment_score=0.60,
         )
 
         genome1 = EntelechyGenome.from_metrics(metrics1)
@@ -129,7 +129,7 @@ class TestEntelechyGenome(unittest.TestCase):
             coherence_score=0.70,
             vitality_score=0.80,
             completeness_score=0.72,
-            alignment_score=0.85
+            alignment_score=0.85,
         )
 
         genome2 = genome1.evolve(metrics2)
@@ -145,7 +145,7 @@ class TestEntelechyGenome(unittest.TestCase):
             coherence_score=0.70,
             vitality_score=0.80,
             completeness_score=0.72,
-            alignment_score=0.85
+            alignment_score=0.85,
         )
 
         genome = EntelechyGenome.from_metrics(metrics)
@@ -189,14 +189,14 @@ class TestResonanceDetection(unittest.TestCase):
             coherence_score=0.86,
             vitality_score=0.84,
             completeness_score=0.85,
-            alignment_score=0.87
+            alignment_score=0.87,
         )
 
         resonance = detect_resonance(metrics, threshold=0.7)
 
-        self.assertTrue(resonance['resonating'])
-        self.assertEqual(resonance['quality'], 'high')
-        self.assertGreater(resonance['resonance_strength'], 0.8)
+        self.assertTrue(resonance["resonating"])
+        self.assertEqual(resonance["quality"], "high")
+        self.assertGreater(resonance["resonance_strength"], 0.8)
 
     def test_low_resonance(self):
         """Test detecting low resonance"""
@@ -205,14 +205,14 @@ class TestResonanceDetection(unittest.TestCase):
             coherence_score=0.40,
             vitality_score=0.85,
             completeness_score=0.45,
-            alignment_score=0.88
+            alignment_score=0.88,
         )
 
         resonance = detect_resonance(metrics, threshold=0.7)
 
-        self.assertFalse(resonance['resonating'])
+        self.assertFalse(resonance["resonating"])
         # Quality will be moderate due to variance calculation
-        self.assertIn(resonance['quality'], ['low', 'moderate'])
+        self.assertIn(resonance["quality"], ["low", "moderate"])
 
 
 class TestSelfTranscendence(unittest.TestCase):
@@ -225,15 +225,15 @@ class TestSelfTranscendence(unittest.TestCase):
             coherence_score=0.80,
             vitality_score=0.82,
             completeness_score=0.83,
-            alignment_score=0.86
+            alignment_score=0.86,
         )
 
         transcendence = SelfTranscendence(transcendence_threshold=0.8)
         self.assertTrue(transcendence.can_transcend(metrics))
 
         assessment = transcendence.assess_transcendence_readiness(metrics)
-        self.assertTrue(assessment['ready_to_transcend'])
-        self.assertGreater(assessment['readiness_score'], 0.8)
+        self.assertTrue(assessment["ready_to_transcend"])
+        self.assertGreater(assessment["readiness_score"], 0.8)
 
     def test_transcendence_readiness_low(self):
         """Test transcendence readiness with low actualization"""
@@ -242,15 +242,15 @@ class TestSelfTranscendence(unittest.TestCase):
             coherence_score=0.60,
             vitality_score=0.55,
             completeness_score=0.58,
-            alignment_score=0.62
+            alignment_score=0.62,
         )
 
         transcendence = SelfTranscendence(transcendence_threshold=0.8)
         self.assertFalse(transcendence.can_transcend(metrics))
 
         assessment = transcendence.assess_transcendence_readiness(metrics)
-        self.assertFalse(assessment['ready_to_transcend'])
-        self.assertGreater(len(assessment['blocking_factors']), 0)
+        self.assertFalse(assessment["ready_to_transcend"])
+        self.assertGreater(len(assessment["blocking_factors"]), 0)
 
     def test_emergent_capabilities_discovery(self):
         """Test discovering emergent capabilities"""
@@ -259,14 +259,14 @@ class TestSelfTranscendence(unittest.TestCase):
             coherence_score=0.85,
             vitality_score=0.85,
             completeness_score=0.85,
-            alignment_score=0.88
+            alignment_score=0.88,
         )
 
         transcendence = SelfTranscendence()
         capabilities = transcendence.discover_emergent_capabilities(metrics)
 
         self.assertGreater(len(capabilities), 0)
-        self.assertIn('emergent_general_intelligence', capabilities)
+        self.assertIn("emergent_general_intelligence", capabilities)
 
 
 class TestEntelechyOptimizer(unittest.TestCase):
@@ -290,17 +290,14 @@ class TestEntelechyOptimizer(unittest.TestCase):
             coherence_score=0.50,
             vitality_score=0.55,
             completeness_score=0.58,
-            alignment_score=0.62
+            alignment_score=0.62,
         )
 
-        improvements = optimizer.generate_improvements(
-            EntelechyDimension.EVOLUTIONARY,
-            metrics
-        )
+        improvements = optimizer.generate_improvements(EntelechyDimension.EVOLUTIONARY, metrics)
 
         self.assertGreater(len(improvements), 0)
-        self.assertIn('action', improvements[0])
-        self.assertIn('priority', improvements[0])
+        self.assertIn("action", improvements[0])
+        self.assertIn("priority", improvements[0])
 
 
 def run_tests():
@@ -312,6 +309,6 @@ def run_tests():
     return result.wasSuccessful()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     success = run_tests()
     sys.exit(0 if success else 1)

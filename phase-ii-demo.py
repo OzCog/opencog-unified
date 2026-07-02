@@ -14,6 +14,7 @@ from threading import Lock
 @dataclass
 class CognitiveNode:
     """Represents a cognitive node in the hypergraph"""
+
     id: str
     state: float
     attention: float
@@ -21,14 +22,17 @@ class CognitiveNode:
     x: float = 0.0
     y: float = 0.0
 
+
 @dataclass
 class CognitiveAgent:
     """Represents a distributed cognitive agent"""
+
     id: str
     state: list[float]
     active: bool
     frequency: float
     adjacent_agents: list[str]
+
 
 class PerceptualInputProcessor:
     """Phase II.1: Perceptual Input Layer implementation"""
@@ -37,8 +41,7 @@ class PerceptualInputProcessor:
         self.attention_weights = [1.0] * 10
         self.gating_threshold = threshold
 
-    def recursive_attention_allocate(self, input_signals: list[float],
-                                   context_weights: list[float]) -> list[float]:
+    def recursive_attention_allocate(self, input_signals: list[float], context_weights: list[float]) -> list[float]:
         """Recursive attention allocation with adaptive signal gating"""
         processed_signals = []
 
@@ -73,6 +76,7 @@ class PerceptualInputProcessor:
                 self.attention_weights[i] += learning_rate * feedback_strength
                 # Clamp to reasonable bounds
                 self.attention_weights[i] = max(0.1, min(2.0, self.attention_weights[i]))
+
 
 class HypergraphPatternExtractor:
     """Phase II.2: Emergent Pattern Encoding implementation"""
@@ -120,7 +124,7 @@ class HypergraphPatternExtractor:
                 if other_node.id in visited:
                     continue
 
-                distance = math.sqrt((node.x - other_node.x)**2 + (node.y - other_node.y)**2)
+                distance = math.sqrt((node.x - other_node.x) ** 2 + (node.y - other_node.y) ** 2)
                 if distance < cluster_threshold:
                     cluster.append(other_node.id)
                     visited.add(other_node.id)
@@ -140,6 +144,7 @@ class HypergraphPatternExtractor:
 
         return reified_links
 
+
 class DistributedCognitionEngine:
     """Phase II.3: Distributed Cognition Engine implementation"""
 
@@ -155,16 +160,13 @@ class DistributedCognitionEngine:
             state=initial_state.copy(),
             active=True,
             frequency=5.0 + random.random() * 5.0,  # 5-10 Hz
-            adjacent_agents=[]
+            adjacent_agents=[],
         )
 
         self.agents[agent_id] = agent
 
         with self.context_lock:
-            self.shared_context[agent_id] = {
-                'state': initial_state.copy(),
-                'last_update': time.time()
-            }
+            self.shared_context[agent_id] = {"state": initial_state.copy(), "last_update": time.time()}
 
         return agent
 
@@ -181,14 +183,14 @@ class DistributedCognitionEngine:
             shared_state = []
             for other_id, context in self.shared_context.items():
                 if other_id != agent.id:
-                    shared_state.extend(context['state'][:2])  # Take first 2 elements
+                    shared_state.extend(context["state"][:2])  # Take first 2 elements
 
         # Process cognitive inputs
-        combined_input = agent.state + shared_state[:len(agent.state)]
+        combined_input = agent.state + shared_state[: len(agent.state)]
 
         # Simple cognitive processing
         new_state = []
-        for _i, (old_val, new_input) in enumerate(zip(agent.state, combined_input[:len(agent.state)], strict=False)):
+        for _i, (old_val, new_input) in enumerate(zip(agent.state, combined_input[: len(agent.state)], strict=False)):
             # Apply learning and adaptation
             new_val = 0.7 * old_val + 0.3 * new_input + 0.1 * (random.random() - 0.5)
             new_val = max(0.0, min(1.0, new_val))  # Clamp to [0,1]
@@ -199,12 +201,10 @@ class DistributedCognitionEngine:
 
         # Update shared context
         with self.context_lock:
-            self.shared_context[agent.id] = {
-                'state': new_state.copy(),
-                'last_update': time.time()
-            }
+            self.shared_context[agent.id] = {"state": new_state.copy(), "last_update": time.time()}
 
         return new_state
+
 
 class CognitiveVisualizer:
     """Phase II.4: Interactive Cognitive Visualization implementation"""
@@ -223,17 +223,16 @@ class CognitiveVisualizer:
         for node in nodes:
             if node.attention > 0.5:
                 self.attention_overlays[node.id] = {
-                    'x': node.x,
-                    'y': node.y,
-                    'radius': node.attention * 50,
-                    'intensity': node.attention
+                    "x": node.x,
+                    "y": node.y,
+                    "radius": node.attention * 50,
+                    "intensity": node.attention,
                 }
 
         # Update patterns
         self.patterns = {f"pattern_{i}": pattern for i, pattern in enumerate(patterns)}
 
-    def generate_visualization_feedback(self, interaction_type: str,
-                                      target_id: str, strength: float) -> list[float]:
+    def generate_visualization_feedback(self, interaction_type: str, target_id: str, strength: float) -> list[float]:
         """Generate feedback from user interactions (recursive pathway)"""
         feedback = [0.0] * 5
 
@@ -251,61 +250,62 @@ class CognitiveVisualizer:
 
         return feedback
 
+
 class NeuralSymbolicTutorial:
     """Phase II.5: Tutorial and Automation Layer implementation"""
 
     def __init__(self):
         self.tutorial_state = {
-            'current_section': 'introduction',
-            'progress': 0,
-            'difficulty': 0.5,
-            'user_responses': []
+            "current_section": "introduction",
+            "progress": 0,
+            "difficulty": 0.5,
+            "user_responses": [],
         }
 
         self.tutorial_content = {
-            'introduction': "Welcome to OpenCog Unified Phase II! This demonstrates recursive cognitive expansion.",
-            'basic_concepts': "Let's explore cognitive nodes, attention allocation, and pattern detection.",
-            'pattern_recognition': "Now we'll see how patterns emerge and get reified into new cognitive objects.",
-            'distributed_cognition': "Multiple cognitive agents work together through shared hypergraph context.",
-            'visualization': "Real-time visualization shows attention flows and emergent patterns."
+            "introduction": "Welcome to OpenCog Unified Phase II! This demonstrates recursive cognitive expansion.",
+            "basic_concepts": "Let's explore cognitive nodes, attention allocation, and pattern detection.",
+            "pattern_recognition": "Now we'll see how patterns emerge and get reified into new cognitive objects.",
+            "distributed_cognition": "Multiple cognitive agents work together through shared hypergraph context.",
+            "visualization": "Real-time visualization shows attention flows and emergent patterns.",
         }
 
     def analyze_user_intent(self, user_input: str) -> str:
         """Analyze user input to determine intent"""
         user_input = user_input.lower()
 
-        if any(word in user_input for word in ['help', 'confused', "don't understand"]):
-            return 'need_help'
-        elif any(word in user_input for word in ['next', 'continue', 'more']):
-            return 'ready_to_proceed'
-        elif any(word in user_input for word in ['example', 'show', 'demonstrate']):
-            return 'want_example'
-        elif any(word in user_input for word in ['yes', 'ok', 'understood', 'got it']):
-            return 'comprehension_positive'
-        elif any(word in user_input for word in ['no', 'wrong', 'incorrect']):
-            return 'comprehension_negative'
+        if any(word in user_input for word in ["help", "confused", "don't understand"]):
+            return "need_help"
+        elif any(word in user_input for word in ["next", "continue", "more"]):
+            return "ready_to_proceed"
+        elif any(word in user_input for word in ["example", "show", "demonstrate"]):
+            return "want_example"
+        elif any(word in user_input for word in ["yes", "ok", "understood", "got it"]):
+            return "comprehension_positive"
+        elif any(word in user_input for word in ["no", "wrong", "incorrect"]):
+            return "comprehension_negative"
         else:
-            return 'general_input'
+            return "general_input"
 
     def chatbot_interaction(self, user_input: str) -> tuple[str, str]:
         """Process user input and generate adaptive tutorial response"""
         intent = self.analyze_user_intent(user_input)
-        current_section = self.tutorial_state['current_section']
+        current_section = self.tutorial_state["current_section"]
 
         # Record interaction for recursive feedback
-        self.tutorial_state['user_responses'].append((user_input, intent, time.time()))
+        self.tutorial_state["user_responses"].append((user_input, intent, time.time()))
 
         # Generate response based on intent
-        if intent == 'need_help':
+        if intent == "need_help":
             response = f"Let me help! {self.tutorial_content[current_section]} What specific aspect confuses you?"
-        elif intent == 'ready_to_proceed':
+        elif intent == "ready_to_proceed":
             response = self.advance_tutorial_section()
-        elif intent == 'want_example':
+        elif intent == "want_example":
             response = self.generate_example(current_section)
-        elif intent == 'comprehension_positive':
+        elif intent == "comprehension_positive":
             response = "Excellent! Let's build on that understanding."
             self.adjust_difficulty(0.1)
-        elif intent == 'comprehension_negative':
+        elif intent == "comprehension_negative":
             response = "No worries! Let me explain this differently."
             self.adjust_difficulty(-0.2)
         else:
@@ -316,30 +316,31 @@ class NeuralSymbolicTutorial:
     def generate_example(self, section: str) -> str:
         """Generate contextual examples"""
         examples = {
-            'introduction': "Try this: Create a cognitive node with attention=0.8 and watch how it affects nearby nodes!",
-            'basic_concepts': "Example: Node 'learning' with high attention (0.9) influences connected nodes through attention propagation.",
-            'pattern_recognition': "Watch: When 3+ nodes cluster together, they form an emergent pattern that gets reified as a new cognitive object.",
-            'distributed_cognition': "Example: Agent A processes input [0.5, 0.8] → shares with Agent B → creates collaborative cognitive state.",
-            'visualization': "Try clicking on nodes in the visualization to see recursive attention feedback in action!"
+            "introduction": "Try this: Create a cognitive node with attention=0.8 and watch how it affects nearby nodes!",
+            "basic_concepts": "Example: Node 'learning' with high attention (0.9) influences connected nodes through attention propagation.",
+            "pattern_recognition": "Watch: When 3+ nodes cluster together, they form an emergent pattern that gets reified as a new cognitive object.",
+            "distributed_cognition": "Example: Agent A processes input [0.5, 0.8] → shares with Agent B → creates collaborative cognitive state.",
+            "visualization": "Try clicking on nodes in the visualization to see recursive attention feedback in action!",
         }
         return examples.get(section, "Here's a general example of cognitive processing...")
 
     def advance_tutorial_section(self) -> str:
         """Advance to next tutorial section"""
-        sections = ['introduction', 'basic_concepts', 'pattern_recognition', 'distributed_cognition', 'visualization']
-        current_index = sections.index(self.tutorial_state['current_section'])
+        sections = ["introduction", "basic_concepts", "pattern_recognition", "distributed_cognition", "visualization"]
+        current_index = sections.index(self.tutorial_state["current_section"])
 
         if current_index < len(sections) - 1:
-            self.tutorial_state['current_section'] = sections[current_index + 1]
-            self.tutorial_state['progress'] = 0
+            self.tutorial_state["current_section"] = sections[current_index + 1]
+            self.tutorial_state["progress"] = 0
             return f"Great! Moving to: {self.tutorial_content[self.tutorial_state['current_section']]}"
         else:
             return "Congratulations! You've completed the Phase II tutorial. You now understand recursive cognitive expansion!"
 
     def adjust_difficulty(self, delta: float):
         """Adjust tutorial difficulty based on user performance (recursive adaptation)"""
-        self.tutorial_state['difficulty'] += delta
-        self.tutorial_state['difficulty'] = max(0.1, min(1.0, self.tutorial_state['difficulty']))
+        self.tutorial_state["difficulty"] += delta
+        self.tutorial_state["difficulty"] = max(0.1, min(1.0, self.tutorial_state["difficulty"]))
+
 
 class PhaseIIDemonstration:
     """Main demonstration orchestrator for Phase II components"""
@@ -353,9 +354,14 @@ class PhaseIIDemonstration:
 
         # Create sample cognitive nodes
         self.cognitive_nodes = [
-            CognitiveNode(f"node_{i}", random.random(), random.random(),
-                         random.choice(['concept', 'predicate', 'evaluation']),
-                         random.uniform(0, 200), random.uniform(0, 200))
+            CognitiveNode(
+                f"node_{i}",
+                random.random(),
+                random.random(),
+                random.choice(["concept", "predicate", "evaluation"]),
+                random.uniform(0, 200),
+                random.uniform(0, 200),
+            )
             for i in range(15)
         ]
 
@@ -369,8 +375,7 @@ class PhaseIIDemonstration:
         input_signals = [0.8, 0.3, 0.9, 0.1, 0.7]
         context_weights = [1.0, 0.5, 1.2, 0.2, 0.8]
 
-        processed_signals = self.perceptual_processor.recursive_attention_allocate(
-            input_signals, context_weights)
+        processed_signals = self.perceptual_processor.recursive_attention_allocate(input_signals, context_weights)
 
         print(f"  Input signals: {input_signals}")
         print(f"  Processed signals: {[round(x, 3) for x in processed_signals]}")
@@ -416,8 +421,7 @@ class PhaseIIDemonstration:
 
         # Simulate user interaction
         if high_attention_nodes:
-            feedback = self.visualizer.generate_visualization_feedback(
-                "click", high_attention_nodes[0].id, 1.0)
+            feedback = self.visualizer.generate_visualization_feedback("click", high_attention_nodes[0].id, 1.0)
             print(f"  User interaction feedback: {[round(x, 3) for x in feedback]}")
 
         # Step 5: Tutorial Interaction
@@ -426,7 +430,7 @@ class PhaseIIDemonstration:
             "What is this system doing?",
             "I want to see an example",
             "Yes, I understand",
-            "Show me more about patterns"
+            "Show me more about patterns",
         ]
 
         for user_input in sample_interactions:
@@ -442,7 +446,7 @@ class PhaseIIDemonstration:
 
         # Update node attention based on pattern detection
         for node in self.cognitive_nodes:
-            if any(pattern in detected_patterns for pattern in ['cluster_pattern_0', 'high_attention_pattern']):
+            if any(pattern in detected_patterns for pattern in ["cluster_pattern_0", "high_attention_pattern"]):
                 node.attention = min(1.0, node.attention + 0.1)
 
         # Update perceptual processor based on agent states
@@ -467,34 +471,35 @@ class PhaseIIDemonstration:
         test_input = [0.5, 0.8, 0.3, 0.9, 0.1]
         test_context = [1.0, 0.7, 0.9, 1.1, 0.6]
         result = self.perceptual_processor.recursive_attention_allocate(test_input, test_context)
-        test_results['perceptual_processing'] = len(result) == len(test_input)
+        test_results["perceptual_processing"] = len(result) == len(test_input)
         print(f"  ✅ Perceptual processing: {test_results['perceptual_processing']}")
 
         # Test 2: Pattern detection
         patterns = self.pattern_extractor.extract_emergent_patterns(self.cognitive_nodes[:5])
-        test_results['pattern_detection'] = len(patterns) >= 0
+        test_results["pattern_detection"] = len(patterns) >= 0
         print(f"  ✅ Pattern detection: {test_results['pattern_detection']} ({len(patterns)} patterns)")
 
         # Test 3: Agent collaboration
         agent_count_before = len(self.cognition_engine.agents)
         self.cognition_engine.create_cognitive_agent("test", [0.5, 0.5, 0.5])
         agent_count_after = len(self.cognition_engine.agents)
-        test_results['agent_creation'] = agent_count_after > agent_count_before
+        test_results["agent_creation"] = agent_count_after > agent_count_before
         print(f"  ✅ Agent creation: {test_results['agent_creation']}")
 
         # Test 4: Tutorial adaptation
         _response, intent = self.tutorial.chatbot_interaction("I need help")
-        test_results['tutorial_interaction'] = intent == 'need_help'
+        test_results["tutorial_interaction"] = intent == "need_help"
         print(f"  ✅ Tutorial interaction: {test_results['tutorial_interaction']}")
 
         # Test 5: Visualization feedback
         feedback = self.visualizer.generate_visualization_feedback("click", "node_0", 0.8)
-        test_results['visualization_feedback'] = len(feedback) == 5
+        test_results["visualization_feedback"] = len(feedback) == 5
         print(f"  ✅ Visualization feedback: {test_results['visualization_feedback']}")
 
         print(f"\n📊 Test Results: {sum(test_results.values())}/{len(test_results)} passed")
 
         return all(test_results.values())
+
 
 def main():
     """Main demonstration function"""
@@ -529,6 +534,7 @@ def main():
     print("  • Open cognitive-visualization/web/index.html for interactive demo")
     print("  • Run guile -l phase-ii-demonstration.scm for Scheme integration")
     print("  • Execute ./test-phase-ii.sh for component validation")
+
 
 if __name__ == "__main__":
     main()

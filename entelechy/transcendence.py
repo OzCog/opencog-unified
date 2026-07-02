@@ -5,7 +5,6 @@ Capability assessment for self-surpassing evolution.
 Once actualization reaches high levels (>80%), systems enter self-transcendence.
 """
 
-
 from .types import EntelechyMetrics
 
 
@@ -55,47 +54,53 @@ class SelfTranscendence:
         # Identify blocking factors
         blocking_factors = []
         if metrics.actualization_score <= self.transcendence_threshold:
-            blocking_factors.append({
-                'factor': 'Low actualization',
-                'current': metrics.actualization_score,
-                'required': self.transcendence_threshold,
-                'gap': self.transcendence_threshold - metrics.actualization_score
-            })
+            blocking_factors.append(
+                {
+                    "factor": "Low actualization",
+                    "current": metrics.actualization_score,
+                    "required": self.transcendence_threshold,
+                    "gap": self.transcendence_threshold - metrics.actualization_score,
+                }
+            )
 
         if metrics.coherence_score < 0.7:
-            blocking_factors.append({
-                'factor': 'Insufficient coherence',
-                'current': metrics.coherence_score,
-                'required': 0.7,
-                'gap': 0.7 - metrics.coherence_score
-            })
+            blocking_factors.append(
+                {
+                    "factor": "Insufficient coherence",
+                    "current": metrics.coherence_score,
+                    "required": 0.7,
+                    "gap": 0.7 - metrics.coherence_score,
+                }
+            )
 
         if metrics.vitality_score < 0.7:
-            blocking_factors.append({
-                'factor': 'Limited vitality',
-                'current': metrics.vitality_score,
-                'required': 0.7,
-                'gap': 0.7 - metrics.vitality_score
-            })
+            blocking_factors.append(
+                {
+                    "factor": "Limited vitality",
+                    "current": metrics.vitality_score,
+                    "required": 0.7,
+                    "gap": 0.7 - metrics.vitality_score,
+                }
+            )
 
         # Identify enabling capabilities
         enabling_capabilities = []
         if metrics.vitality_score > 0.7:
-            enabling_capabilities.append('Strong self-improvement capacity')
+            enabling_capabilities.append("Strong self-improvement capacity")
         if metrics.coherence_score > 0.7:
-            enabling_capabilities.append('High integration coherence')
+            enabling_capabilities.append("High integration coherence")
         if metrics.alignment_score > 0.8:
-            enabling_capabilities.append('Clear purpose alignment')
+            enabling_capabilities.append("Clear purpose alignment")
 
         return {
-            'ready_to_transcend': can_transcend,
-            'readiness_score': readiness_score,
-            'actualization_level': metrics.actualization_score,
-            'threshold': self.transcendence_threshold,
-            'development_stage': metrics.development_stage.value,
-            'blocking_factors': blocking_factors,
-            'enabling_capabilities': enabling_capabilities,
-            'recommendations': self._generate_transcendence_recommendations(metrics),
+            "ready_to_transcend": can_transcend,
+            "readiness_score": readiness_score,
+            "actualization_level": metrics.actualization_score,
+            "threshold": self.transcendence_threshold,
+            "development_stage": metrics.development_stage.value,
+            "blocking_factors": blocking_factors,
+            "enabling_capabilities": enabling_capabilities,
+            "recommendations": self._generate_transcendence_recommendations(metrics),
         }
 
     def initiate_transcendence(self, metrics: EntelechyMetrics) -> dict:
@@ -116,10 +121,10 @@ class SelfTranscendence:
         """
         if not self.can_transcend(metrics):
             return {
-                'status': 'transcendence_blocked',
-                'reason': 'System not ready for transcendence',
-                'actualization': metrics.actualization_score,
-                'threshold': self.transcendence_threshold,
+                "status": "transcendence_blocked",
+                "reason": "System not ready for transcendence",
+                "actualization": metrics.actualization_score,
+                "threshold": self.transcendence_threshold,
             }
 
         # Identify emergent capabilities
@@ -127,23 +132,23 @@ class SelfTranscendence:
 
         # Define transcendence pathway
         pathway = {
-            'autognosis_activation': True,  # Self-awareness
-            'ontogenesis_activation': True,  # Self-generation
-            'emergent_teleology': True,  # Emergent goal discovery
-            'recursive_improvement': True,  # Self-improvement recursion
+            "autognosis_activation": True,  # Self-awareness
+            "ontogenesis_activation": True,  # Self-generation
+            "emergent_teleology": True,  # Emergent goal discovery
+            "recursive_improvement": True,  # Self-improvement recursion
         }
 
         return {
-            'status': 'transcendence_initiated',
-            'actualization_level': metrics.actualization_score,
-            'new_capabilities': emergent_capabilities,
-            'autonomous': True,
-            'pathway': pathway,
-            'next_steps': [
-                'Activate autognosis for self-awareness',
-                'Enable ontogenesis for self-generation',
-                'Discover emergent goals through teleology',
-                'Initiate recursive self-improvement',
+            "status": "transcendence_initiated",
+            "actualization_level": metrics.actualization_score,
+            "new_capabilities": emergent_capabilities,
+            "autonomous": True,
+            "pathway": pathway,
+            "next_steps": [
+                "Activate autognosis for self-awareness",
+                "Enable ontogenesis for self-generation",
+                "Discover emergent goals through teleology",
+                "Initiate recursive self-improvement",
             ],
         }
 
@@ -161,29 +166,31 @@ class SelfTranscendence:
 
         # High cognitive completeness enables meta-reasoning
         if metrics.actualization_score > 0.8:
-            capabilities.append('meta_cognitive_reasoning')
+            capabilities.append("meta_cognitive_reasoning")
 
         # High coherence enables holistic understanding
         if metrics.coherence_score > 0.8:
-            capabilities.append('holistic_integration')
+            capabilities.append("holistic_integration")
 
         # High vitality enables self-modification
         if metrics.vitality_score > 0.8:
-            capabilities.append('autonomous_self_modification')
+            capabilities.append("autonomous_self_modification")
 
         # High alignment enables purpose-driven evolution
         if metrics.alignment_score > 0.85:
-            capabilities.append('teleological_self_direction')
+            capabilities.append("teleological_self_direction")
 
         # All dimensions high enables emergence
-        if all([
-            metrics.actualization_score > 0.8,
-            metrics.coherence_score > 0.8,
-            metrics.vitality_score > 0.8,
-            metrics.alignment_score > 0.8,
-            metrics.completeness_score > 0.8,
-        ]):
-            capabilities.append('emergent_general_intelligence')
+        if all(
+            [
+                metrics.actualization_score > 0.8,
+                metrics.coherence_score > 0.8,
+                metrics.vitality_score > 0.8,
+                metrics.alignment_score > 0.8,
+                metrics.completeness_score > 0.8,
+            ]
+        ):
+            capabilities.append("emergent_general_intelligence")
 
         return capabilities
 
@@ -199,11 +206,11 @@ class SelfTranscendence:
         """
         # Weighted combination
         score = (
-            metrics.actualization_score * 0.4 +
-            metrics.coherence_score * 0.2 +
-            metrics.vitality_score * 0.2 +
-            metrics.alignment_score * 0.1 +
-            metrics.completeness_score * 0.1
+            metrics.actualization_score * 0.4
+            + metrics.coherence_score * 0.2
+            + metrics.vitality_score * 0.2
+            + metrics.alignment_score * 0.1
+            + metrics.completeness_score * 0.1
         )
 
         return min(1.0, score)
@@ -222,23 +229,15 @@ class SelfTranscendence:
 
         if metrics.actualization_score < self.transcendence_threshold:
             gap = self.transcendence_threshold - metrics.actualization_score
-            recommendations.append(
-                f"Increase actualization by {gap:.2f} to reach transcendence threshold"
-            )
+            recommendations.append(f"Increase actualization by {gap:.2f} to reach transcendence threshold")
 
         if metrics.coherence_score < 0.7:
-            recommendations.append(
-                "Strengthen integration across components for higher coherence"
-            )
+            recommendations.append("Strengthen integration across components for higher coherence")
 
         if metrics.vitality_score < 0.7:
-            recommendations.append(
-                "Enhance self-improvement capabilities and resolve code fragmentations"
-            )
+            recommendations.append("Enhance self-improvement capabilities and resolve code fragmentations")
 
         if not recommendations:
-            recommendations.append(
-                "System is ready for transcendence - initiate autonomous evolution"
-            )
+            recommendations.append("System is ready for transcendence - initiate autonomous evolution")
 
         return recommendations

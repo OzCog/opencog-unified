@@ -13,20 +13,20 @@ from datetime import datetime
 
 
 class EntelechyMetrics:
-    def __init__(self, repo_path='.'):
+    def __init__(self, repo_path="."):
         self.repo_path = repo_path
-        self.marker_types = ['TODO', 'FIXME', 'STUB', 'XXX', 'HACK', 'NOT IMPLEMENTED']
-        self.file_extensions = ['.cc', '.cpp', '.h', '.hpp', '.scm']
+        self.marker_types = ["TODO", "FIXME", "STUB", "XXX", "HACK", "NOT IMPLEMENTED"]
+        self.file_extensions = [".cc", ".cpp", ".h", ".hpp", ".scm"]
 
     def scan_markers(self):
         """Scan repository for all placeholder markers"""
         markers = {mtype: [] for mtype in self.marker_types}
         total = 0
 
-        skip_dirs = {'.git', 'build', 'components', '__pycache__', '.devcontainer'}
+        skip_dirs = {".git", "build", "components", "__pycache__", ".devcontainer"}
 
         for root, dirs, files in os.walk(self.repo_path):
-            dirs[:] = [d for d in dirs if d not in skip_dirs and not d.startswith('.')]
+            dirs[:] = [d for d in dirs if d not in skip_dirs and not d.startswith(".")]
 
             for file in files:
                 if not any(file.endswith(ext) for ext in self.file_extensions):
@@ -34,21 +34,17 @@ class EntelechyMetrics:
 
                 filepath = os.path.join(root, file)
                 try:
-                    with open(filepath, encoding='utf-8', errors='ignore') as f:
+                    with open(filepath, encoding="utf-8", errors="ignore") as f:
                         lines = f.readlines()
 
                     for i, line in enumerate(lines):
                         # Skip std::placeholders and boost placeholders
-                        if 'std::placeholders' in line or 'boost/mpl/placeholders' in line:
+                        if "std::placeholders" in line or "boost/mpl/placeholders" in line:
                             continue
 
                         for mtype in self.marker_types:
-                            if re.search(rf'\b{mtype}\b', line, re.IGNORECASE):
-                                markers[mtype].append({
-                                    'file': filepath,
-                                    'line': i + 1,
-                                    'content': line.strip()
-                                })
+                            if re.search(rf"\b{mtype}\b", line, re.IGNORECASE):
+                                markers[mtype].append({"file": filepath, "line": i + 1, "content": line.strip()})
                                 total += 1
                                 break  # Count each line only once
                 except Exception:
@@ -63,11 +59,11 @@ class EntelechyMetrics:
         for _mtype, marker_list in markers.items():
             for marker in marker_list:
                 # Extract component from path
-                path_parts = marker['file'].split(os.sep)
+                path_parts = marker["file"].split(os.sep)
                 if len(path_parts) > 1:
-                    component = path_parts[1] if path_parts[0] == '.' else path_parts[0]
+                    component = path_parts[1] if path_parts[0] == "." else path_parts[0]
                 else:
-                    component = 'root'
+                    component = "root"
 
                 if component not in components:
                     components[component] = 0
@@ -95,13 +91,13 @@ class EntelechyMetrics:
             fitness = 1.0
 
         return {
-            'baseline_markers': baseline_markers,
-            'current_markers': total_markers,
-            'markers_resolved': max(0, baseline_markers - total_markers),
-            'resolution_rate': (max(0, baseline_markers - total_markers) / baseline_markers * 100),
-            'severity': severity,
-            'actualization': actualization,
-            'fitness': fitness
+            "baseline_markers": baseline_markers,
+            "current_markers": total_markers,
+            "markers_resolved": max(0, baseline_markers - total_markers),
+            "resolution_rate": (max(0, baseline_markers - total_markers) / baseline_markers * 100),
+            "severity": severity,
+            "actualization": actualization,
+            "fitness": fitness,
         }
 
     def generate_report(self):
@@ -116,12 +112,12 @@ class EntelechyMetrics:
         entelechy_metrics = self.calculate_entelechy_metrics(total)
 
         report = {
-            'timestamp': datetime.utcnow().isoformat() + 'Z',
-            'total_markers': total,
-            'by_type': {mtype: len(mlist) for mtype, mlist in markers.items()},
-            'by_component': by_component,
-            'entelechy_metrics': entelechy_metrics,
-            'top_components': dict(list(by_component.items())[:10])
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "total_markers": total,
+            "by_type": {mtype: len(mlist) for mtype, mlist in markers.items()},
+            "by_component": by_component,
+            "entelechy_metrics": entelechy_metrics,
+            "top_components": dict(list(by_component.items())[:10]),
         }
 
         return report
@@ -136,10 +132,10 @@ class EntelechyMetrics:
         # Summary
         print("SUMMARY")
         print("-" * 70)
-        total = report['total_markers']
+        total = report["total_markers"]
         print(f"Total Placeholder Markers: {total}")
         print("\nBy Type:")
-        for mtype, count in sorted(report['by_type'].items(), key=lambda x: x[1], reverse=True):
+        for mtype, count in sorted(report["by_type"].items(), key=lambda x: x[1], reverse=True):
             if count > 0:
                 percentage = (count / total * 100) if total > 0 else 0
                 print(f"  {mtype:20s}: {count:4d} ({percentage:5.1f}%)")
@@ -148,7 +144,7 @@ class EntelechyMetrics:
         print("\n" + "-" * 70)
         print("ENTELECHY METRICS")
         print("-" * 70)
-        em = report['entelechy_metrics']
+        em = report["entelechy_metrics"]
         print(f"Baseline Markers:      {em['baseline_markers']:,}")
         print(f"Current Markers:       {em['current_markers']:,}")
         print(f"Markers Resolved:      {em['markers_resolved']:,}")
@@ -158,11 +154,11 @@ class EntelechyMetrics:
         print(f"Entelechy Fitness:     {em['fitness']:.3f}")
 
         # Determine stage based on metrics
-        if em['actualization'] >= 0.98:
+        if em["actualization"] >= 0.98:
             stage = "Transcendent"
-        elif em['actualization'] >= 0.95:
+        elif em["actualization"] >= 0.95:
             stage = "Harmonized"
-        elif em['actualization'] >= 0.90:
+        elif em["actualization"] >= 0.90:
             stage = "Integrated"
         else:
             stage = "Developing"
@@ -172,7 +168,7 @@ class EntelechyMetrics:
         print("\n" + "-" * 70)
         print("TOP 10 COMPONENTS BY MARKER COUNT")
         print("-" * 70)
-        for i, (component, count) in enumerate(list(report['top_components'].items())[:10], 1):
+        for i, (component, count) in enumerate(list(report["top_components"].items())[:10], 1):
             percentage = (count / total * 100) if total > 0 else 0
             print(f"{i:2d}. {component:30s}: {count:4d} ({percentage:5.1f}%)")
 
@@ -181,7 +177,7 @@ class EntelechyMetrics:
         print("PROGRESS ASSESSMENT")
         print("-" * 70)
 
-        resolved = em['markers_resolved']
+        resolved = em["markers_resolved"]
         if resolved > 100:
             print("✅ Excellent progress! Significant marker reduction achieved.")
         elif resolved > 50:
@@ -205,7 +201,7 @@ def main():
     report = metrics.generate_report()
 
     # Save detailed report
-    with open('entelechy_metrics_report.json', 'w') as f:
+    with open("entelechy_metrics_report.json", "w") as f:
         json.dump(report, f, indent=2)
 
     # Print summary
@@ -219,5 +215,5 @@ def main():
     print("  5. Re-run this report after each resolution batch\n")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

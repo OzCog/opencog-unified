@@ -32,7 +32,7 @@ def main():
 
     # Show schema sample
     print("\nSchema sample:")
-    schema_lines = schema.split('\n')
+    schema_lines = schema.split("\n")
     for line in schema_lines[15:25]:  # Show middle section
         if line.strip():
             print(f"  {line}")
@@ -100,22 +100,21 @@ def main():
 
     print("✅ Message passing complete:")
     print(f"   Processing time: {processing_time:.2f}s")
-    print(f"   Throughput: {len(result_graph.nodes)/processing_time:.1f} nodes/s")
+    print(f"   Throughput: {len(result_graph.nodes) / processing_time:.1f} nodes/s")
     print(f"   Final state: {result_graph.current_state}")
 
     # Attention analysis
     attention_scores = [node.attention_score for node in result_graph.nodes.values()]
     print("   Attention stats:")
-    print(f"     Mean: {sum(attention_scores)/len(attention_scores):.4f}")
+    print(f"     Mean: {sum(attention_scores) / len(attention_scores):.4f}")
     print(f"     Max:  {max(attention_scores):.4f}")
     print(f"     Min:  {min(attention_scores):.4f}")
 
     # Find most attentive nodes
-    top_nodes = sorted(result_graph.nodes.values(),
-                      key=lambda n: n.attention_score, reverse=True)[:3]
+    top_nodes = sorted(result_graph.nodes.values(), key=lambda n: n.attention_score, reverse=True)[:3]
     print("   Top attention nodes:")
     for i, node in enumerate(top_nodes):
-        print(f"     {i+1}. {node.id}: {node.attention_score:.4f} at {node.coordinates}")
+        print(f"     {i + 1}. {node.id}: {node.attention_score:.4f} at {node.coordinates}")
 
     # Attention encoding demo
     print("\n8. Demonstrating attention encoding...")
@@ -140,32 +139,28 @@ def main():
         "schema_length": len(schema),
         "total_states": len(states),
         "prime_factorization": factors,
-        "graph_stats": {
-            "nodes": len(graph.nodes),
-            "edges": len(graph.edges),
-            "creation_time": creation_time
-        },
+        "graph_stats": {"nodes": len(graph.nodes), "edges": len(graph.edges), "creation_time": creation_time},
         "query_stats": {
             "operation_type": parsed_query.operation_type.value,
             "operation_name": parsed_query.operation_name,
             "fields": len(parsed_query.fields),
             "neural_nodes": len(neural_graph_structure.nodes),
-            "neural_edges": len(neural_graph_structure.edges)
+            "neural_edges": len(neural_graph_structure.edges),
         },
         "message_passing": {
             "processing_time": processing_time,
-            "throughput_nodes_per_sec": len(result_graph.nodes)/processing_time,
+            "throughput_nodes_per_sec": len(result_graph.nodes) / processing_time,
             "final_state": result_graph.current_state,
-            "attention_mean": sum(attention_scores)/len(attention_scores),
+            "attention_mean": sum(attention_scores) / len(attention_scores),
             "attention_max": max(attention_scores),
-            "attention_min": min(attention_scores)
+            "attention_min": min(attention_scores),
         },
         "validation": {
             "states_enumerated": len(states) == 343,
             "prime_factors_correct": factors == [7, 7, 7],
             "tensor_shape_consistent": True,
-            "attention_encoding_valid": True
-        }
+            "attention_encoding_valid": True,
+        },
     }
 
     with open("phase_alpha_demo_results.json", "w") as f:
@@ -173,13 +168,14 @@ def main():
 
     print("✅ Results saved to phase_alpha_demo_results.json")
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("🎯 PHASE α DEMONSTRATION COMPLETE")
     print("🚀 343 quantum states operational")
     print("🧠 7×7×7 tensor architecture validated")
     print("📊 GraphQL-GNN integration successful")
     print("⚡ Ready for Phase β: DAS-Hypergraph Integration")
-    print("="*60)
+    print("=" * 60)
+
 
 if __name__ == "__main__":
     main()

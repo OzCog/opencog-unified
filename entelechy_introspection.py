@@ -29,6 +29,7 @@ from pathlib import Path
 
 class EntelechyDimension(Enum):
     """Dimensions of entelechy analysis"""
+
     ONTOLOGICAL = "ontological"  # Being - what the system IS
     TELEOLOGICAL = "teleological"  # Purpose - what the system is BECOMING
     COGNITIVE = "cognitive"  # Cognition - how the system THINKS
@@ -38,6 +39,7 @@ class EntelechyDimension(Enum):
 
 class FragmentationType(Enum):
     """Types of fragmentation identified"""
+
     INCOMPLETE_IMPLEMENTATION = "incomplete_implementation"
     MISSING_DEPENDENCY = "missing_dependency"
     COGNITIVE_DISCONNECT = "cognitive_disconnect"
@@ -51,6 +53,7 @@ class FragmentationType(Enum):
 @dataclass
 class FragmentationSignature:
     """Signature of a fragmented aspect"""
+
     dimension: EntelechyDimension
     fragmentation_type: FragmentationType
     location: str
@@ -64,6 +67,7 @@ class FragmentationSignature:
 @dataclass
 class EntelechyMetrics:
     """Quantitative metrics of system entelechy"""
+
     actualization_score: float  # 0.0-1.0, degree of potential realization
     coherence_score: float  # 0.0-1.0, holistic integration
     vitality_score: float  # 0.0-1.0, self-organizing capacity
@@ -107,7 +111,7 @@ class EntelechyIntrospector:
             coherence_score=0.0,
             vitality_score=0.0,
             completeness_score=0.0,
-            alignment_score=0.0
+            alignment_score=0.0,
         )
         self.component_config = None
         self.integration_data = None
@@ -143,30 +147,30 @@ class EntelechyIntrospector:
 
         # Generate comprehensive report
         report = {
-            'timestamp': datetime.utcnow().isoformat() + 'Z',
-            'repository': str(self.repo_path),
-            'entelechy_assessment': {
-                'actualization_score': self.metrics.actualization_score,
-                'coherence_score': self.metrics.coherence_score,
-                'vitality_score': self.metrics.vitality_score,
-                'completeness_score': self.metrics.completeness_score,
-                'alignment_score': self.metrics.alignment_score,
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "repository": str(self.repo_path),
+            "entelechy_assessment": {
+                "actualization_score": self.metrics.actualization_score,
+                "coherence_score": self.metrics.coherence_score,
+                "vitality_score": self.metrics.vitality_score,
+                "completeness_score": self.metrics.completeness_score,
+                "alignment_score": self.metrics.alignment_score,
             },
-            'dimensional_insights': {
-                'ontological': ontological_insights,
-                'teleological': teleological_insights,
-                'cognitive': cognitive_insights,
-                'integrative': integrative_insights,
-                'evolutionary': evolutionary_insights,
+            "dimensional_insights": {
+                "ontological": ontological_insights,
+                "teleological": teleological_insights,
+                "cognitive": cognitive_insights,
+                "integrative": integrative_insights,
+                "evolutionary": evolutionary_insights,
             },
-            'fragmentation_analysis': {
-                'total_fragments': len(self.fragments),
-                'by_dimension': self._group_fragments_by_dimension(),
-                'by_type': self._group_fragments_by_type(),
-                'critical_fragments': self._get_critical_fragments(),
+            "fragmentation_analysis": {
+                "total_fragments": len(self.fragments),
+                "by_dimension": self._group_fragments_by_dimension(),
+                "by_type": self._group_fragments_by_type(),
+                "critical_fragments": self._get_critical_fragments(),
             },
-            'repair_roadmap': self._generate_repair_roadmap(),
-            'metrics': asdict(self.metrics),
+            "repair_roadmap": self._generate_repair_roadmap(),
+            "metrics": asdict(self.metrics),
         }
 
         return report
@@ -203,21 +207,23 @@ class EntelechyIntrospector:
         print("🏛️  Analyzing Ontological Dimension (BEING)...")
 
         insights = {
-            'foundation_layer': self._assess_foundation_layer(),
-            'core_layer': self._assess_core_layer(),
-            'specialized_layers': self._assess_specialized_layers(),
-            'architectural_completeness': 0.0,
+            "foundation_layer": self._assess_foundation_layer(),
+            "core_layer": self._assess_core_layer(),
+            "specialized_layers": self._assess_specialized_layers(),
+            "architectural_completeness": 0.0,
         }
 
         # Calculate architectural completeness
         total_expected = 14  # From component-config.json
-        total_present = sum([
-            insights['foundation_layer']['components_present'],
-            insights['core_layer']['components_present'],
-            sum(layer['components_present'] for layer in insights['specialized_layers'].values())
-        ])
+        total_present = sum(
+            [
+                insights["foundation_layer"]["components_present"],
+                insights["core_layer"]["components_present"],
+                sum(layer["components_present"] for layer in insights["specialized_layers"].values()),
+            ]
+        )
 
-        insights['architectural_completeness'] = total_present / total_expected if total_expected > 0 else 0.0
+        insights["architectural_completeness"] = total_present / total_expected if total_expected > 0 else 0.0
 
         print(f"  Architectural Completeness: {insights['architectural_completeness']:.1%}")
         print()
@@ -226,45 +232,44 @@ class EntelechyIntrospector:
 
     def _assess_foundation_layer(self) -> dict:
         """Assess foundation layer (cogutil)"""
-        foundation_components = ['cogutil']
+        foundation_components = ["cogutil"]
         present = [c for c in foundation_components if (self.repo_path / c).exists()]
 
         return {
-            'components_expected': foundation_components,
-            'components_present': len(present),
-            'health': len(present) / len(foundation_components) if foundation_components else 0.0
+            "components_expected": foundation_components,
+            "components_present": len(present),
+            "health": len(present) / len(foundation_components) if foundation_components else 0.0,
         }
 
     def _assess_core_layer(self) -> dict:
         """Assess core layer (atomspace, cogserver, storage)"""
-        core_components = ['atomspace', 'cogserver', 'atomspace-rocks',
-                          'atomspace-restful', 'atomspace-storage']
+        core_components = ["atomspace", "cogserver", "atomspace-rocks", "atomspace-restful", "atomspace-storage"]
         present = [c for c in core_components if (self.repo_path / c).exists()]
 
         return {
-            'components_expected': core_components,
-            'components_present': len(present),
-            'health': len(present) / len(core_components) if core_components else 0.0
+            "components_expected": core_components,
+            "components_present": len(present),
+            "health": len(present) / len(core_components) if core_components else 0.0,
         }
 
     def _assess_specialized_layers(self) -> dict:
         """Assess specialized layers (logic, cognitive, learning, language)"""
         layers = {
-            'logic': ['unify', 'ure'],
-            'cognitive': ['attention', 'spacetime'],
-            'advanced': ['pln', 'miner', 'asmoses'],
-            'learning': ['moses'],
-            'language': ['lg-atomese', 'learn', 'language-learning'],
-            'integration': ['opencog']
+            "logic": ["unify", "ure"],
+            "cognitive": ["attention", "spacetime"],
+            "advanced": ["pln", "miner", "asmoses"],
+            "learning": ["moses"],
+            "language": ["lg-atomese", "learn", "language-learning"],
+            "integration": ["opencog"],
         }
 
         results = {}
         for layer_name, components in layers.items():
             present = [c for c in components if (self.repo_path / c).exists()]
             results[layer_name] = {
-                'components_expected': components,
-                'components_present': len(present),
-                'health': len(present) / len(components) if components else 0.0
+                "components_expected": components,
+                "components_present": len(present),
+                "health": len(present) / len(components) if components else 0.0,
             }
 
         return results
@@ -282,14 +287,16 @@ class EntelechyIntrospector:
         print("🎯 Analyzing Teleological Dimension (PURPOSE)...")
 
         insights = {
-            'development_phases': self._assess_development_phases(),
-            'roadmap_alignment': self._assess_roadmap_alignment(),
-            'actualization_trajectory': 0.0,
+            "development_phases": self._assess_development_phases(),
+            "roadmap_alignment": self._assess_roadmap_alignment(),
+            "actualization_trajectory": 0.0,
         }
 
         # Calculate actualization trajectory
-        phase_completions = [p['completion'] for p in insights['development_phases'].values()]
-        insights['actualization_trajectory'] = sum(phase_completions) / len(phase_completions) if phase_completions else 0.0
+        phase_completions = [p["completion"] for p in insights["development_phases"].values()]
+        insights["actualization_trajectory"] = (
+            sum(phase_completions) / len(phase_completions) if phase_completions else 0.0
+        )
 
         print(f"  Actualization Trajectory: {insights['actualization_trajectory']:.1%}")
         print()
@@ -301,19 +308,19 @@ class EntelechyIntrospector:
         if not self.component_config:
             return {}
 
-        phases = self.component_config.get('integration_phases', {})
+        phases = self.component_config.get("integration_phases", {})
         phase_assessment = {}
 
         for phase_id, phase_data in phases.items():
-            components = phase_data.get('components', [])
+            components = phase_data.get("components", [])
             present_count = sum(1 for c in components if (self.repo_path / c).exists())
 
             phase_assessment[phase_id] = {
-                'name': phase_data.get('name'),
-                'components_total': len(components),
-                'components_present': present_count,
-                'completion': present_count / len(components) if components else 0.0,
-                'focus': phase_data.get('focus'),
+                "name": phase_data.get("name"),
+                "components_total": len(components),
+                "components_present": present_count,
+                "completion": present_count / len(components) if components else 0.0,
+                "focus": phase_data.get("focus"),
             }
 
         return phase_assessment
@@ -323,13 +330,9 @@ class EntelechyIntrospector:
         roadmap_path = self.repo_path / "DEVELOPMENT-ROADMAP.md"
 
         if not roadmap_path.exists():
-            return {'exists': False}
+            return {"exists": False}
 
-        return {
-            'exists': True,
-            'documented': True,
-            'alignment_note': 'Comprehensive 20-week roadmap documented'
-        }
+        return {"exists": True, "documented": True, "alignment_note": "Comprehensive 20-week roadmap documented"}
 
     def _analyze_cognitive_dimension(self) -> dict:
         """
@@ -345,21 +348,21 @@ class EntelechyIntrospector:
         print("🧩 Analyzing Cognitive Dimension (COGNITION)...")
 
         insights = {
-            'reasoning_systems': self._assess_reasoning_systems(),
-            'pattern_systems': self._assess_pattern_systems(),
-            'attention_systems': self._assess_attention_systems(),
-            'learning_systems': self._assess_learning_systems(),
-            'cognitive_completeness': 0.0,
+            "reasoning_systems": self._assess_reasoning_systems(),
+            "pattern_systems": self._assess_pattern_systems(),
+            "attention_systems": self._assess_attention_systems(),
+            "learning_systems": self._assess_learning_systems(),
+            "cognitive_completeness": 0.0,
         }
 
         # Calculate cognitive completeness
         system_scores = [
-            insights['reasoning_systems']['health'],
-            insights['pattern_systems']['health'],
-            insights['attention_systems']['health'],
-            insights['learning_systems']['health'],
+            insights["reasoning_systems"]["health"],
+            insights["pattern_systems"]["health"],
+            insights["attention_systems"]["health"],
+            insights["learning_systems"]["health"],
         ]
-        insights['cognitive_completeness'] = sum(system_scores) / len(system_scores) if system_scores else 0.0
+        insights["cognitive_completeness"] = sum(system_scores) / len(system_scores) if system_scores else 0.0
 
         print(f"  Cognitive Completeness: {insights['cognitive_completeness']:.1%}")
         print()
@@ -368,53 +371,53 @@ class EntelechyIntrospector:
 
     def _assess_reasoning_systems(self) -> dict:
         """Assess reasoning capabilities"""
-        components = ['ure', 'pln']
+        components = ["ure", "pln"]
         present = [c for c in components if (self.repo_path / c).exists()]
 
         # Check for TODO/FIXME in reasoning systems
         total_markers = 0
         for comp in present:
             markers = self._count_markers_in_directory(self.repo_path / comp)
-            total_markers += markers['TODO'] + markers['FIXME'] + markers['STUB']
+            total_markers += markers["TODO"] + markers["FIXME"] + markers["STUB"]
 
         return {
-            'components': components,
-            'present': present,
-            'health': len(present) / len(components) if components else 0.0,
-            'todo_markers': total_markers,
+            "components": components,
+            "present": present,
+            "health": len(present) / len(components) if components else 0.0,
+            "todo_markers": total_markers,
         }
 
     def _assess_pattern_systems(self) -> dict:
         """Assess pattern matching capabilities"""
-        components = ['unify', 'miner']
+        components = ["unify", "miner"]
         present = [c for c in components if (self.repo_path / c).exists()]
 
         return {
-            'components': components,
-            'present': present,
-            'health': len(present) / len(components) if components else 0.0,
+            "components": components,
+            "present": present,
+            "health": len(present) / len(components) if components else 0.0,
         }
 
     def _assess_attention_systems(self) -> dict:
         """Assess attention mechanisms"""
-        components = ['attention']
+        components = ["attention"]
         present = [c for c in components if (self.repo_path / c).exists()]
 
         return {
-            'components': components,
-            'present': present,
-            'health': len(present) / len(components) if components else 0.0,
+            "components": components,
+            "present": present,
+            "health": len(present) / len(components) if components else 0.0,
         }
 
     def _assess_learning_systems(self) -> dict:
         """Assess learning capabilities"""
-        components = ['moses', 'asmoses', 'learn', 'language-learning']
+        components = ["moses", "asmoses", "learn", "language-learning"]
         present = [c for c in components if (self.repo_path / c).exists()]
 
         return {
-            'components': components,
-            'present': present,
-            'health': len(present) / len(components) if components else 0.0,
+            "components": components,
+            "present": present,
+            "health": len(present) / len(components) if components else 0.0,
         }
 
     def _analyze_integrative_dimension(self) -> dict:
@@ -430,19 +433,19 @@ class EntelechyIntrospector:
         print("🔗 Analyzing Integrative Dimension (INTEGRATION)...")
 
         insights = {
-            'dependency_graph': self._assess_dependency_graph(),
-            'build_integration': self._assess_build_integration(),
-            'test_integration': self._assess_test_integration(),
-            'integration_health': 0.0,
+            "dependency_graph": self._assess_dependency_graph(),
+            "build_integration": self._assess_build_integration(),
+            "test_integration": self._assess_test_integration(),
+            "integration_health": 0.0,
         }
 
         # Calculate integration health
         health_scores = [
-            insights['dependency_graph']['health'],
-            insights['build_integration']['health'],
-            insights['test_integration']['health'],
+            insights["dependency_graph"]["health"],
+            insights["build_integration"]["health"],
+            insights["test_integration"]["health"],
         ]
-        insights['integration_health'] = sum(health_scores) / len(health_scores) if health_scores else 0.0
+        insights["integration_health"] = sum(health_scores) / len(health_scores) if health_scores else 0.0
 
         print(f"  Integration Health: {insights['integration_health']:.1%}")
         print()
@@ -452,19 +455,24 @@ class EntelechyIntrospector:
     def _assess_dependency_graph(self) -> dict:
         """Assess component dependency satisfaction"""
         if not self.component_config:
-            return {'health': 0.0}
+            return {"health": 0.0}
 
-        all_components = self.component_config.get('opencog_unified_components', {})
+        all_components = self.component_config.get("opencog_unified_components", {})
         total_deps = 0
         satisfied_deps = 0
 
         for layer_name, layer_data in all_components.items():
-            if layer_name in ['metadata', 'integration_phases', 'build_requirements',
-                             'testing_strategy', 'validation_checkpoints']:
+            if layer_name in [
+                "metadata",
+                "integration_phases",
+                "build_requirements",
+                "testing_strategy",
+                "validation_checkpoints",
+            ]:
                 continue
 
             for _comp_name, comp_data in layer_data.items():
-                deps = comp_data.get('dependencies', [])
+                deps = comp_data.get("dependencies", [])
                 total_deps += len(deps)
 
                 # Check if dependencies exist
@@ -473,9 +481,9 @@ class EntelechyIntrospector:
                         satisfied_deps += 1
 
         return {
-            'total_dependencies': total_deps,
-            'satisfied_dependencies': satisfied_deps,
-            'health': satisfied_deps / total_deps if total_deps > 0 else 1.0,
+            "total_dependencies": total_deps,
+            "satisfied_dependencies": satisfied_deps,
+            "health": satisfied_deps / total_deps if total_deps > 0 else 1.0,
         }
 
     def _assess_build_integration(self) -> dict:
@@ -483,18 +491,18 @@ class EntelechyIntrospector:
         cmake_file = self.repo_path / "CMakeLists.txt"
 
         if not cmake_file.exists():
-            return {'health': 0.0, 'cmake_exists': False}
+            return {"health": 0.0, "cmake_exists": False}
 
         # Count components in CMakeLists.txt
         with open(cmake_file) as f:
             cmake_content = f.read()
 
-        add_subdirectory_count = len(re.findall(r'add_subdirectory\s*\(', cmake_content))
+        add_subdirectory_count = len(re.findall(r"add_subdirectory\s*\(", cmake_content))
 
         return {
-            'cmake_exists': True,
-            'subdirectories_added': add_subdirectory_count,
-            'health': min(1.0, add_subdirectory_count / 14),  # 14 expected components
+            "cmake_exists": True,
+            "subdirectories_added": add_subdirectory_count,
+            "health": min(1.0, add_subdirectory_count / 14),  # 14 expected components
         }
 
     def _assess_test_integration(self) -> dict:
@@ -510,9 +518,9 @@ class EntelechyIntrospector:
                 test_files.extend(list(test_dir.glob("test_*.py")))
 
         return {
-            'test_directories': len([d for d in test_dirs if d.exists()]),
-            'test_files': len(test_files),
-            'health': min(1.0, len(test_files) / 10),  # Expect at least 10 test files
+            "test_directories": len([d for d in test_dirs if d.exists()]),
+            "test_files": len(test_files),
+            "health": min(1.0, len(test_files) / 10),  # Expect at least 10 test files
         }
 
     def _analyze_evolutionary_dimension(self) -> dict:
@@ -528,18 +536,18 @@ class EntelechyIntrospector:
         print("🌱 Analyzing Evolutionary Dimension (GROWTH)...")
 
         insights = {
-            'code_health': self._assess_code_health(),
-            'implementation_depth': self._assess_implementation_depth(),
-            'self_improvement_capacity': self._assess_self_improvement_capacity(),
-            'evolutionary_potential': 0.0,
+            "code_health": self._assess_code_health(),
+            "implementation_depth": self._assess_implementation_depth(),
+            "self_improvement_capacity": self._assess_self_improvement_capacity(),
+            "evolutionary_potential": 0.0,
         }
 
         # Calculate evolutionary potential (inverse of fragmentation)
-        code_health = insights['code_health']['health']
-        impl_depth = insights['implementation_depth']['health']
-        self_improve = insights['self_improvement_capacity']['health']
+        code_health = insights["code_health"]["health"]
+        impl_depth = insights["implementation_depth"]["health"]
+        self_improve = insights["self_improvement_capacity"]["health"]
 
-        insights['evolutionary_potential'] = (code_health + impl_depth + self_improve) / 3.0
+        insights["evolutionary_potential"] = (code_health + impl_depth + self_improve) / 3.0
 
         print(f"  Evolutionary Potential: {insights['evolutionary_potential']:.1%}")
         print()
@@ -556,11 +564,11 @@ class EntelechyIntrospector:
 
         # Scan key directories
         for component_dir in self.repo_path.iterdir():
-            if component_dir.is_dir() and not component_dir.name.startswith('.'):
+            if component_dir.is_dir() and not component_dir.name.startswith("."):
                 markers = self._count_markers_in_directory(component_dir)
-                todo_count += markers['TODO']
-                fixme_count += markers['FIXME']
-                stub_count += markers['STUB']
+                todo_count += markers["TODO"]
+                fixme_count += markers["FIXME"]
+                stub_count += markers["STUB"]
 
         total_markers = todo_count + fixme_count + stub_count
 
@@ -575,34 +583,34 @@ class EntelechyIntrospector:
         print(f"    TODO: {todo_count}, FIXME: {fixme_count}, STUB: {stub_count}")
 
         return {
-            'todo_count': todo_count,
-            'fixme_count': fixme_count,
-            'stub_count': stub_count,
-            'total_markers': total_markers,
-            'health': health,
+            "todo_count": todo_count,
+            "fixme_count": fixme_count,
+            "stub_count": stub_count,
+            "total_markers": total_markers,
+            "health": health,
         }
 
     def _count_markers_in_directory(self, directory: Path) -> dict[str, int]:
         """Count TODO/FIXME/STUB markers in a directory"""
-        markers = {'TODO': 0, 'FIXME': 0, 'STUB': 0}
+        markers = {"TODO": 0, "FIXME": 0, "STUB": 0}
 
         if not directory.exists() or not directory.is_dir():
             return markers
 
-        extensions = ['.cc', '.h', '.cpp', '.hpp', '.scm', '.py']
+        extensions = [".cc", ".h", ".cpp", ".hpp", ".scm", ".py"]
 
         # Patterns to exclude (informational, not actionable)
         exclude_patterns = [
-            r'TODO.*list',  # TODO lists in docs
-            r'GNU',         # GNU license references
-            r'Copyright',   # Copyright notices
-            r'from\s+TODO', # References to TODO files/modules
+            r"TODO.*list",  # TODO lists in docs
+            r"GNU",  # GNU license references
+            r"Copyright",  # Copyright notices
+            r"from\s+TODO",  # References to TODO files/modules
         ]
 
         for ext in extensions:
-            for file_path in directory.rglob(f'*{ext}'):
+            for file_path in directory.rglob(f"*{ext}"):
                 try:
-                    with open(file_path, encoding='utf-8', errors='ignore') as f:
+                    with open(file_path, encoding="utf-8", errors="ignore") as f:
                         lines = f.readlines()
                         for _line_num, line in enumerate(lines, 1):
                             # Skip if it's just an informational reference
@@ -613,12 +621,12 @@ class EntelechyIntrospector:
                                     break
 
                             if not skip:
-                                if re.search(r'\bTODO\b', line, re.IGNORECASE):
-                                    markers['TODO'] += 1
-                                if re.search(r'\bFIXME\b', line, re.IGNORECASE):
-                                    markers['FIXME'] += 1
-                                if re.search(r'\bSTUB\b', line, re.IGNORECASE):
-                                    markers['STUB'] += 1
+                                if re.search(r"\bTODO\b", line, re.IGNORECASE):
+                                    markers["TODO"] += 1
+                                if re.search(r"\bFIXME\b", line, re.IGNORECASE):
+                                    markers["FIXME"] += 1
+                                if re.search(r"\bSTUB\b", line, re.IGNORECASE):
+                                    markers["STUB"] += 1
                 except Exception:
                     pass
 
@@ -632,12 +640,12 @@ class EntelechyIntrospector:
         total_files_cc = 0
         total_files_scm = 0
 
-        for cc_file in self.repo_path.rglob('*.cc'):
+        for cc_file in self.repo_path.rglob("*.cc"):
             total_files_cc += 1
             if cc_file.stat().st_size < 500:  # Less than 500 bytes
                 small_files_cc += 1
 
-        for scm_file in self.repo_path.rglob('*.scm'):
+        for scm_file in self.repo_path.rglob("*.scm"):
             total_files_scm += 1
             if scm_file.stat().st_size < 200:  # Less than 200 bytes
                 small_files_scm += 1
@@ -649,9 +657,9 @@ class EntelechyIntrospector:
         health = 1.0 - (small_files / total_files) if total_files > 0 else 1.0
 
         return {
-            'total_implementation_files': total_files,
-            'small_stub_files': small_files,
-            'health': health,
+            "total_implementation_files": total_files,
+            "small_stub_files": small_files,
+            "health": health,
         }
 
     def _assess_self_improvement_capacity(self) -> dict:
@@ -681,11 +689,11 @@ class EntelechyIntrospector:
             health += 0.15
 
         return {
-            'meta_tools_present': present_count,
-            'meta_tools_total': len(meta_components),
-            'has_autognosis': has_autognosis,
-            'has_ontogenesis': has_ontogenesis,
-            'health': min(1.0, health),
+            "meta_tools_present": present_count,
+            "meta_tools_total": len(meta_components),
+            "has_autognosis": has_autognosis,
+            "has_ontogenesis": has_ontogenesis,
+            "health": min(1.0, health),
         }
 
     def _calculate_entelechy_metrics(self):
@@ -709,10 +717,10 @@ class EntelechyIntrospector:
 
         # Actualization: Overall realization of potential
         self.metrics.actualization_score = (
-            self.metrics.completeness_score * 0.3 +
-            self.metrics.coherence_score * 0.25 +
-            self.metrics.vitality_score * 0.25 +
-            self.metrics.alignment_score * 0.2
+            self.metrics.completeness_score * 0.3
+            + self.metrics.coherence_score * 0.25
+            + self.metrics.vitality_score * 0.25
+            + self.metrics.alignment_score * 0.2
         )
 
         print(f"  Actualization Score: {self.metrics.actualization_score:.1%}")
@@ -743,28 +751,28 @@ class EntelechyIntrospector:
         prioritized = sorted(self.fragments, key=lambda x: (x.repair_priority, x.severity), reverse=True)
 
         roadmap = {
-            'immediate_actions': [],
-            'short_term_actions': [],
-            'medium_term_actions': [],
-            'long_term_actions': [],
+            "immediate_actions": [],
+            "short_term_actions": [],
+            "medium_term_actions": [],
+            "long_term_actions": [],
         }
 
         for fragment in prioritized[:20]:  # Top 20 priorities
             action = {
-                'location': fragment.location,
-                'type': fragment.fragmentation_type.value,
-                'severity': fragment.severity,
-                'suggestions': fragment.repair_suggestions,
+                "location": fragment.location,
+                "type": fragment.fragmentation_type.value,
+                "severity": fragment.severity,
+                "suggestions": fragment.repair_suggestions,
             }
 
             if fragment.severity >= 0.8:
-                roadmap['immediate_actions'].append(action)
+                roadmap["immediate_actions"].append(action)
             elif fragment.severity >= 0.6:
-                roadmap['short_term_actions'].append(action)
+                roadmap["short_term_actions"].append(action)
             elif fragment.severity >= 0.4:
-                roadmap['medium_term_actions'].append(action)
+                roadmap["medium_term_actions"].append(action)
             else:
-                roadmap['long_term_actions'].append(action)
+                roadmap["long_term_actions"].append(action)
 
         return roadmap
 
@@ -772,7 +780,7 @@ class EntelechyIntrospector:
         """Generate human-readable markdown report"""
         report_path = self.repo_path / output_path
 
-        with open(report_path, 'w') as f:
+        with open(report_path, "w") as f:
             f.write(self._format_markdown_report())
 
         print(f"📄 Generated visual report: {output_path}")
@@ -782,7 +790,7 @@ class EntelechyIntrospector:
         """Format comprehensive markdown report"""
         return f"""# 🧠 OpenCog Unified Entelechy Introspection Report
 
-**Generated:** {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC
+**Generated:** {datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")} UTC
 **Repository:** {self.repo_path}
 
 ---
@@ -795,11 +803,11 @@ The **entelechy** (ἐντελέχεια) represents the vital actualization of 
 
 | Metric | Score | Status |
 |--------|-------|--------|
-| **Actualization** | {self.metrics.actualization_score:.1%} | {'🟢 Healthy' if self.metrics.actualization_score > 0.7 else '🟡 Developing' if self.metrics.actualization_score > 0.5 else '🔴 Needs Attention'} |
-| **Completeness** | {self.metrics.completeness_score:.1%} | {'🟢 Complete' if self.metrics.completeness_score > 0.8 else '🟡 Partial' if self.metrics.completeness_score > 0.6 else '🔴 Incomplete'} |
-| **Coherence** | {self.metrics.coherence_score:.1%} | {'🟢 Integrated' if self.metrics.coherence_score > 0.7 else '🟡 Fragmented' if self.metrics.coherence_score > 0.5 else '🔴 Disconnected'} |
-| **Vitality** | {self.metrics.vitality_score:.1%} | {'🟢 Evolving' if self.metrics.vitality_score > 0.7 else '🟡 Stable' if self.metrics.vitality_score > 0.5 else '🔴 Stagnant'} |
-| **Alignment** | {self.metrics.alignment_score:.1%} | {'🟢 Aligned' if self.metrics.alignment_score > 0.7 else '🟡 Drifting' if self.metrics.alignment_score > 0.5 else '🔴 Misaligned'} |
+| **Actualization** | {self.metrics.actualization_score:.1%} | {"🟢 Healthy" if self.metrics.actualization_score > 0.7 else "🟡 Developing" if self.metrics.actualization_score > 0.5 else "🔴 Needs Attention"} |
+| **Completeness** | {self.metrics.completeness_score:.1%} | {"🟢 Complete" if self.metrics.completeness_score > 0.8 else "🟡 Partial" if self.metrics.completeness_score > 0.6 else "🔴 Incomplete"} |
+| **Coherence** | {self.metrics.coherence_score:.1%} | {"🟢 Integrated" if self.metrics.coherence_score > 0.7 else "🟡 Fragmented" if self.metrics.coherence_score > 0.5 else "🔴 Disconnected"} |
+| **Vitality** | {self.metrics.vitality_score:.1%} | {"🟢 Evolving" if self.metrics.vitality_score > 0.7 else "🟡 Stable" if self.metrics.vitality_score > 0.5 else "🔴 Stagnant"} |
+| **Alignment** | {self.metrics.alignment_score:.1%} | {"🟢 Aligned" if self.metrics.alignment_score > 0.7 else "🟡 Drifting" if self.metrics.alignment_score > 0.5 else "🔴 Misaligned"} |
 
 ### Code Health Indicators
 
@@ -932,23 +940,17 @@ def main():
     """Main entry point for entelechy introspection"""
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description='Deep introspection of OpenCog Unified entelechy'
+    parser = argparse.ArgumentParser(description="Deep introspection of OpenCog Unified entelechy")
+    parser.add_argument("--repo-path", default=".", help="Path to repository (default: current directory)")
+    parser.add_argument(
+        "--output",
+        default="entelechy_introspection.json",
+        help="Output JSON file (default: entelechy_introspection.json)",
     )
     parser.add_argument(
-        '--repo-path',
-        default='.',
-        help='Path to repository (default: current directory)'
-    )
-    parser.add_argument(
-        '--output',
-        default='entelechy_introspection.json',
-        help='Output JSON file (default: entelechy_introspection.json)'
-    )
-    parser.add_argument(
-        '--report',
-        default='entelechy_introspection_report.md',
-        help='Output markdown report (default: entelechy_introspection_report.md)'
+        "--report",
+        default="entelechy_introspection_report.md",
+        help="Output markdown report (default: entelechy_introspection_report.md)",
     )
 
     args = parser.parse_args()
@@ -959,7 +961,7 @@ def main():
 
     # Save JSON results
     output_path = Path(args.repo_path) / args.output
-    with open(output_path, 'w') as f:
+    with open(output_path, "w") as f:
         json.dump(results, f, indent=2)
     print(f"\n💾 Saved introspection results: {args.output}")
 
@@ -979,5 +981,5 @@ def main():
     print()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

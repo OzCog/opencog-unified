@@ -38,7 +38,7 @@ def demonstrate_introspection():
     introspector = EntelechyIntrospector(repo_path=".")
     report = introspector.perform_deep_introspection()
 
-    assessment = report['entelechy_assessment']
+    assessment = report["entelechy_assessment"]
 
     print("\n📊 Entelechy Assessment:")
     print(f"  Actualization:  {assessment['actualization_score']:.1%}")
@@ -50,13 +50,13 @@ def demonstrate_introspection():
     print(f"  Stage:          {assessment['development_stage']}")
 
     print("\n🔍 Fragmentation Analysis:")
-    frag = report['fragmentation_analysis']
+    frag = report["fragmentation_analysis"]
     print(f"  Total Fragments: {frag['total_fragments']}")
     print(f"  Critical:        {len(frag['critical_fragments'])}")
 
-    if frag['critical_fragments']:
+    if frag["critical_fragments"]:
         print("\n⚠️  Critical Fragmentations:")
-        for fragment in frag['critical_fragments'][:3]:
+        for fragment in frag["critical_fragments"][:3]:
             print(f"    • {fragment['description']}")
             print(f"      Location: {fragment['location']}")
             print(f"      Severity: {fragment['severity']:.1%}")
@@ -105,7 +105,7 @@ def demonstrate_resonance(introspector):
     print(f"  Variance:        {resonance['variance']:.4f}")
 
     print("\n📊 Dimensional Scores:")
-    for dim, score in resonance['dimension_scores'].items():
+    for dim, score in resonance["dimension_scores"].items():
         bar = "█" * int(score * 50)
         print(f"  {dim:15s}: {bar} {score:.1%}")
 
@@ -134,21 +134,21 @@ def demonstrate_transcendence(introspector):
     print(f"  Threshold:       {assessment['threshold']:.1%}")
     print(f"  Stage:           {assessment['development_stage']}")
 
-    if assessment['blocking_factors']:
+    if assessment["blocking_factors"]:
         print("\n⚠️  Blocking Factors:")
-        for factor in assessment['blocking_factors']:
-            gap = factor['gap']
+        for factor in assessment["blocking_factors"]:
+            gap = factor["gap"]
             print(f"  • {factor['factor']}")
             print(f"    Current: {factor['current']:.1%}, Need: {factor['required']:.1%} (gap: {gap:.1%})")
 
-    if assessment['enabling_capabilities']:
+    if assessment["enabling_capabilities"]:
         print("\n✅ Enabling Capabilities:")
-        for cap in assessment['enabling_capabilities']:
+        for cap in assessment["enabling_capabilities"]:
             print(f"  • {cap}")
 
-    if assessment['recommendations']:
+    if assessment["recommendations"]:
         print("\n📋 Recommendations:")
-        for rec in assessment['recommendations']:
+        for rec in assessment["recommendations"]:
             print(f"  • {rec}")
 
     # Discover emergent capabilities
@@ -159,13 +159,13 @@ def demonstrate_transcendence(introspector):
             print(f"  • {cap}")
 
     # Initiate if ready
-    if assessment['ready_to_transcend']:
+    if assessment["ready_to_transcend"]:
         print("\n🎆 Initiating Transcendence...")
         result = transcendence.initiate_transcendence(introspector.metrics)
         print(f"  Status: {result['status']}")
         print(f"  Autonomous: {result['autonomous']}")
         print("\n  Pathway Activated:")
-        for key, value in result['pathway'].items():
+        for key, value in result["pathway"].items():
             print(f"    • {key}: {value}")
 
 
@@ -189,7 +189,7 @@ def demonstrate_tracker():
     # Analyze trajectory if history exists
     trajectory = tracker.analyze_trajectory()
 
-    if trajectory['status'] == 'analyzed':
+    if trajectory["status"] == "analyzed":
         print("\n📊 Trajectory Analysis:")
         print(f"  Trajectory:      {trajectory['trajectory']}")
         print(f"  Actual. Gain:    {trajectory['actualization_gain']:+.2%}")
@@ -273,7 +273,7 @@ def main():
     print()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
@@ -282,5 +282,6 @@ if __name__ == '__main__':
     except Exception as e:
         print(f"\n\nError: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

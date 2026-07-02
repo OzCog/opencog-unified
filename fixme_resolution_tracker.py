@@ -26,6 +26,7 @@ from pathlib import Path
 @dataclass
 class FIXMEResolution:
     """Tracks resolution status of a FIXME item."""
+
     file_path: str
     line_number: int
     fixme_text: str
@@ -42,6 +43,7 @@ class FIXMEResolution:
     def __post_init__(self):
         if self.dependencies is None:
             self.dependencies = []
+
 
 class FIXMEResolutionTracker:
     """Manages FIXME resolution progress and implements next steps."""
@@ -70,7 +72,7 @@ class FIXMEResolutionTracker:
         for key, resolution in self.resolutions.items():
             data[key] = asdict(resolution)
 
-        with open(self.tracking_file, 'w') as f:
+        with open(self.tracking_file, "w") as f:
             json.dump(data, f, indent=2)
         print(f"Saved progress for {len(self.resolutions)} FIXME items")
 
@@ -89,7 +91,7 @@ class FIXMEResolutionTracker:
 
     def _parse_catalog_content(self, content: str):
         """Parse the FIXME catalog markdown content."""
-        lines = content.split('\n')
+        lines = content.split("\n")
         current_difficulty = None
         current_component = None
 
@@ -117,7 +119,7 @@ class FIXMEResolutionTracker:
         try:
             # Parse file path and line number
             entry_line = lines[start_idx]
-            path_match = re.search(r'`([^`]+):(\d+)`', entry_line)
+            path_match = re.search(r"`([^`]+):(\d+)`", entry_line)
             if not path_match:
                 return
 
@@ -146,7 +148,7 @@ class FIXMEResolutionTracker:
                     fixme_text=issue_text,
                     difficulty=difficulty,
                     category=category,
-                    estimated_effort=effort
+                    estimated_effort=effort,
                 )
 
         except Exception as e:
@@ -154,13 +156,11 @@ class FIXMEResolutionTracker:
 
     def get_easy_wins(self) -> list[FIXMEResolution]:
         """Get all EASY priority items for immediate action."""
-        return [res for res in self.resolutions.values()
-                if res.difficulty == "EASY" and res.status == "OPEN"]
+        return [res for res in self.resolutions.values() if res.difficulty == "EASY" and res.status == "OPEN"]
 
     def get_by_component(self, component: str) -> list[FIXMEResolution]:
         """Get FIXME items for a specific component."""
-        return [res for res in self.resolutions.values()
-                if component.lower() in res.file_path.lower()]
+        return [res for res in self.resolutions.values() if component.lower() in res.file_path.lower()]
 
     def generate_next_steps_report(self) -> str:
         """Generate a report implementing the next steps from the catalog."""
@@ -219,13 +219,13 @@ class FIXMEResolutionTracker:
         """Calculate resolution statistics."""
         stats = defaultdict(int)
         for res in self.resolutions.values():
-            stats['total'] += 1
+            stats["total"] += 1
             stats[res.status.lower()] += 1
         return dict(stats)
 
     def _get_component_name(self, file_path: str) -> str:
         """Extract component name from file path."""
-        parts = file_path.split('/')
+        parts = file_path.split("/")
         if len(parts) > 0:
             return parts[0].title()
         return "Unknown"
@@ -235,20 +235,20 @@ class FIXMEResolutionTracker:
         phases = {
             "Phase 1 (Immediate - 2 weeks)": {
                 "target": "Complete all EASY items",
-                "items": [r for r in self.resolutions.values() if r.difficulty == "EASY"]
+                "items": [r for r in self.resolutions.values() if r.difficulty == "EASY"],
             },
             "Phase 2 (Short Term - 1-3 months)": {
                 "target": "Begin MEDIUM items",
-                "items": [r for r in self.resolutions.values() if r.difficulty == "MEDIUM"]
+                "items": [r for r in self.resolutions.values() if r.difficulty == "MEDIUM"],
             },
             "Phase 3 (Medium Term - 3-12 months)": {
                 "target": "Complete MEDIUM and HARD items",
-                "items": [r for r in self.resolutions.values() if r.difficulty in ["MEDIUM", "HARD"]]
+                "items": [r for r in self.resolutions.values() if r.difficulty in ["MEDIUM", "HARD"]],
             },
             "Phase 4 (Long Term - 12+ months)": {
                 "target": "Complete all FIXME items",
-                "items": list(self.resolutions.values())
-            }
+                "items": list(self.resolutions.values()),
+            },
         }
 
         for _phase_name, phase_data in phases.items():
@@ -256,10 +256,7 @@ class FIXMEResolutionTracker:
             completed = len([r for r in phase_data["items"] if r.status == "RESOLVED"])
             progress = (completed / total * 100) if total > 0 else 0
 
-            phase_data.update({
-                "completed": f"{completed}/{total}",
-                "progress": progress
-            })
+            phase_data.update({"completed": f"{completed}/{total}", "progress": progress})
 
         return phases
 
@@ -270,10 +267,10 @@ class FIXMEResolutionTracker:
         if len(easy_wins) > 0:
             recommendations.append(f"Start with {min(5, len(easy_wins))} easiest documentation/comment fixes")
 
-        if stats.get('open', 0) > 100:
+        if stats.get("open", 0) > 100:
             recommendations.append("Consider splitting MEDIUM items into smaller sub-tasks")
 
-        if stats.get('in_progress', 0) > stats.get('resolved', 0):
+        if stats.get("in_progress", 0) > stats.get("resolved", 0):
             recommendations.append("Focus on completing in-progress items before starting new ones")
 
         recommendations.append("Set up weekly FIXME resolution review meetings")
@@ -304,6 +301,7 @@ class FIXMEResolutionTracker:
             return True
         return False
 
+
 def main():
     """Main entry point for FIXME resolution tracking."""
     import argparse
@@ -327,7 +325,7 @@ def main():
 
         # Save report to file
         report_file = Path(args.repo) / "FIXME_RESOLUTION_PROGRESS_REPORT.md"
-        with open(report_file, 'w') as f:
+        with open(report_file, "w") as f:
             f.write(report)
         print(f"\nReport saved to {report_file}")
 
@@ -338,6 +336,7 @@ def main():
             print(f"  - {item.file_path}:{item.line_number}")
             print(f"    {item.fixme_text[:80]}...")
             print()
+
 
 if __name__ == "__main__":
     main()

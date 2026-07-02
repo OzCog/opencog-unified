@@ -21,6 +21,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
+
 class APRFEIntegrationTest(unittest.TestCase):
     """
     Comprehensive integration tests for APRFE cognitive architecture enhancement
@@ -31,7 +32,7 @@ class APRFEIntegrationTest(unittest.TestCase):
         self.test_data = {
             "atoms": self._create_test_atomspace_data(),
             "patterns": self._create_test_patterns(),
-            "cognitive_tasks": self._create_cognitive_tasks()
+            "cognitive_tasks": self._create_cognitive_tasks(),
         }
 
         # Performance tracking
@@ -55,15 +56,16 @@ class APRFEIntegrationTest(unittest.TestCase):
             task_complexity = self._calculate_task_complexity(load)
 
             # Test strategy selection under this load
-            selected_strategy = self._test_strategy_selection(
-                load, task_complexity, self.test_data["atoms"][:20])
+            selected_strategy = self._test_strategy_selection(load, task_complexity, self.test_data["atoms"][:20])
 
-            strategy_selections.append({
-                "cognitive_load": load,
-                "task_complexity": task_complexity,
-                "selected_strategy": selected_strategy,
-                "reasoning": self._get_strategy_reasoning(load, task_complexity)
-            })
+            strategy_selections.append(
+                {
+                    "cognitive_load": load,
+                    "task_complexity": task_complexity,
+                    "selected_strategy": selected_strategy,
+                    "reasoning": self._get_strategy_reasoning(load, task_complexity),
+                }
+            )
 
             print(f"Load {load:.1f}: {selected_strategy} (complexity: {task_complexity:.2f})")
 
@@ -75,12 +77,12 @@ class APRFEIntegrationTest(unittest.TestCase):
         high_load_strategies = [s["selected_strategy"] for s in strategy_selections if s["cognitive_load"] > 0.7]
 
         # Under low load, should prefer thorough strategies
-        self.assertIn("hybrid_fusion", low_load_strategies,
-                     "Should prefer hybrid fusion under low cognitive load")
+        self.assertIn("hybrid_fusion", low_load_strategies, "Should prefer hybrid fusion under low cognitive load")
 
         # Under high load, should prefer efficient strategies
-        self.assertIn("attention_guided", high_load_strategies,
-                     "Should prefer attention-guided under high cognitive load")
+        self.assertIn(
+            "attention_guided", high_load_strategies, "Should prefer attention-guided under high cognitive load"
+        )
 
         print("✓ Adaptive strategy selection validated")
 
@@ -92,18 +94,18 @@ class APRFEIntegrationTest(unittest.TestCase):
             {
                 "description": "detect linguistic patterns with semantic similarity",
                 "atoms": self.test_data["atoms"][:30],
-                "expected_modalities": ["symbolic", "neural", "attention"]
+                "expected_modalities": ["symbolic", "neural", "attention"],
             },
             {
                 "description": "mathematical reasoning with attention guidance",
                 "atoms": self.test_data["atoms"][10:40],
-                "expected_modalities": ["symbolic", "attention"]
+                "expected_modalities": ["symbolic", "attention"],
             },
             {
                 "description": "complex pattern matching with neural embeddings",
                 "atoms": self.test_data["atoms"][20:50],
-                "expected_modalities": ["neural", "symbolic"]
-            }
+                "expected_modalities": ["neural", "symbolic"],
+            },
         ]
 
         cross_modal_results = []
@@ -113,20 +115,21 @@ class APRFEIntegrationTest(unittest.TestCase):
 
             # Execute cross-modal recognition
             start_time = time.time()
-            result = self._execute_cross_modal_recognition(
-                task["description"], task["atoms"])
+            result = self._execute_cross_modal_recognition(task["description"], task["atoms"])
             end_time = time.time()
 
             # Validate cross-modal integration
             self._validate_cross_modal_result(result, task["expected_modalities"])
 
-            cross_modal_results.append({
-                "task": task["description"],
-                "processing_time": end_time - start_time,
-                "modality_contributions": result["modality_contributions"],
-                "integration_quality": result["integration_quality"],
-                "patterns_found": len(result["integrated_patterns"])
-            })
+            cross_modal_results.append(
+                {
+                    "task": task["description"],
+                    "processing_time": end_time - start_time,
+                    "modality_contributions": result["modality_contributions"],
+                    "integration_quality": result["integration_quality"],
+                    "patterns_found": len(result["integrated_patterns"]),
+                }
+            )
 
             print(f"  Patterns found: {len(result['integrated_patterns'])}")
             print(f"  Integration quality: {result['integration_quality']:.3f}")
@@ -134,15 +137,13 @@ class APRFEIntegrationTest(unittest.TestCase):
 
         # Assert cross-modal integration quality
         avg_integration_quality = sum(r["integration_quality"] for r in cross_modal_results) / len(cross_modal_results)
-        self.assertGreater(avg_integration_quality, 0.7,
-                          "Cross-modal integration quality should be > 0.7")
+        self.assertGreater(avg_integration_quality, 0.7, "Cross-modal integration quality should be > 0.7")
 
         # Validate modality diversity
         for result in cross_modal_results:
             contributions = result["modality_contributions"]
             active_modalities = sum(1 for v in contributions.values() if v > 0.1)
-            self.assertGreaterEqual(active_modalities, 2,
-                                   "Should use at least 2 modalities for cross-modal tasks")
+            self.assertGreaterEqual(active_modalities, 2, "Should use at least 2 modalities for cross-modal tasks")
 
         print("✓ Cross-modal pattern recognition validated")
 
@@ -167,8 +168,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             recognition_result = self._execute_recognition_with_monitoring(task)
 
             # Provide performance feedback
-            feedback = self._generate_performance_feedback(
-                recognition_result, difficulty)
+            feedback = self._generate_performance_feedback(recognition_result, difficulty)
 
             # Trigger adaptation
             adaptation_result = self._trigger_system_adaptation(feedback)
@@ -176,13 +176,15 @@ class APRFEIntegrationTest(unittest.TestCase):
             # Measure performance after adaptation
             performance_after = self._measure_performance_after_adaptation()
 
-            adaptation_sequence.append({
-                "difficulty": difficulty,
-                "performance_before": performance_before,
-                "performance_after": performance_after,
-                "adaptation_magnitude": adaptation_result["magnitude"],
-                "strategy_changes": adaptation_result["strategy_changes"]
-            })
+            adaptation_sequence.append(
+                {
+                    "difficulty": difficulty,
+                    "performance_before": performance_before,
+                    "performance_after": performance_after,
+                    "adaptation_magnitude": adaptation_result["magnitude"],
+                    "strategy_changes": adaptation_result["strategy_changes"],
+                }
+            )
 
             print(f"  Performance improvement: {performance_after - performance_before:.3f}")
             print(f"  Adaptation magnitude: {adaptation_result['magnitude']:.3f}")
@@ -195,8 +197,7 @@ class APRFEIntegrationTest(unittest.TestCase):
         final_performance = adaptation_sequence[-1]["performance_after"]
         improvement = final_performance - initial_performance
 
-        self.assertGreater(improvement, 0.1,
-                          "Should show at least 10% performance improvement over time")
+        self.assertGreater(improvement, 0.1, "Should show at least 10% performance improvement over time")
 
         print("✓ Performance-based adaptation validated")
 
@@ -219,8 +220,7 @@ class APRFEIntegrationTest(unittest.TestCase):
 
             # Detect emergent patterns every 5 sessions
             if (session_id + 1) % 5 == 0:
-                emergent_detected = self._detect_emergent_patterns(
-                    recognition_sessions[-5:])
+                emergent_detected = self._detect_emergent_patterns(recognition_sessions[-5:])
                 emergent_patterns.extend(emergent_detected)
 
                 if emergent_detected:
@@ -232,16 +232,14 @@ class APRFEIntegrationTest(unittest.TestCase):
         self._analyze_emergent_behaviors(emergent_patterns)
 
         # Validate emergent behavior detection
-        self.assertGreater(len(emergent_patterns), 0,
-                          "Should detect at least some emergent patterns")
+        self.assertGreater(len(emergent_patterns), 0, "Should detect at least some emergent patterns")
 
         # Check for specific types of emergent behaviors
         behavior_types = {pattern["type"] for pattern in emergent_patterns}
         expected_types = {"strategy_optimization", "pattern_synthesis", "cross_modal_correlation"}
 
         detected_expected = behavior_types.intersection(expected_types)
-        self.assertGreater(len(detected_expected), 0,
-                          f"Should detect expected emergent behaviors: {expected_types}")
+        self.assertGreater(len(detected_expected), 0, f"Should detect expected emergent behaviors: {expected_types}")
 
         print(f"✓ Detected {len(emergent_patterns)} emergent behaviors")
         print(f"  Types detected: {list(behavior_types)}")
@@ -256,7 +254,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             "description": "Multiple agents must coordinate to recognize distributed patterns",
             "agents": 5,
             "pattern_complexity": 0.8,
-            "coordination_requirements": ["attention_sharing", "pattern_fusion", "adaptive_strategy"]
+            "coordination_requirements": ["attention_sharing", "pattern_fusion", "adaptive_strategy"],
         }
 
         print(f"Scenario: {scenario['name']}")
@@ -275,16 +273,14 @@ class APRFEIntegrationTest(unittest.TestCase):
             round_tasks = self._distribute_pattern_tasks(agent_states, scenario)
 
             # Execute coordinated recognition
-            round_result = self._execute_coordinated_recognition(
-                round_tasks, scenario["coordination_requirements"])
+            round_result = self._execute_coordinated_recognition(round_tasks, scenario["coordination_requirements"])
 
             coordination_results.append(round_result)
 
             # Update agent states based on results
             agent_states = self._update_agent_states(agent_states, round_result)
 
-            print(f"Accuracy: {round_result['accuracy']:.3f}, "
-                  f"Coordination: {round_result['coordination_score']:.3f}")
+            print(f"Accuracy: {round_result['accuracy']:.3f}, Coordination: {round_result['coordination_score']:.3f}")
 
         # Analyze overall scenario performance
         scenario_analysis = self._analyze_scenario_performance(coordination_results)
@@ -294,14 +290,11 @@ class APRFEIntegrationTest(unittest.TestCase):
         coordination_improvement = scenario_analysis["coordination_improvement"]
         adaptive_behavior = scenario_analysis["adaptive_behavior_detected"]
 
-        self.assertGreater(avg_accuracy, 0.75,
-                          "Multi-agent scenario accuracy should be > 75%")
+        self.assertGreater(avg_accuracy, 0.75, "Multi-agent scenario accuracy should be > 75%")
 
-        self.assertGreater(coordination_improvement, 0.0,
-                          "Should show coordination improvement over time")
+        self.assertGreater(coordination_improvement, 0.0, "Should show coordination improvement over time")
 
-        self.assertTrue(adaptive_behavior,
-                       "Should demonstrate adaptive behavior in multi-agent scenario")
+        self.assertTrue(adaptive_behavior, "Should demonstrate adaptive behavior in multi-agent scenario")
 
         print("✓ Real-world cognitive scenario validated")
         print(f"  Average accuracy: {avg_accuracy:.3f}")
@@ -316,7 +309,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             ("AtomSpace Integration", self._test_atomspace_integration),
             ("URE Integration", self._test_ure_integration),
             ("Attention Integration", self._test_attention_integration),
-            ("Neural-Symbolic Bridge", self._test_neural_symbolic_integration)
+            ("Neural-Symbolic Bridge", self._test_neural_symbolic_integration),
         ]
 
         integration_results = {}
@@ -325,16 +318,10 @@ class APRFEIntegrationTest(unittest.TestCase):
             print(f"Testing {test_name}...")
             try:
                 result = test_func()
-                integration_results[test_name] = {
-                    "status": "success",
-                    "metrics": result
-                }
+                integration_results[test_name] = {"status": "success", "metrics": result}
                 print(f"  ✓ {test_name} integration successful")
             except Exception as e:
-                integration_results[test_name] = {
-                    "status": "error",
-                    "error": str(e)
-                }
+                integration_results[test_name] = {"status": "error", "error": str(e)}
                 print(f"  ✗ {test_name} integration failed: {e}")
 
         # Validate system consistency
@@ -343,15 +330,14 @@ class APRFEIntegrationTest(unittest.TestCase):
         # Assert critical integrations
         critical_components = ["AtomSpace Integration", "URE Integration"]
         for component in critical_components:
-            self.assertEqual(integration_results[component]["status"], "success",
-                           f"{component} must be successfully integrated")
+            self.assertEqual(
+                integration_results[component]["status"], "success", f"{component} must be successfully integrated"
+            )
 
         # Assert system consistency
-        self.assertTrue(consistency_checks["memory_consistency"],
-                       "System memory state should be consistent")
+        self.assertTrue(consistency_checks["memory_consistency"], "System memory state should be consistent")
 
-        self.assertTrue(consistency_checks["performance_consistency"],
-                       "Performance metrics should be consistent")
+        self.assertTrue(consistency_checks["performance_consistency"], "Performance metrics should be consistent")
 
         print("✓ System integration and consistency validated")
 
@@ -363,72 +349,47 @@ class APRFEIntegrationTest(unittest.TestCase):
 
         # Create concept nodes
         for i in range(50):
-            atoms.append({
-                "type": "ConceptNode",
-                "name": f"concept_{i}",
-                "properties": {"relevance": 0.1 + (i % 10) * 0.1}
-            })
+            atoms.append(
+                {"type": "ConceptNode", "name": f"concept_{i}", "properties": {"relevance": 0.1 + (i % 10) * 0.1}}
+            )
 
         # Create inheritance links
         for i in range(25):
-            atoms.append({
-                "type": "InheritanceLink",
-                "outgoing": [f"concept_{i}", f"concept_{(i + 1) % 50}"],
-                "properties": {"strength": 0.8, "confidence": 0.9}
-            })
+            atoms.append(
+                {
+                    "type": "InheritanceLink",
+                    "outgoing": [f"concept_{i}", f"concept_{(i + 1) % 50}"],
+                    "properties": {"strength": 0.8, "confidence": 0.9},
+                }
+            )
 
         # Create evaluation links
         for i in range(30):
-            atoms.append({
-                "type": "EvaluationLink",
-                "outgoing": [f"predicate_{i % 10}", f"concept_{i}"],
-                "properties": {"truth_value": 0.7 + (i % 3) * 0.1}
-            })
+            atoms.append(
+                {
+                    "type": "EvaluationLink",
+                    "outgoing": [f"predicate_{i % 10}", f"concept_{i}"],
+                    "properties": {"truth_value": 0.7 + (i % 3) * 0.1},
+                }
+            )
 
         return atoms
 
     def _create_test_patterns(self) -> list[dict]:
         """Create test patterns for recognition"""
         patterns = [
-            {
-                "name": "inheritance_chain",
-                "complexity": 0.6,
-                "modalities": ["symbolic", "attention"]
-            },
-            {
-                "name": "semantic_cluster",
-                "complexity": 0.8,
-                "modalities": ["neural", "symbolic"]
-            },
-            {
-                "name": "temporal_sequence",
-                "complexity": 0.7,
-                "modalities": ["attention", "neural"]
-            }
+            {"name": "inheritance_chain", "complexity": 0.6, "modalities": ["symbolic", "attention"]},
+            {"name": "semantic_cluster", "complexity": 0.8, "modalities": ["neural", "symbolic"]},
+            {"name": "temporal_sequence", "complexity": 0.7, "modalities": ["attention", "neural"]},
         ]
         return patterns
 
     def _create_cognitive_tasks(self) -> list[dict]:
         """Create cognitive tasks for testing"""
         tasks = [
-            {
-                "name": "pattern_matching",
-                "complexity": 0.5,
-                "time_limit": 5.0,
-                "success_threshold": 0.7
-            },
-            {
-                "name": "reasoning_chain",
-                "complexity": 0.8,
-                "time_limit": 10.0,
-                "success_threshold": 0.8
-            },
-            {
-                "name": "multi_modal_fusion",
-                "complexity": 0.9,
-                "time_limit": 15.0,
-                "success_threshold": 0.75
-            }
+            {"name": "pattern_matching", "complexity": 0.5, "time_limit": 5.0, "success_threshold": 0.7},
+            {"name": "reasoning_chain", "complexity": 0.8, "time_limit": 10.0, "success_threshold": 0.8},
+            {"name": "multi_modal_fusion", "complexity": 0.9, "time_limit": 15.0, "success_threshold": 0.75},
         ]
         return tasks
 
@@ -468,14 +429,14 @@ class APRFEIntegrationTest(unittest.TestCase):
         high_load_strategies = {s["selected_strategy"] for s in selections if s["cognitive_load"] > 0.7}
 
         # Should have different strategies for different loads
-        assert low_load_strategies != high_load_strategies, \
+        assert low_load_strategies != high_load_strategies, (
             "Strategy selection should adapt to different cognitive loads"
+        )
 
         # Should prefer efficient strategies under high load
         efficient_strategies = {"attention_guided", "neural_only"}
         high_load_efficient = high_load_strategies.intersection(efficient_strategies)
-        assert len(high_load_efficient) > 0, \
-            "Should prefer efficient strategies under high cognitive load"
+        assert len(high_load_efficient) > 0, "Should prefer efficient strategies under high cognitive load"
 
     def _execute_cross_modal_recognition(self, description: str, atoms: list) -> dict:
         """Execute cross-modal pattern recognition"""
@@ -496,16 +457,17 @@ class APRFEIntegrationTest(unittest.TestCase):
         # Integrate results
         all_patterns = list(set(symbolic_patterns + neural_patterns + attention_patterns))
         integration_quality = self._calculate_integration_quality(
-            symbolic_patterns, neural_patterns, attention_patterns)
+            symbolic_patterns, neural_patterns, attention_patterns
+        )
 
         return {
             "integrated_patterns": all_patterns,
             "modality_contributions": {
                 "symbolic": symbolic_contribution,
                 "neural": neural_contribution,
-                "attention": attention_contribution
+                "attention": attention_contribution,
             },
-            "integration_quality": integration_quality
+            "integration_quality": integration_quality,
         }
 
     def _simulate_symbolic_processing(self, atoms: list) -> list[str]:
@@ -560,12 +522,12 @@ class APRFEIntegrationTest(unittest.TestCase):
 
         # Check that expected modalities are active
         for modality in expected_modalities:
-            assert contributions[modality] > 0.1, \
+            assert contributions[modality] > 0.1, (
                 f"Expected modality '{modality}' should have significant contribution > 0.1"
+            )
 
         # Check integration quality
-        assert result["integration_quality"] > 0.5, \
-            "Cross-modal integration quality should be > 0.5"
+        assert result["integration_quality"] > 0.5, "Cross-modal integration quality should be > 0.5"
 
     def _create_difficulty_task(self, difficulty: float) -> dict:
         """Create task with specified difficulty level"""
@@ -578,7 +540,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             "atoms": self.test_data["atoms"][:num_atoms],
             "pattern_complexity": pattern_complexity,
             "time_limit": 10.0 * time_pressure,
-            "success_threshold": 0.5 + difficulty * 0.3
+            "success_threshold": 0.5 + difficulty * 0.3,
         }
 
     def _measure_baseline_performance(self) -> float:
@@ -610,7 +572,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             "accuracy": max(0.0, min(1.0, accuracy)),
             "patterns_found": patterns_found,
             "processing_time": time.time() - start_time,
-            "complexity_handled": complexity
+            "complexity_handled": complexity,
         }
 
     def _generate_performance_feedback(self, result: dict, difficulty: float) -> dict:
@@ -622,7 +584,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             "accuracy_gap": accuracy_gap,
             "processing_efficiency": result["processing_time"] / 10.0,  # Normalized
             "complexity_handling": result["complexity_handled"],
-            "adaptation_urgency": max(0.0, accuracy_gap)
+            "adaptation_urgency": max(0.0, accuracy_gap),
         }
 
     def _trigger_system_adaptation(self, feedback: dict) -> dict:
@@ -638,7 +600,7 @@ class APRFEIntegrationTest(unittest.TestCase):
         return {
             "magnitude": adaptation_magnitude,
             "strategy_changes": strategy_changes,
-            "adaptation_applied": len(strategy_changes) > 0
+            "adaptation_applied": len(strategy_changes) > 0,
         }
 
     def _measure_performance_after_adaptation(self) -> float:
@@ -656,8 +618,7 @@ class APRFEIntegrationTest(unittest.TestCase):
         early_avg = sum(performances[:2]) / 2
         late_avg = sum(performances[-2:]) / 2
 
-        assert late_avg > early_avg, \
-            f"Should show learning improvement: early={early_avg:.3f}, late={late_avg:.3f}"
+        assert late_avg > early_avg, f"Should show learning improvement: early={early_avg:.3f}, late={late_avg:.3f}"
 
     def _create_session_context(self, session_id: int) -> dict:
         """Create context for recognition session"""
@@ -668,15 +629,20 @@ class APRFEIntegrationTest(unittest.TestCase):
         return {
             "type": context_type,
             "complexity": 0.4 + (session_id % 6) * 0.1,  # Gradually increasing
-            "atoms": self.test_data["atoms"][session_id*2:(session_id*2)+15],
-            "constraints": f"{context_type}_constraints_{session_id}"
+            "atoms": self.test_data["atoms"][session_id * 2 : (session_id * 2) + 15],
+            "constraints": f"{context_type}_constraints_{session_id}",
         }
 
     def _execute_recognition_session(self, context: dict) -> dict:
         """Execute a single recognition session"""
         # Simulate context-specific recognition
-        context_bonus = {"linguistic": 0.1, "mathematical": 0.15, "spatial": 0.05,
-                        "temporal": 0.08, "logical": 0.12}.get(context["type"], 0.0)
+        context_bonus = {
+            "linguistic": 0.1,
+            "mathematical": 0.15,
+            "spatial": 0.05,
+            "temporal": 0.08,
+            "logical": 0.12,
+        }.get(context["type"], 0.0)
 
         base_accuracy = 0.65 + context_bonus
         complexity_factor = 1.0 - context["complexity"] * 0.3
@@ -687,7 +653,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             "accuracy": base_accuracy * complexity_factor,
             "patterns_discovered": int(len(context["atoms"]) * 0.4),
             "novel_patterns": max(0, int((base_accuracy - 0.7) * 10)),  # Novel patterns when performing well
-            "processing_strategy": self._determine_session_strategy(context)
+            "processing_strategy": self._determine_session_strategy(context),
         }
 
     def _determine_session_strategy(self, context: dict) -> str:
@@ -697,7 +663,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             "mathematical": "symbolic_reasoning",
             "spatial": "attention_guided",
             "temporal": "neural_sequence",
-            "logical": "symbolic_chain"
+            "logical": "symbolic_chain",
         }
         return strategy_map.get(context["type"], "adaptive_select")
 
@@ -708,31 +674,37 @@ class APRFEIntegrationTest(unittest.TestCase):
         # Strategy optimization emergence
         strategies = [session["processing_strategy"] for session in recent_sessions]
         if len(set(strategies)) < len(strategies) * 0.7:  # Strategy convergence
-            emergent_patterns.append({
-                "type": "strategy_optimization",
-                "description": f"Converged to optimal strategy: {max(set(strategies), key=strategies.count)}",
-                "confidence": 0.8
-            })
+            emergent_patterns.append(
+                {
+                    "type": "strategy_optimization",
+                    "description": f"Converged to optimal strategy: {max(set(strategies), key=strategies.count)}",
+                    "confidence": 0.8,
+                }
+            )
 
         # Performance improvement emergence
         accuracies = [session["accuracy"] for session in recent_sessions]
         if len(accuracies) >= 3:
             trend = (accuracies[-1] + accuracies[-2]) / 2 - (accuracies[0] + accuracies[1]) / 2
             if trend > 0.1:  # Significant improvement
-                emergent_patterns.append({
-                    "type": "performance_emergence",
-                    "description": f"Self-improving performance trend: +{trend:.3f}",
-                    "confidence": 0.85
-                })
+                emergent_patterns.append(
+                    {
+                        "type": "performance_emergence",
+                        "description": f"Self-improving performance trend: +{trend:.3f}",
+                        "confidence": 0.85,
+                    }
+                )
 
         # Novel pattern synthesis
         total_novel = sum(session["novel_patterns"] for session in recent_sessions)
         if total_novel > len(recent_sessions) * 2:  # Above expected novel patterns
-            emergent_patterns.append({
-                "type": "pattern_synthesis",
-                "description": f"Enhanced novel pattern discovery: {total_novel} patterns",
-                "confidence": 0.75
-            })
+            emergent_patterns.append(
+                {
+                    "type": "pattern_synthesis",
+                    "description": f"Enhanced novel pattern discovery: {total_novel} patterns",
+                    "confidence": 0.75,
+                }
+            )
 
         return emergent_patterns
 
@@ -745,23 +717,22 @@ class APRFEIntegrationTest(unittest.TestCase):
             "total_emergent_behaviors": len(emergent_patterns),
             "behavior_diversity": len(set(behavior_types)),
             "average_confidence": avg_confidence,
-            "dominant_behavior": max(set(behavior_types), key=behavior_types.count) if behavior_types else None
+            "dominant_behavior": max(set(behavior_types), key=behavior_types.count) if behavior_types else None,
         }
 
     def _initialize_multi_agent_scenario(self, scenario: dict) -> list[dict]:
         """Initialize multi-agent coordination scenario"""
         agents = []
         for i in range(scenario["agents"]):
-            agents.append({
-                "id": f"agent_{i}",
-                "specialization": ["symbolic", "neural", "attention"][i % 3],
-                "performance_history": [],
-                "coordination_score": 0.5,
-                "adaptive_parameters": {
-                    "learning_rate": 0.1,
-                    "cooperation_tendency": 0.7
+            agents.append(
+                {
+                    "id": f"agent_{i}",
+                    "specialization": ["symbolic", "neural", "attention"][i % 3],
+                    "performance_history": [],
+                    "coordination_score": 0.5,
+                    "adaptive_parameters": {"learning_rate": 0.1, "cooperation_tendency": 0.7},
                 }
-            })
+            )
         return agents
 
     def _distribute_pattern_tasks(self, agents: list[dict], scenario: dict) -> dict:
@@ -777,7 +748,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             tasks[agent["id"]] = {
                 "atoms": self.test_data["atoms"][start_idx:end_idx],
                 "specialization": agent["specialization"],
-                "coordination_required": len(agents) > 1
+                "coordination_required": len(agents) > 1,
             }
 
         return tasks
@@ -806,36 +777,29 @@ class APRFEIntegrationTest(unittest.TestCase):
         coordination_bonus = len([e for e in coordination_events if e["success"]]) * 0.05
         overall_accuracy = min(1.0, avg_individual_accuracy + coordination_bonus)
 
-        coordination_score = sum(event["effectiveness"] for event in coordination_events) / max(len(coordination_events), 1)
+        coordination_score = sum(event["effectiveness"] for event in coordination_events) / max(
+            len(coordination_events), 1
+        )
 
         return {
             "accuracy": overall_accuracy,
             "coordination_score": coordination_score,
             "agent_results": agent_results,
-            "coordination_events": coordination_events
+            "coordination_events": coordination_events,
         }
 
     def _execute_agent_recognition(self, task: dict) -> dict:
         """Execute pattern recognition for individual agent"""
-        specialization_bonus = {
-            "symbolic": 0.1,
-            "neural": 0.08,
-            "attention": 0.06
-        }.get(task["specialization"], 0.0)
+        specialization_bonus = {"symbolic": 0.1, "neural": 0.08, "attention": 0.06}.get(task["specialization"], 0.0)
 
         base_accuracy = 0.7 + specialization_bonus
         num_patterns = int(len(task["atoms"]) * base_accuracy * 0.25)
 
-        return {
-            "accuracy": base_accuracy,
-            "patterns_found": num_patterns,
-            "specialization": task["specialization"]
-        }
+        return {"accuracy": base_accuracy, "patterns_found": num_patterns, "specialization": task["specialization"]}
 
     def _simulate_attention_sharing(self, agent_results: dict) -> dict:
         """Simulate attention sharing between agents"""
-        attention_agents = [aid for aid, result in agent_results.items()
-                          if result["specialization"] == "attention"]
+        attention_agents = [aid for aid, result in agent_results.items() if result["specialization"] == "attention"]
 
         success = len(attention_agents) > 0
         effectiveness = 0.8 if success else 0.0
@@ -844,7 +808,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             "type": "attention_sharing",
             "success": success,
             "effectiveness": effectiveness,
-            "participants": attention_agents
+            "participants": attention_agents,
         }
 
     def _simulate_pattern_fusion(self, agent_results: dict) -> dict:
@@ -856,7 +820,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             "type": "pattern_fusion",
             "success": total_patterns > len(agent_results) * 3,
             "effectiveness": fusion_efficiency,
-            "patterns_fused": total_patterns
+            "patterns_fused": total_patterns,
         }
 
     def _update_agent_states(self, agents: list[dict], round_result: dict) -> list[dict]:
@@ -894,7 +858,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             "average_accuracy": sum(accuracies) / len(accuracies),
             "average_coordination": sum(coordination_scores) / len(coordination_scores),
             "coordination_improvement": coordination_improvement,
-            "adaptive_behavior_detected": adaptive_behavior
+            "adaptive_behavior_detected": adaptive_behavior,
         }
 
     def _test_atomspace_integration(self) -> dict:
@@ -911,7 +875,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             results[operation] = {
                 "success_rate": success_rate,
                 "average_time_ms": avg_time * 1000,
-                "operations_tested": 100
+                "operations_tested": 100,
             }
 
         return results
@@ -930,7 +894,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             results[rule_type] = {
                 "execution_success_rate": execution_success,
                 "average_inference_time_ms": avg_inference_time * 1000,
-                "rules_executed": 50
+                "rules_executed": 50,
             }
 
         return results
@@ -949,7 +913,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             results[operation] = {
                 "allocation_efficiency": efficiency,
                 "convergence_time_ms": convergence_time * 1000,
-                "attention_operations": 75
+                "attention_operations": 75,
             }
 
         return results
@@ -968,7 +932,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             results[conversion] = {
                 "conversion_accuracy": accuracy,
                 "average_conversion_time_ms": conversion_time * 1000,
-                "conversions_tested": 60
+                "conversions_tested": 60,
             }
 
         return results
@@ -980,7 +944,7 @@ class APRFEIntegrationTest(unittest.TestCase):
             "memory_consistency": True,  # No memory leaks or corruption
             "performance_consistency": True,  # Stable performance metrics
             "state_consistency": True,  # Consistent internal state
-            "integration_consistency": True  # Components work together properly
+            "integration_consistency": True,  # Components work together properly
         }
 
         return checks

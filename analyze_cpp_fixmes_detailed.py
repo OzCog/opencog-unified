@@ -15,12 +15,13 @@ def extract_module_from_path(filepath):
 
     # Skip leading ./ and find the main module
     for i, part in enumerate(parts):
-        if part in ['.', '..']:
+        if part in [".", ".."]:
             continue
         # First meaningful directory is usually the module
         if i < len(parts) - 1:  # Not the filename itself
             return part
-    return 'unknown'
+    return "unknown"
+
 
 def categorize_severity(fixme_content, context):
     """
@@ -30,91 +31,92 @@ def categorize_severity(fixme_content, context):
     content_lower = (fixme_content + context).lower()
 
     # CRITICAL: Security, crashes, data loss, undefined behavior
-    if any(kw in content_lower for kw in [
-        'crash', 'segfault', 'undefined behavior', 'memory leak',
-        'security', 'vulnerability', 'data loss', 'corruption',
-        'race condition', 'deadlock', 'buffer overflow'
-    ]):
-        return 'CRITICAL', 'security_or_crash', 'Security vulnerability or crash risk'
+    if any(
+        kw in content_lower
+        for kw in [
+            "crash",
+            "segfault",
+            "undefined behavior",
+            "memory leak",
+            "security",
+            "vulnerability",
+            "data loss",
+            "corruption",
+            "race condition",
+            "deadlock",
+            "buffer overflow",
+        ]
+    ):
+        return "CRITICAL", "security_or_crash", "Security vulnerability or crash risk"
 
     # HIGH: Thread safety, exception handling, API correctness
-    if any(kw in content_lower for kw in [
-        'thread', 'lock', 'mutex', 'atomic', 'concurrent',
-        'exception', 'throw', 'error handling', 'catch'
-    ]):
-        if 'throw' in content_lower or 'exception' in content_lower:
-            return 'HIGH', 'exception_handling', 'Exception/error handling issue'
-        return 'HIGH', 'thread_safety', 'Thread safety or concurrency issue'
+    if any(
+        kw in content_lower
+        for kw in ["thread", "lock", "mutex", "atomic", "concurrent", "exception", "throw", "error handling", "catch"]
+    ):
+        if "throw" in content_lower or "exception" in content_lower:
+            return "HIGH", "exception_handling", "Exception/error handling issue"
+        return "HIGH", "thread_safety", "Thread safety or concurrency issue"
 
     # HIGH: Performance bottlenecks
-    if any(kw in content_lower for kw in [
-        'performance', 'slow', 'bottleneck', 'optimize', 'inefficient'
-    ]):
-        return 'HIGH', 'performance', 'Performance optimization needed'
+    if any(kw in content_lower for kw in ["performance", "slow", "bottleneck", "optimize", "inefficient"]):
+        return "HIGH", "performance", "Performance optimization needed"
 
     # MEDIUM: Incomplete features, API design
-    if any(kw in content_lower for kw in [
-        'incomplete', 'not implemented', 'todo', 'missing',
-        'should be', 'need to', 'must'
-    ]):
-        return 'MEDIUM', 'incomplete_feature', 'Incomplete implementation'
+    if any(
+        kw in content_lower
+        for kw in ["incomplete", "not implemented", "todo", "missing", "should be", "need to", "must"]
+    ):
+        return "MEDIUM", "incomplete_feature", "Incomplete implementation"
 
     # MEDIUM: Code quality issues
-    if any(kw in content_lower for kw in [
-        'hack', 'workaround', 'temporary', 'kludge', 'cheesy',
-        'ugly', 'messy', 'cleanup', 'refactor'
-    ]):
-        return 'MEDIUM', 'code_quality', 'Code quality/refactoring needed'
+    if any(
+        kw in content_lower
+        for kw in ["hack", "workaround", "temporary", "kludge", "cheesy", "ugly", "messy", "cleanup", "refactor"]
+    ):
+        return "MEDIUM", "code_quality", "Code quality/refactoring needed"
 
     # MEDIUM: API design issues
-    if any(kw in content_lower for kw in [
-        'api', 'interface', 'design', 'architecture', 'structure'
-    ]):
-        return 'MEDIUM', 'api_design', 'API or design improvement'
+    if any(kw in content_lower for kw in ["api", "interface", "design", "architecture", "structure"]):
+        return "MEDIUM", "api_design", "API or design improvement"
 
     # LOW: Documentation, comments
-    if any(kw in content_lower for kw in [
-        'document', 'comment', 'explain', 'clarify'
-    ]):
-        return 'LOW', 'documentation', 'Documentation needed'
+    if any(kw in content_lower for kw in ["document", "comment", "explain", "clarify"]):
+        return "LOW", "documentation", "Documentation needed"
 
     # LOW: General improvements
-    return 'LOW', 'general', 'General improvement or consideration'
+    return "LOW", "general", "General improvement or consideration"
+
 
 def analyze_fixmes():
     """Analyze all C++ FIXMEs with detailed categorization"""
 
     # Load the existing analysis
-    with open('cpp_fixme_analysis.json') as f:
+    with open("cpp_fixme_analysis.json") as f:
         data = json.load(f)
 
     # Detailed analysis structure
     analysis = {
-        'total': data['total'],
-        'by_severity': defaultdict(list),
-        'by_module': defaultdict(list),
-        'by_category': defaultdict(list),
-        'summary': {
-            'critical': 0,
-            'high': 0,
-            'medium': 0,
-            'low': 0
-        },
-        'module_summary': defaultdict(lambda: {'critical': 0, 'high': 0, 'medium': 0, 'low': 0}),
-        'category_summary': defaultdict(int)
+        "total": data["total"],
+        "by_severity": defaultdict(list),
+        "by_module": defaultdict(list),
+        "by_category": defaultdict(list),
+        "summary": {"critical": 0, "high": 0, "medium": 0, "low": 0},
+        "module_summary": defaultdict(lambda: {"critical": 0, "high": 0, "medium": 0, "low": 0}),
+        "category_summary": defaultdict(int),
     }
 
     # Process all FIXMEs from all categories
     all_fixmes = []
-    for category, fixmes in data['fixmes_by_category'].items():
+    for category, fixmes in data["fixmes_by_category"].items():
         all_fixmes.extend(fixmes)
 
     # Analyze each FIXME
     for fixme in all_fixmes:
-        filepath = fixme['file']
-        content = fixme['content']
-        context = fixme.get('context', '')
-        line = fixme['line']
+        filepath = fixme["file"]
+        content = fixme["content"]
+        context = fixme.get("context", "")
+        line = fixme["line"]
 
         # Extract module
         module = extract_module_from_path(filepath)
@@ -124,42 +126,43 @@ def analyze_fixmes():
 
         # Create detailed entry
         entry = {
-            'file': filepath,
-            'line': line,
-            'module': module,
-            'severity': severity,
-            'category': category,
-            'description': description,
-            'content': content.strip(),
-            'context_preview': context.strip()[:200] + '...' if len(context.strip()) > 200 else context.strip()
+            "file": filepath,
+            "line": line,
+            "module": module,
+            "severity": severity,
+            "category": category,
+            "description": description,
+            "content": content.strip(),
+            "context_preview": context.strip()[:200] + "..." if len(context.strip()) > 200 else context.strip(),
         }
 
         # Add to categorizations
-        analysis['by_severity'][severity].append(entry)
-        analysis['by_module'][module].append(entry)
-        analysis['by_category'][category].append(entry)
+        analysis["by_severity"][severity].append(entry)
+        analysis["by_module"][module].append(entry)
+        analysis["by_category"][category].append(entry)
 
         # Update summaries
-        analysis['summary'][severity.lower()] += 1
-        analysis['module_summary'][module][severity.lower()] += 1
-        analysis['category_summary'][category] += 1
+        analysis["summary"][severity.lower()] += 1
+        analysis["module_summary"][module][severity.lower()] += 1
+        analysis["category_summary"][category] += 1
 
     # Convert defaultdicts to regular dicts for JSON serialization
-    analysis['by_severity'] = dict(analysis['by_severity'])
-    analysis['by_module'] = dict(analysis['by_module'])
-    analysis['by_category'] = dict(analysis['by_category'])
-    analysis['module_summary'] = dict(analysis['module_summary'])
-    analysis['category_summary'] = dict(analysis['category_summary'])
+    analysis["by_severity"] = dict(analysis["by_severity"])
+    analysis["by_module"] = dict(analysis["by_module"])
+    analysis["by_category"] = dict(analysis["by_category"])
+    analysis["module_summary"] = dict(analysis["module_summary"])
+    analysis["category_summary"] = dict(analysis["category_summary"])
 
     # Sort by severity
-    for severity in analysis['by_severity']:
-        analysis['by_severity'][severity].sort(key=lambda x: (x['module'], x['file'], x['line']))
+    for severity in analysis["by_severity"]:
+        analysis["by_severity"][severity].sort(key=lambda x: (x["module"], x["file"], x["line"]))
 
     # Save detailed analysis
-    with open('cpp_fixme_detailed_analysis.json', 'w') as f:
+    with open("cpp_fixme_detailed_analysis.json", "w") as f:
         json.dump(analysis, f, indent=2)
 
     return analysis
+
 
 def generate_report(analysis):
     """Generate a human-readable report"""
@@ -187,7 +190,7 @@ def generate_report(analysis):
     report.append("-" * 80)
 
     module_totals = []
-    for module, counts in analysis['module_summary'].items():
+    for module, counts in analysis["module_summary"].items():
         total = sum(counts.values())
         module_totals.append((module, counts, total))
 
@@ -195,7 +198,9 @@ def generate_report(analysis):
     module_totals.sort(key=lambda x: x[2], reverse=True)
 
     for module, counts, total in module_totals:
-        report.append(f"{module:<30} {counts['critical']:8d} {counts['high']:8d} {counts['medium']:8d} {counts['low']:8d} {total:8d}")
+        report.append(
+            f"{module:<30} {counts['critical']:8d} {counts['high']:8d} {counts['medium']:8d} {counts['low']:8d} {total:8d}"
+        )
 
     report.append("")
 
@@ -205,7 +210,7 @@ def generate_report(analysis):
     report.append(f"{'Category':<30} {'Count':>8}")
     report.append("-" * 80)
 
-    for category, count in sorted(analysis['category_summary'].items(), key=lambda x: x[1], reverse=True):
+    for category, count in sorted(analysis["category_summary"].items(), key=lambda x: x[1], reverse=True):
         report.append(f"{category:<30} {count:8d}")
 
     report.append("")
@@ -215,10 +220,10 @@ def generate_report(analysis):
     report.append("=" * 80)
 
     priority_items = []
-    if 'CRITICAL' in analysis['by_severity']:
-        priority_items.extend(analysis['by_severity']['CRITICAL'])
-    if 'HIGH' in analysis['by_severity']:
-        priority_items.extend(analysis['by_severity']['HIGH'])
+    if "CRITICAL" in analysis["by_severity"]:
+        priority_items.extend(analysis["by_severity"]["CRITICAL"])
+    if "HIGH" in analysis["by_severity"]:
+        priority_items.extend(analysis["by_severity"]["HIGH"])
 
     for i, item in enumerate(priority_items[:20], 1):  # Top 20
         report.append("")
@@ -239,14 +244,15 @@ def generate_report(analysis):
 
     return "\n".join(report)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     print("Analyzing C++ FIXMEs in detail...")
     analysis = analyze_fixmes()
 
     report = generate_report(analysis)
 
     # Save report
-    with open('cpp_fixme_analysis_report.txt', 'w') as f:
+    with open("cpp_fixme_analysis_report.txt", "w") as f:
         f.write(report)
 
     print(report)

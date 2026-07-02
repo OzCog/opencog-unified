@@ -22,7 +22,7 @@ def demo_marker_analysis():
     """Demonstrate marker analysis results."""
     print_header("MARKER ANALYSIS")
 
-    analysis_file = Path('entelechy_marker_analysis.json')
+    analysis_file = Path("entelechy_marker_analysis.json")
     if not analysis_file.exists():
         print("⚠ Run: python3 entelechy_marker_analyzer.py")
         return
@@ -33,10 +33,10 @@ def demo_marker_analysis():
     print(f"\n📊 Total Markers Found: {data['summary']['total_markers']}")
 
     # Count by type
-    markers = data.get('markers', [])
+    markers = data.get("markers", [])
     by_type = {}
     for m in markers:
-        mt = m.get('marker_type', 'unknown')
+        mt = m.get("marker_type", "unknown")
         by_type[mt] = by_type.get(mt, 0) + 1
 
     print("\n📋 By Type:")
@@ -50,7 +50,7 @@ def demo_marker_analysis():
         print(f"\n   {i}. [{marker['marker_type']}] {marker['file_path']}:{marker['line_number']}")
         print(f"      Category: {marker['category']}")
         print(f"      Severity: {marker['severity']:.2f}")
-        content = marker.get('content', '')[:60]
+        content = marker.get("content", "")[:60]
         print(f"      Content: {content}...")
 
 
@@ -58,7 +58,7 @@ def demo_repair_plan():
     """Demonstrate repair plan results."""
     print_header("REPAIR PLAN")
 
-    plan_file = Path('repair_plan.json')
+    plan_file = Path("repair_plan.json")
     if not plan_file.exists():
         print("⚠ Run: python3 scripts/intelligent_marker_repair.py --analyze")
         return
@@ -66,7 +66,7 @@ def demo_repair_plan():
     with open(plan_file) as f:
         plan = json.load(f)
 
-    summary = plan['summary']
+    summary = plan["summary"]
 
     print(f"\n🎯 Repair Plan Generated: {plan['timestamp']}")
     print(f"\n   Total repairs analyzed: {summary['total_repairs']}")
@@ -74,17 +74,17 @@ def demo_repair_plan():
     print(f"   Manual review needed: {summary['needs_review']}")
 
     print("\n   By Repair Type:")
-    for repair_type, count in sorted(summary['by_type'].items(), key=lambda x: x[1], reverse=True):
+    for repair_type, count in sorted(summary["by_type"].items(), key=lambda x: x[1], reverse=True):
         if count > 0:
-            pct = (count / summary['total_repairs'] * 100) if summary['total_repairs'] else 0
+            pct = (count / summary["total_repairs"] * 100) if summary["total_repairs"] else 0
             print(f"      {repair_type:15s} {count:4d} ({pct:5.1f}%)")
 
     # Show statistics
-    stats = plan.get('statistics', {})
+    stats = plan.get("statistics", {})
     if stats:
         print("\n   Work Distribution:")
         for key, value in sorted(stats.items()):
-            if key != 'total_analyzed':
+            if key != "total_analyzed":
                 print(f"      {key:25s} {value:4d}")
 
 
@@ -127,7 +127,7 @@ def demo_metrics():
     """Show key metrics."""
     print_header("ENTELECHY METRICS")
 
-    analysis_file = Path('entelechy_marker_analysis.json')
+    analysis_file = Path("entelechy_marker_analysis.json")
     if not analysis_file.exists():
         print("⚠ Analysis not available")
         return
@@ -135,20 +135,20 @@ def demo_metrics():
     with open(analysis_file) as f:
         data = json.load(f)
 
-    markers = data.get('markers', [])
+    markers = data.get("markers", [])
     total = len(markers)
 
     # Calculate severity distribution
-    critical = sum(1 for m in markers if m.get('severity', 0) >= 0.8)
-    high = sum(1 for m in markers if 0.6 <= m.get('severity', 0) < 0.8)
-    medium = sum(1 for m in markers if 0.4 <= m.get('severity', 0) < 0.6)
-    low = sum(1 for m in markers if m.get('severity', 0) < 0.4)
+    critical = sum(1 for m in markers if m.get("severity", 0) >= 0.8)
+    high = sum(1 for m in markers if 0.6 <= m.get("severity", 0) < 0.8)
+    medium = sum(1 for m in markers if 0.4 <= m.get("severity", 0) < 0.6)
+    low = sum(1 for m in markers if m.get("severity", 0) < 0.4)
 
     print("\n📈 Severity Distribution:\n")
-    print(f"   Critical (≥0.8):  {critical:4d} ({critical/total*100:5.1f}%)")
-    print(f"   High (0.6-0.8):   {high:4d} ({high/total*100:5.1f}%)")
-    print(f"   Medium (0.4-0.6): {medium:4d} ({medium/total*100:5.1f}%)")
-    print(f"   Low (<0.4):       {low:4d} ({low/total*100:5.1f}%)")
+    print(f"   Critical (≥0.8):  {critical:4d} ({critical / total * 100:5.1f}%)")
+    print(f"   High (0.6-0.8):   {high:4d} ({high / total * 100:5.1f}%)")
+    print(f"   Medium (0.4-0.6): {medium:4d} ({medium / total * 100:5.1f}%)")
+    print(f"   Low (<0.4):       {low:4d} ({low / total * 100:5.1f}%)")
 
     # Estimate actualization impact
     fragmentation_density = total / 100000  # markers per 100k LOC (approx)
@@ -192,5 +192,5 @@ def main():
     print()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

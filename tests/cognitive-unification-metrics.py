@@ -21,6 +21,7 @@ from typing import Any
 @dataclass
 class UnifiedTensorSignature:
     """Unified cognitive tensor signature for Phase VI"""
+
     phase_integration: list[int]
     cognitive_coherence: float
     emergent_properties: list[str]
@@ -46,31 +47,32 @@ class UnifiedTensorSignature:
     def calculate_unified_score(self) -> float:
         """Calculate overall unification score (0-100)"""
         weights = {
-            'cognitive_coherence': 0.20,
-            'system_stability': 0.15,
-            'documentation_completeness': 0.10,
-            'test_coverage': 0.15,
-            'transcendence_level': 0.15,
-            'meta_cognitive_awareness': 0.10,
-            'adaptive_capacity': 0.10,
-            'emergence_velocity': 0.05
+            "cognitive_coherence": 0.20,
+            "system_stability": 0.15,
+            "documentation_completeness": 0.10,
+            "test_coverage": 0.15,
+            "transcendence_level": 0.15,
+            "meta_cognitive_awareness": 0.10,
+            "adaptive_capacity": 0.10,
+            "emergence_velocity": 0.05,
         }
 
         # Normalize transcendence_level to 0-1 range
         normalized_transcendence = min(self.transcendence_level / 2.0, 1.0)
 
         score = (
-            weights['cognitive_coherence'] * self.cognitive_coherence +
-            weights['system_stability'] * self.system_stability +
-            weights['documentation_completeness'] * self.documentation_completeness +
-            weights['test_coverage'] * self.test_coverage +
-            weights['transcendence_level'] * normalized_transcendence +
-            weights['meta_cognitive_awareness'] * self.meta_cognitive_awareness +
-            weights['adaptive_capacity'] * self.adaptive_capacity +
-            weights['emergence_velocity'] * min(self.emergence_velocity, 1.0)
+            weights["cognitive_coherence"] * self.cognitive_coherence
+            + weights["system_stability"] * self.system_stability
+            + weights["documentation_completeness"] * self.documentation_completeness
+            + weights["test_coverage"] * self.test_coverage
+            + weights["transcendence_level"] * normalized_transcendence
+            + weights["meta_cognitive_awareness"] * self.meta_cognitive_awareness
+            + weights["adaptive_capacity"] * self.adaptive_capacity
+            + weights["emergence_velocity"] * min(self.emergence_velocity, 1.0)
         )
 
         return score * 100
+
 
 class CognitiveUnificationMetrics:
     """Comprehensive system for measuring cognitive unification"""
@@ -119,7 +121,7 @@ class CognitiveUnificationMetrics:
             meta_cognitive_awareness=meta_cognitive_awareness,
             adaptive_capacity=adaptive_capacity,
             emergence_velocity=emergence_velocity,
-            coherence_gradient=coherence_gradient
+            coherence_gradient=coherence_gradient,
         )
 
         return self.unified_tensor
@@ -192,6 +194,7 @@ class CognitiveUnificationMetrics:
 
         return "\n".join(dashboard)
 
+
 def main():
     """Main execution for cognitive unification metrics"""
     print("🧮 Cognitive Unification Metrics System")
@@ -231,8 +234,10 @@ def main():
     except Exception as e:
         print(f"\n❌ COGNITIVE UNIFICATION ERROR: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

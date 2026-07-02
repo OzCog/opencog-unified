@@ -22,20 +22,23 @@ class QueryType(Enum):
     MUTATION = "mutation"
     SUBSCRIPTION = "subscription"
 
+
 class DirectiveType(Enum):
     NEURAL_ATTENTION = "neural_attention"
     MESSAGE_PASSING = "message_passing"
     TENSOR_RESHAPE = "tensor_reshape"
     COGNITIVE_PRIMITIVE = "cognitive_primitive"
 
+
 @dataclass
 class QueryField:
     """Represents a field in a GraphQL query"""
+
     name: str
     alias: str | None = None
     arguments: dict[str, Any] = None
     directives: list[dict[str, Any]] = None
-    selections: list['QueryField'] = None
+    selections: list["QueryField"] = None
 
     def __post_init__(self):
         if self.arguments is None:
@@ -45,9 +48,11 @@ class QueryField:
         if self.selections is None:
             self.selections = []
 
+
 @dataclass
 class ParsedQuery:
     """Complete parsed GraphQL query structure"""
+
     operation_type: QueryType
     operation_name: str | None
     fields: list[QueryField]
@@ -57,14 +62,17 @@ class ParsedQuery:
         if self.variables is None:
             self.variables = {}
 
+
 @dataclass
 class NeuralGraphStructure:
     """Neural graph representation of parsed query"""
+
     nodes: list[dict[str, Any]]
     edges: list[dict[str, Any]]
     tensor_shape: tuple[int, int, int] = (7, 7, 7)
     query_embedding: np.ndarray = None
     attention_weights: np.ndarray = None
+
 
 class GraphQLQueryParser:
     """
@@ -88,7 +96,7 @@ class GraphQLQueryParser:
             "updateNeuralWeights": np.array([1, 0, 1, 0]),
             "executeMessagePassing": np.array([0, 1, 1, 0]),
             "attentionUpdates": np.array([1, 1, 1, 0]),
-            "neuralStateChanges": np.array([1, 0, 0, 1])
+            "neuralStateChanges": np.array([1, 0, 0, 1]),
         }
 
     def parse_query(self, query_string: str) -> ParsedQuery:
@@ -114,10 +122,7 @@ class GraphQLQueryParser:
         fields = self._parse_fields(cleaned_query)
 
         return ParsedQuery(
-            operation_type=operation_type,
-            operation_name=operation_name,
-            fields=fields,
-            variables=variables
+            operation_type=operation_type, operation_name=operation_name, fields=fields, variables=variables
         )
 
     def query_to_neural_graph(self, query: str | ParsedQuery) -> NeuralGraphStructure:
@@ -149,16 +154,16 @@ class GraphQLQueryParser:
             edges=edges,
             tensor_shape=self.tensor_shape,
             query_embedding=query_embedding,
-            attention_weights=attention_weights
+            attention_weights=attention_weights,
         )
 
     def _clean_query(self, query_string: str) -> str:
         """Clean and normalize GraphQL query string"""
         # Remove comments
-        query_string = re.sub(r'#.*$', '', query_string, flags=re.MULTILINE)
+        query_string = re.sub(r"#.*$", "", query_string, flags=re.MULTILINE)
 
         # Normalize whitespace
-        query_string = re.sub(r'\s+', ' ', query_string)
+        query_string = re.sub(r"\s+", " ", query_string)
 
         # Remove leading/trailing whitespace
         query_string = query_string.strip()
@@ -168,7 +173,7 @@ class GraphQLQueryParser:
     def _extract_operation(self, query_string: str) -> tuple[QueryType, str | None]:
         """Extract operation type and name from query"""
         # Match operation pattern (more flexible with whitespace and variables)
-        operation_match = re.search(r'(query|mutation|subscription)(?:\s+(\w+))?(?:\s*\([^)]*\))?\s*{', query_string)
+        operation_match = re.search(r"(query|mutation|subscription)(?:\s+(\w+))?(?:\s*\([^)]*\))?\s*{", query_string)
 
         if operation_match:
             operation_type = QueryType(operation_match.group(1))
@@ -185,21 +190,18 @@ class GraphQLQueryParser:
         variables = {}
 
         # Find variable declarations
-        var_match = re.search(r'\(([^)]+)\)', query_string)
+        var_match = re.search(r"\(([^)]+)\)", query_string)
         if var_match:
             var_string = var_match.group(1)
 
             # Parse individual variables
-            var_pattern = r'\$(\w+):\s*([^,\s]+)(?:\s*=\s*([^,\s]+))?'
+            var_pattern = r"\$(\w+):\s*([^,\s]+)(?:\s*=\s*([^,\s]+))?"
             for match in re.finditer(var_pattern, var_string):
                 var_name = match.group(1)
                 var_type = match.group(2)
                 default_value = match.group(3)
 
-                variables[var_name] = {
-                    "type": var_type,
-                    "default": default_value
-                }
+                variables[var_name] = {"type": var_type, "default": default_value}
 
         return variables
 
@@ -208,7 +210,7 @@ class GraphQLQueryParser:
         fields = []
 
         # Find the main selection set
-        brace_start = query_string.find('{')
+        brace_start = query_string.find("{")
         if brace_start == -1:
             return fields
 
@@ -218,9 +220,9 @@ class GraphQLQueryParser:
         end_pos = start_pos
 
         for i, char in enumerate(query_string[brace_start:], brace_start):
-            if char == '{':
+            if char == "{":
                 brace_count += 1
-            elif char == '}':
+            elif char == "}":
                 brace_count -= 1
                 if brace_count == 0:
                     end_pos = i
@@ -255,15 +257,15 @@ class GraphQLQueryParser:
         brace_count = 0
 
         for char in selection_set:
-            if char == '(':
+            if char == "(":
                 paren_count += 1
-            elif char == ')':
+            elif char == ")":
                 paren_count -= 1
-            elif char == '{':
+            elif char == "{":
                 brace_count += 1
-            elif char == '}':
+            elif char == "}":
                 brace_count -= 1
-            elif char == ',' and paren_count == 0 and brace_count == 0:
+            elif char == "," and paren_count == 0 and brace_count == 0:
                 if current_field.strip():
                     fields.append(current_field.strip())
                 current_field = ""
@@ -282,7 +284,7 @@ class GraphQLQueryParser:
             return None
 
         # Parse field name and alias
-        field_match = re.match(r'^(?:(\w+):\s*)?(\w+)', field_string)
+        field_match = re.match(r"^(?:(\w+):\s*)?(\w+)", field_string)
         if not field_match:
             return None
 
@@ -297,30 +299,26 @@ class GraphQLQueryParser:
 
         # Parse nested selections
         selections = []
-        brace_start = field_string.find('{')
+        brace_start = field_string.find("{")
         if brace_start != -1:
             # Find matching closing brace
             brace_count = 0
             end_pos = brace_start
 
             for i, char in enumerate(field_string[brace_start:], brace_start):
-                if char == '{':
+                if char == "{":
                     brace_count += 1
-                elif char == '}':
+                elif char == "}":
                     brace_count -= 1
                     if brace_count == 0:
                         end_pos = i
                         break
 
-            nested_selection = field_string[brace_start + 1:end_pos]
+            nested_selection = field_string[brace_start + 1 : end_pos]
             selections = self._parse_selection_set(nested_selection)
 
         return QueryField(
-            name=field_name,
-            alias=alias,
-            arguments=arguments,
-            directives=directives,
-            selections=selections
+            name=field_name, alias=alias, arguments=arguments, directives=directives, selections=selections
         )
 
     def _parse_arguments(self, field_string: str) -> dict[str, Any]:
@@ -328,14 +326,14 @@ class GraphQLQueryParser:
         arguments = {}
 
         # Find arguments in parentheses
-        arg_match = re.search(r'\(([^)]+)\)', field_string)
+        arg_match = re.search(r"\(([^)]+)\)", field_string)
         if arg_match:
             arg_string = arg_match.group(1)
 
             # Parse individual arguments
             arg_pairs = self._split_arguments(arg_string)
             for arg_pair in arg_pairs:
-                key_value = arg_pair.split(':', 1)
+                key_value = arg_pair.split(":", 1)
                 if len(key_value) == 2:
                     key = key_value[0].strip()
                     value = self._parse_argument_value(key_value[1].strip())
@@ -351,15 +349,15 @@ class GraphQLQueryParser:
         bracket_count = 0
 
         for char in arg_string:
-            if char == '(':
+            if char == "(":
                 paren_count += 1
-            elif char == ')':
+            elif char == ")":
                 paren_count -= 1
-            elif char == '[':
+            elif char == "[":
                 bracket_count += 1
-            elif char == ']':
+            elif char == "]":
                 bracket_count -= 1
-            elif char == ',' and paren_count == 0 and bracket_count == 0:
+            elif char == "," and paren_count == 0 and bracket_count == 0:
                 if current_arg.strip():
                     args.append(current_arg.strip())
                 current_arg = ""
@@ -382,7 +380,7 @@ class GraphQLQueryParser:
 
         # Parse numbers
         try:
-            if '.' in value_string:
+            if "." in value_string:
                 return float(value_string)
             else:
                 return int(value_string)
@@ -390,17 +388,16 @@ class GraphQLQueryParser:
             pass
 
         # Parse booleans
-        if value_string.lower() == 'true':
+        if value_string.lower() == "true":
             return True
-        elif value_string.lower() == 'false':
+        elif value_string.lower() == "false":
             return False
 
         # Parse arrays
-        if value_string.startswith('[') and value_string.endswith(']'):
+        if value_string.startswith("[") and value_string.endswith("]"):
             array_content = value_string[1:-1]
             if array_content:
-                elements = [self._parse_argument_value(elem.strip())
-                           for elem in array_content.split(',')]
+                elements = [self._parse_argument_value(elem.strip()) for elem in array_content.split(",")]
                 return elements
             return []
 
@@ -412,7 +409,7 @@ class GraphQLQueryParser:
         directives = []
 
         # Find all directives
-        directive_matches = re.finditer(r'@(\w+)(?:\(([^)]+)\))?', field_string)
+        directive_matches = re.finditer(r"@(\w+)(?:\(([^)]+)\))?", field_string)
 
         for match in directive_matches:
             directive_name = match.group(1)
@@ -422,16 +419,13 @@ class GraphQLQueryParser:
                 arg_string = match.group(2)
                 arg_pairs = self._split_arguments(arg_string)
                 for arg_pair in arg_pairs:
-                    key_value = arg_pair.split(':', 1)
+                    key_value = arg_pair.split(":", 1)
                     if len(key_value) == 2:
                         key = key_value[0].strip()
                         value = self._parse_argument_value(key_value[1].strip())
                         directive_args[key] = value
 
-            directives.append({
-                "name": directive_name,
-                "arguments": directive_args
-            })
+            directives.append({"name": directive_name, "arguments": directive_args})
 
         return directives
 
@@ -443,7 +437,7 @@ class GraphQLQueryParser:
         op_type_embedding = {
             QueryType.QUERY: [1, 0, 0],
             QueryType.MUTATION: [0, 1, 0],
-            QueryType.SUBSCRIPTION: [0, 0, 1]
+            QueryType.SUBSCRIPTION: [0, 0, 1],
         }
 
         op_embedding = op_type_embedding[parsed_query.operation_type]
@@ -483,7 +477,7 @@ class GraphQLQueryParser:
             "embedding": self._generate_node_embedding("operation", parsed_query.operation_type.value),
             "coordinates": (3, 3, 3),  # Center of 7x7x7 space
             "attention_score": 1.0,
-            "layer": 0
+            "layer": 0,
         }
         nodes.append(root_node)
         node_id_counter += 1
@@ -498,9 +492,9 @@ class GraphQLQueryParser:
 
         return nodes, edges
 
-    def _process_field(self, field: QueryField, parent_id: str,
-                      node_id_counter: int, edge_id_counter: int,
-                      depth: int) -> tuple[list[dict], list[dict], int, int]:
+    def _process_field(
+        self, field: QueryField, parent_id: str, node_id_counter: int, edge_id_counter: int, depth: int
+    ) -> tuple[list[dict], list[dict], int, int]:
         """Process a single field and its selections"""
         nodes = []
         edges = []
@@ -519,7 +513,7 @@ class GraphQLQueryParser:
             "embedding": self._generate_node_embedding("field", field.name),
             "coordinates": coordinates,
             "attention_score": self._compute_field_attention(field),
-            "layer": depth
+            "layer": depth,
         }
         nodes.append(field_node)
         field_node_id = field_node["id"]
@@ -533,7 +527,7 @@ class GraphQLQueryParser:
             "weight": 1.0,
             "type": "parent_child",
             "message_vector": np.zeros(self.embedding_dim).tolist(),
-            "attention_weight": 1.0
+            "attention_weight": 1.0,
         }
         edges.append(edge)
         edge_id_counter += 1
@@ -557,7 +551,7 @@ class GraphQLQueryParser:
             "operation": [1, 0, 0, 0],
             "field": [0, 1, 0, 0],
             "argument": [0, 0, 1, 0],
-            "directive": [0, 0, 0, 1]
+            "directive": [0, 0, 0, 1],
         }
 
         if node_type in type_encodings:
@@ -579,8 +573,8 @@ class GraphQLQueryParser:
         # Hash field name to get base coordinates
         name_hash = hash(field_name)
 
-        x = (name_hash % 7)
-        y = ((name_hash // 7) % 7)
+        x = name_hash % 7
+        y = (name_hash // 7) % 7
         z = min(depth, 6)  # Depth becomes z-coordinate, clamped to 6
 
         return (x, y, z)
@@ -603,8 +597,7 @@ class GraphQLQueryParser:
 
         return min(1.0, base_attention)
 
-    def _compute_attention_weights(self, parsed_query: ParsedQuery,
-                                  nodes: list[dict]) -> np.ndarray:
+    def _compute_attention_weights(self, parsed_query: ParsedQuery, nodes: list[dict]) -> np.ndarray:
         """Compute attention weight matrix"""
         attention_matrix = np.zeros((7, 7))
 
@@ -672,7 +665,7 @@ def main():
                 attention_weights
             }
         }
-        """
+        """,
     ]
 
     for i, query in enumerate(test_queries):
@@ -698,15 +691,15 @@ def main():
                     "operation_type": parsed.operation_type.value,
                     "operation_name": parsed.operation_name,
                     "variables": parsed.variables,
-                    "fields": [asdict(f) for f in parsed.fields]
+                    "fields": [asdict(f) for f in parsed.fields],
                 },
                 "neural_graph": {
                     "nodes": neural_graph.nodes,
                     "edges": neural_graph.edges,
                     "tensor_shape": neural_graph.tensor_shape,
                     "query_embedding": neural_graph.query_embedding.tolist(),
-                    "attention_weights": neural_graph.attention_weights.tolist()
-                }
+                    "attention_weights": neural_graph.attention_weights.tolist(),
+                },
             }
 
             with open("query_parser_results.json", "w") as f:

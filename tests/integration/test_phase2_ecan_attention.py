@@ -20,6 +20,7 @@ from pathlib import Path
 # Add opencog modules to path if available
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+
 class TestPhase2ECANAttention(unittest.TestCase):
     """Test Phase 2 ECAN attention allocation enhancements"""
 
@@ -33,7 +34,7 @@ class TestPhase2ECANAttention(unittest.TestCase):
             "conflict_resolution": False,
             "performance_metrics": False,
             "fairness_analysis": False,
-            "mesh_topology": False
+            "mesh_topology": False,
         }
 
     def test_ecan_attention_tensor_signature(self):
@@ -47,7 +48,7 @@ class TestPhase2ECANAttention(unittest.TestCase):
             "urgency",
             "confidence",
             "spreading_factor",
-            "decay_rate"
+            "decay_rate",
         ]
 
         # Simulate tensor validation
@@ -63,17 +64,21 @@ class TestPhase2ECANAttention(unittest.TestCase):
         print(f"✓ Tensor values normalized: {normalized_values}")
 
         # Test economic value computation
-        economic_value = (normalized_values[0] * 0.4 +  # STI
-                         normalized_values[1] * 0.3 +   # LTI
-                         normalized_values[2] * 0.2 +   # urgency
-                         normalized_values[3] * 0.1)    # confidence
+        economic_value = (
+            normalized_values[0] * 0.4  # STI
+            + normalized_values[1] * 0.3  # LTI
+            + normalized_values[2] * 0.2  # urgency
+            + normalized_values[3] * 0.1
+        )  # confidence
 
         print(f"✓ Economic value computed: {economic_value:.3f}")
 
         # Test spreading potential
-        spreading_potential = (normalized_values[4] *  # spreading_factor
-                              normalized_values[3] *   # confidence
-                              normalized_values[0])    # STI
+        spreading_potential = (
+            normalized_values[4]  # spreading_factor
+            * normalized_values[3]  # confidence
+            * normalized_values[0]
+        )  # STI
 
         print(f"✓ Spreading potential computed: {spreading_potential:.3f}")
 
@@ -89,7 +94,7 @@ class TestPhase2ECANAttention(unittest.TestCase):
             {"atom_id": "atom_1", "priority": 0.9, "amount": 50, "type": "stimulate"},
             {"atom_id": "atom_2", "priority": 0.7, "amount": 30, "type": "spread"},
             {"atom_id": "atom_3", "priority": 0.95, "amount": 70, "type": "stimulate"},
-            {"atom_id": "atom_4", "priority": 0.6, "amount": 20, "type": "decay"}
+            {"atom_id": "atom_4", "priority": 0.6, "amount": 20, "type": "decay"},
         ]
 
         # Sort by priority (descending)
@@ -97,7 +102,7 @@ class TestPhase2ECANAttention(unittest.TestCase):
 
         print("✓ Priority queue processing order:")
         for i, req in enumerate(sorted_requests):
-            print(f"  {i+1}. {req['atom_id']} (priority: {req['priority']}, {req['type']})")
+            print(f"  {i + 1}. {req['atom_id']} (priority: {req['priority']}, {req['type']})")
 
         # Test request processing simulation
         processed_requests = 0
@@ -123,13 +128,7 @@ class TestPhase2ECANAttention(unittest.TestCase):
         print("\n=== Testing Attention Decay and Refresh Mechanisms ===")
 
         # Simulate attention values for atoms
-        initial_attention = {
-            "atom_1": 100,
-            "atom_2": 75,
-            "atom_3": 50,
-            "atom_4": 25,
-            "atom_5": 10
-        }
+        initial_attention = {"atom_1": 100, "atom_2": 75, "atom_3": 50, "atom_4": 25, "atom_5": 10}
 
         # Test attention decay (factor = 0.95)
         decay_factor = 0.95
@@ -171,7 +170,7 @@ class TestPhase2ECANAttention(unittest.TestCase):
         agent_attention_states = {
             "agent_1": {"atom_A": 80, "atom_B": 60, "atom_C": 40},
             "agent_2": {"atom_A": 70, "atom_B": 90, "atom_D": 50},
-            "agent_3": {"atom_A": 85, "atom_C": 35, "atom_E": 45}
+            "agent_3": {"atom_A": 85, "atom_C": 35, "atom_E": 45},
         }
 
         # Test attention synchronization protocol
@@ -184,13 +183,15 @@ class TestPhase2ECANAttention(unittest.TestCase):
             for atom_id, value in high_attention_atoms.items():
                 for other_agent in agents:
                     if other_agent != agent_id:
-                        sync_messages.append({
-                            "from": agent_id,
-                            "to": other_agent,
-                            "atom": atom_id,
-                            "value": value,
-                            "timestamp": time.time()
-                        })
+                        sync_messages.append(
+                            {
+                                "from": agent_id,
+                                "to": other_agent,
+                                "atom": atom_id,
+                                "value": value,
+                                "timestamp": time.time(),
+                            }
+                        )
 
         print(f"✓ Generated {len(sync_messages)} synchronization messages")
 
@@ -206,7 +207,7 @@ class TestPhase2ECANAttention(unittest.TestCase):
         for atom_id, values in conflicting_atoms.items():
             if len(values) > 1:
                 # Weighted average conflict resolution
-                resolved_value = sum(v * (1.0 + v/100.0) for v in values) / sum(1.0 + v/100.0 for v in values)
+                resolved_value = sum(v * (1.0 + v / 100.0) for v in values) / sum(1.0 + v / 100.0 for v in values)
                 resolved_values[atom_id] = resolved_value
                 print(f"✓ Resolved conflict for {atom_id}: {values} → {resolved_value:.1f}")
 
@@ -228,7 +229,7 @@ class TestPhase2ECANAttention(unittest.TestCase):
         conflict_scenarios = [
             {"atom_id": "atom_X", "values": [80, 75, 85], "expected_strategy": "weighted_average"},
             {"atom_id": "atom_Y", "values": [20, 90], "expected_strategy": "bias_toward_higher"},
-            {"atom_id": "atom_Z", "values": [50], "expected_strategy": "no_conflict"}
+            {"atom_id": "atom_Z", "values": [50], "expected_strategy": "no_conflict"},
         ]
 
         resolved_conflicts = 0
@@ -242,7 +243,7 @@ class TestPhase2ECANAttention(unittest.TestCase):
                 print(f"✓ No conflict for {atom_id}: {resolved_value}")
             else:
                 # Weighted average with bias toward higher values
-                weights = [1.0 + v/100.0 for v in values]  # Higher values get more weight
+                weights = [1.0 + v / 100.0 for v in values]  # Higher values get more weight
                 resolved_value = sum(v * w for v, w in zip(values, weights, strict=False)) / sum(weights)
                 print(f"✓ Resolved conflict for {atom_id}: {values} → {resolved_value:.1f}")
                 resolved_conflicts += 1
@@ -250,8 +251,9 @@ class TestPhase2ECANAttention(unittest.TestCase):
         # Test conflict resolution fairness
         fairness_metrics = {
             "conflicts_resolved": resolved_conflicts,
-            "resolution_success_rate": resolved_conflicts / len([s for s in conflict_scenarios if len(s["values"]) > 1]),
-            "average_resolution_time": 1.2  # ms (simulated)
+            "resolution_success_rate": resolved_conflicts
+            / len([s for s in conflict_scenarios if len(s["values"]) > 1]),
+            "average_resolution_time": 1.2,  # ms (simulated)
         }
 
         print(f"✓ Conflict resolution metrics: {fairness_metrics}")
@@ -283,9 +285,10 @@ class TestPhase2ECANAttention(unittest.TestCase):
         performance_metrics = {
             "total_attention_allocated": sum(allocations),
             "average_allocation": sum(allocations) / len(allocations),
-            "allocation_variance": sum((x - sum(allocations)/len(allocations))**2 for x in allocations) / len(allocations),
+            "allocation_variance": sum((x - sum(allocations) / len(allocations)) ** 2 for x in allocations)
+            / len(allocations),
             "fairness_score": fairness_score,
-            "efficiency_ratio": 0.87  # Simulated efficiency
+            "efficiency_ratio": 0.87,  # Simulated efficiency
         }
 
         print("✓ Performance metrics:")
@@ -316,20 +319,20 @@ class TestPhase2ECANAttention(unittest.TestCase):
                 {"from": "cognitive_agent_1", "to": "cognitive_agent_2", "bandwidth": 100, "latency": 1.2},
                 {"from": "cognitive_agent_2", "to": "cognitive_agent_3", "bandwidth": 80, "latency": 1.5},
                 {"from": "cognitive_agent_3", "to": "resource_manager", "bandwidth": 120, "latency": 0.8},
-                {"from": "resource_manager", "to": "cognitive_agent_1", "bandwidth": 90, "latency": 1.0}
+                {"from": "resource_manager", "to": "cognitive_agent_1", "bandwidth": 90, "latency": 1.0},
             ],
             "attention_flow_paths": [
                 ["cognitive_agent_1", "cognitive_agent_2", "cognitive_agent_3"],
                 ["resource_manager", "cognitive_agent_1"],
-                ["cognitive_agent_2", "resource_manager"]
-            ]
+                ["cognitive_agent_2", "resource_manager"],
+            ],
         }
 
         # Test state propagation simulation
         attention_states = {
             "cognitive_agent_1": {"focus_atoms": ["concept_A", "relation_B"], "attention_level": 0.8},
             "cognitive_agent_2": {"focus_atoms": ["concept_C", "relation_D"], "attention_level": 0.6},
-            "cognitive_agent_3": {"focus_atoms": ["concept_A", "relation_E"], "attention_level": 0.9}
+            "cognitive_agent_3": {"focus_atoms": ["concept_A", "relation_E"], "attention_level": 0.9},
         }
 
         # Simulate attention state propagation through mesh
@@ -344,12 +347,14 @@ class TestPhase2ECANAttention(unittest.TestCase):
                         "source": source,
                         "target": target,
                         "attention_data": attention_states[source],
-                        "propagation_time": 2.1  # ms (simulated)
+                        "propagation_time": 2.1,  # ms (simulated)
                     }
                     propagation_events.append(event)
 
         print(f"✓ Mesh topology: {len(mesh_topology['nodes'])} nodes, {len(mesh_topology['connections'])} connections")
-        print(f"✓ State propagation: {len(propagation_events)} events across {len(mesh_topology['attention_flow_paths'])} paths")
+        print(
+            f"✓ State propagation: {len(propagation_events)} events across {len(mesh_topology['attention_flow_paths'])} paths"
+        )
 
         # Test mesh resilience
         failed_nodes = ["cognitive_agent_2"]
@@ -375,24 +380,24 @@ class TestPhase2ECANAttention(unittest.TestCase):
                         "allocation": 400,
                         "children": {
                             "attention_system": {"allocation": 200, "leaf": True},
-                            "reasoning_system": {"allocation": 200, "leaf": True}
-                        }
+                            "reasoning_system": {"allocation": 200, "leaf": True},
+                        },
                     },
                     "learning_branch": {
                         "allocation": 300,
                         "children": {
                             "pattern_recognition": {"allocation": 150, "leaf": True},
-                            "memory_consolidation": {"allocation": 150, "leaf": True}
-                        }
+                            "memory_consolidation": {"allocation": 150, "leaf": True},
+                        },
                     },
                     "communication_branch": {
                         "allocation": 300,
                         "children": {
                             "inter_agent_sync": {"allocation": 200, "leaf": True},
-                            "external_interface": {"allocation": 100, "leaf": True}
-                        }
-                    }
-                }
+                            "external_interface": {"allocation": 100, "leaf": True},
+                        },
+                    },
+                },
             }
         }
 
@@ -403,11 +408,9 @@ class TestPhase2ECANAttention(unittest.TestCase):
             if "children" in node:
                 for child_name, child_node in node["children"].items():
                     current_path = f"{path}/{child_name}" if path else child_name
-                    allocation_paths.append({
-                        "path": current_path,
-                        "allocation": child_node["allocation"],
-                        "depth": depth + 1
-                    })
+                    allocation_paths.append(
+                        {"path": current_path, "allocation": child_node["allocation"], "depth": depth + 1}
+                    )
 
                     # Recursive traversal
                     child_paths = traverse_allocation_tree(child_node, current_path, depth + 1)
@@ -435,9 +438,9 @@ class TestPhase2ECANAttention(unittest.TestCase):
 
     def tearDown(self):
         """Generate test report"""
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print("PHASE 2 ECAN ATTENTION ALLOCATION TEST RESULTS")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
 
         passed_tests = sum(1 for result in self.test_results.values() if result)
         total_tests = len(self.test_results)
@@ -453,6 +456,7 @@ class TestPhase2ECANAttention(unittest.TestCase):
             print("✓ Phase 2 ECAN Attention Allocation: READY FOR INTEGRATION")
         else:
             print("⚠ Phase 2 ECAN Attention Allocation: NEEDS IMPROVEMENT")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -21,18 +21,21 @@ class EntelechyGenome:
     Tracks the genetic configuration and evolutionary lineage
     of the system's vital actualization.
     """
+
     id: str
     generation: int
     lineage: list[str] = field(default_factory=list)
 
     # Genetic material (dimensional genes)
-    genes: dict[str, list[float]] = field(default_factory=lambda: {
-        'ontological': [],
-        'teleological': [],
-        'cognitive': [],
-        'integrative': [],
-        'evolutionary': [],
-    })
+    genes: dict[str, list[float]] = field(
+        default_factory=lambda: {
+            "ontological": [],
+            "teleological": [],
+            "cognitive": [],
+            "integrative": [],
+            "evolutionary": [],
+        }
+    )
 
     # Fitness and maturity
     fitness: float = 0.0
@@ -40,11 +43,11 @@ class EntelechyGenome:
     actualization_level: float = 0.0
 
     # Timestamps
-    birth_time: str = field(default_factory=lambda: datetime.utcnow().isoformat() + 'Z')
-    last_update: str = field(default_factory=lambda: datetime.utcnow().isoformat() + 'Z')
+    birth_time: str = field(default_factory=lambda: datetime.utcnow().isoformat() + "Z")
+    last_update: str = field(default_factory=lambda: datetime.utcnow().isoformat() + "Z")
 
     @classmethod
-    def from_metrics(cls, metrics: EntelechyMetrics, parent_genome: 'EntelechyGenome' = None) -> 'EntelechyGenome':
+    def from_metrics(cls, metrics: EntelechyMetrics, parent_genome: "EntelechyGenome" = None) -> "EntelechyGenome":
         """
         Create genome from entelechy metrics
 
@@ -68,11 +71,11 @@ class EntelechyGenome:
 
         # Extract genes from metrics
         genes = {
-            'ontological': [metrics.completeness_score],
-            'teleological': [metrics.alignment_score],
-            'cognitive': [metrics.actualization_score],
-            'integrative': [metrics.coherence_score],
-            'evolutionary': [metrics.vitality_score],
+            "ontological": [metrics.completeness_score],
+            "teleological": [metrics.alignment_score],
+            "cognitive": [metrics.actualization_score],
+            "integrative": [metrics.coherence_score],
+            "evolutionary": [metrics.vitality_score],
         }
 
         return cls(
@@ -82,7 +85,7 @@ class EntelechyGenome:
             genes=genes,
             fitness=metrics.fitness(),
             actualization_level=metrics.actualization_score,
-            age=0
+            age=0,
         )
 
     @staticmethod
@@ -92,7 +95,7 @@ class EntelechyGenome:
         data = f"{timestamp}:{metrics.actualization_score}:{metrics.fitness()}"
         return hashlib.sha256(data.encode()).hexdigest()[:16]
 
-    def evolve(self, new_metrics: EntelechyMetrics) -> 'EntelechyGenome':
+    def evolve(self, new_metrics: EntelechyMetrics) -> "EntelechyGenome":
         """
         Evolve genome to next generation
 
@@ -114,7 +117,7 @@ class EntelechyGenome:
         """
         if dimension in self.genes:
             self.genes[dimension].append(value)
-            self.last_update = datetime.utcnow().isoformat() + 'Z'
+            self.last_update = datetime.utcnow().isoformat() + "Z"
 
     def get_gene_trajectory(self, dimension: str) -> list[float]:
         """
@@ -160,11 +163,11 @@ class EntelechyGenome:
         return json.dumps(self.to_dict(), indent=2)
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'EntelechyGenome':
+    def from_dict(cls, data: dict) -> "EntelechyGenome":
         """Create genome from dictionary"""
         return cls(**data)
 
     @classmethod
-    def from_json(cls, json_str: str) -> 'EntelechyGenome':
+    def from_json(cls, json_str: str) -> "EntelechyGenome":
         """Create genome from JSON string"""
         return cls.from_dict(json.loads(json_str))

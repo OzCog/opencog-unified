@@ -2,6 +2,7 @@
 """
 Integration test for lg-atomese atomspace dependency
 """
+
 import os
 import sys
 
@@ -26,7 +27,9 @@ def test_lg_atomese_dependency():
     with open(main_cmake) as f:
         main_content = f.read()
 
-    assert "add_dependencies(lg-atomese atomspace)" in main_content, "Main CMakeLists.txt must declare lg-atomese depends on atomspace"
+    assert "add_dependencies(lg-atomese atomspace)" in main_content, (
+        "Main CMakeLists.txt must declare lg-atomese depends on atomspace"
+    )
     print("✅ Main CMakeLists.txt properly declares lg-atomese dependency on atomspace")
 
     # Test 3: Verify integration script knows about the dependency
@@ -35,7 +38,9 @@ def test_lg_atomese_dependency():
     with open(integration_script) as f:
         integration_content = f.read()
 
-    assert '"lg-atomese"]="language:atomspace"' in integration_content, "Integration script must know lg-atomese depends on atomspace"
+    assert '"lg-atomese"]="language:atomspace"' in integration_content, (
+        "Integration script must know lg-atomese depends on atomspace"
+    )
     print("✅ Integration script properly declares lg-atomese dependency on atomspace")
 
     # Test 4: Check that atomspace directory exists (dependency is satisfied)
@@ -48,6 +53,7 @@ def test_lg_atomese_dependency():
     print("✅ lg-atomese properly requires atomspace as specified in the issue")
 
     return True
+
 
 if __name__ == "__main__":
     try:

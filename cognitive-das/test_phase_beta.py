@@ -45,16 +45,14 @@ class PhaseBetaIntegrationTest(unittest.TestCase):
         total_matcher_states = self.matcher.total_states
         self.assertEqual(total_matcher_states, 110, "Matcher should have 110 total states")
 
-        self.test_results['state_validation'] = {
-            'bridge_states': bridge_validation["states_found"],
-            'executor_states': total_executor_states,
-            'matcher_states': total_matcher_states,
-            'all_valid': all([
-                bridge_validation["validation_passed"],
-                total_executor_states == 110,
-                total_matcher_states == 110
-            ]),
-            'passed': True
+        self.test_results["state_validation"] = {
+            "bridge_states": bridge_validation["states_found"],
+            "executor_states": total_executor_states,
+            "matcher_states": total_matcher_states,
+            "all_valid": all(
+                [bridge_validation["validation_passed"], total_executor_states == 110, total_matcher_states == 110]
+            ),
+            "passed": True,
         }
 
         print(f"✅ State validation: {bridge_validation['states_found']}/110 states accessible")
@@ -78,8 +76,7 @@ class PhaseBetaIntegrationTest(unittest.TestCase):
         factors = prime_factorize(110)
         expected_factors = [2, 5, 11]
 
-        self.assertEqual(sorted(factors), sorted(expected_factors),
-                        f"110 should factor as 2×5×11, got {factors}")
+        self.assertEqual(sorted(factors), sorted(expected_factors), f"110 should factor as 2×5×11, got {factors}")
 
         # Verify the tensor dimensions
         self.assertEqual(self.bridge.num_shards, 11, "Should have 11 shards")
@@ -89,13 +86,13 @@ class PhaseBetaIntegrationTest(unittest.TestCase):
         product = self.bridge.num_shards * self.bridge.links_per_shard * self.bridge.truth_dimensions
         self.assertEqual(product, 110, "Product should equal 110")
 
-        self.test_results['prime_factorization'] = {
-            'target': 110,
-            'factors': factors,
-            'expected': expected_factors,
-            'tensor_dimensions': (11, 5, 2),
-            'product': product,
-            'passed': factors == expected_factors and product == 110
+        self.test_results["prime_factorization"] = {
+            "target": 110,
+            "factors": factors,
+            "expected": expected_factors,
+            "tensor_dimensions": (11, 5, 2),
+            "product": product,
+            "passed": factors == expected_factors and product == 110,
         }
 
         print(f"✅ Prime factorization: 110 = {' × '.join(map(str, factors))}")
@@ -132,13 +129,13 @@ class PhaseBetaIntegrationTest(unittest.TestCase):
         self.assertEqual(stats["total_shards"], 11, "Should have 11 shards")
         self.assertEqual(stats["total_states"], 110, "Should have 110 total states")
 
-        self.test_results['atomspace_bridge'] = {
-            'queries_generated': len(atomspace_queries),
-            'total_matches': results["total_matches"],
-            'execution_time': results["execution_time"],
-            'shards_used': len(results["shard_results"]),
-            'stats_valid': stats["total_states"] == 110,
-            'passed': True
+        self.test_results["atomspace_bridge"] = {
+            "queries_generated": len(atomspace_queries),
+            "total_matches": results["total_matches"],
+            "execution_time": results["execution_time"],
+            "shards_used": len(results["shard_results"]),
+            "stats_valid": stats["total_states"] == 110,
+            "passed": True,
         }
 
         print(f"✅ AtomSpace bridge: {len(atomspace_queries)} queries, {results['total_matches']} matches")
@@ -149,18 +146,13 @@ class PhaseBetaIntegrationTest(unittest.TestCase):
 
         # Create test patterns
         test_patterns = [
-            {
-                "pattern": "ConceptNode search",
-                "variables": ["$concept"],
-                "constraints": [],
-                "priority": 1
-            },
+            {"pattern": "ConceptNode search", "variables": ["$concept"], "constraints": [], "priority": 1},
             {
                 "pattern": "EvaluationLink match",
                 "variables": ["$pred", "$arg1", "$arg2"],
                 "constraints": ["strength > 0.5"],
-                "priority": 2
-            }
+                "priority": 2,
+            },
         ] * 5  # 10 total patterns
 
         # Execute patterns
@@ -180,13 +172,13 @@ class PhaseBetaIntegrationTest(unittest.TestCase):
         perf_report = self.executor.get_performance_report()
         self.assertEqual(perf_report["system_summary"]["total_states"], 110, "Should track 110 states")
 
-        self.test_results['distributed_execution'] = {
-            'total_patterns': len(test_patterns),
-            'successful_tasks': results["successful_tasks"],
-            'execution_time': execution_time,
-            'shards_utilized': len(results["shard_utilization"]),
-            'system_efficiency': perf_report["performance_summary"]["system_efficiency"],
-            'passed': True
+        self.test_results["distributed_execution"] = {
+            "total_patterns": len(test_patterns),
+            "successful_tasks": results["successful_tasks"],
+            "execution_time": execution_time,
+            "shards_utilized": len(results["shard_utilization"]),
+            "system_efficiency": perf_report["performance_summary"]["system_efficiency"],
+            "passed": True,
         }
 
         print(f"✅ Distributed execution: {results['successful_tasks']}/{len(test_patterns)} tasks completed")
@@ -218,14 +210,14 @@ class PhaseBetaIntegrationTest(unittest.TestCase):
         self.assertGreater(stats["hypergraph_stats"]["total_atoms"], 0, "Should have atoms")
         self.assertGreater(stats["hypergraph_stats"]["total_links"], 0, "Should have links")
 
-        self.test_results['pattern_matching'] = {
-            'patterns_created': len(pattern_ids),
-            'total_matches': total_matches,
-            'atoms_count': stats["hypergraph_stats"]["total_atoms"],
-            'links_count': stats["hypergraph_stats"]["total_links"],
-            'states_covered': stats["hypergraph_stats"]["states_covered"],
-            'cache_hit_rate': stats["cache_stats"]["hit_rate"],
-            'passed': True
+        self.test_results["pattern_matching"] = {
+            "patterns_created": len(pattern_ids),
+            "total_matches": total_matches,
+            "atoms_count": stats["hypergraph_stats"]["total_atoms"],
+            "links_count": stats["hypergraph_stats"]["total_links"],
+            "states_covered": stats["hypergraph_stats"]["states_covered"],
+            "cache_hit_rate": stats["cache_stats"]["hit_rate"],
+            "passed": True,
         }
 
         print(f"✅ Pattern matching: {total_matches} matches across {len(pattern_ids)} patterns")
@@ -267,13 +259,13 @@ class PhaseBetaIntegrationTest(unittest.TestCase):
 
         self.assertEqual(len(set(reverse_coords)), 110, "Reverse mapping should be unique")
 
-        self.test_results['tensor_coordinates'] = {
-            'coordinates_generated': len(coordinates_found),
-            'state_indices_generated': len(state_indices),
-            'min_state_index': min(state_indices),
-            'max_state_index': max(state_indices),
-            'reverse_mapping_unique': len(set(reverse_coords)) == 110,
-            'passed': True
+        self.test_results["tensor_coordinates"] = {
+            "coordinates_generated": len(coordinates_found),
+            "state_indices_generated": len(state_indices),
+            "min_state_index": min(state_indices),
+            "max_state_index": max(state_indices),
+            "reverse_mapping_unique": len(set(reverse_coords)) == 110,
+            "passed": True,
         }
 
         print("✅ Tensor coordinates: 110 unique mappings validated")
@@ -283,7 +275,7 @@ class PhaseBetaIntegrationTest(unittest.TestCase):
         print("\n=== Testing Performance Benchmarks ===")
 
         # Benchmark 1: AtomSpace query conversion time
-        test_query = "query { searchHypergraph(pattern: \"test\") { nodes { id } } }"
+        test_query = 'query { searchHypergraph(pattern: "test") { nodes { id } } }'
 
         start_time = time.time()
         for _ in range(100):
@@ -310,19 +302,17 @@ class PhaseBetaIntegrationTest(unittest.TestCase):
 
         self.assertLess(match_time, 0.1, "Pattern matching should be < 100ms")
 
-        self.test_results['performance_benchmarks'] = {
-            'query_conversion_time': conversion_time,
-            'execution_throughput': throughput,
-            'pattern_match_time': match_time,
-            'all_benchmarks_passed': all([
-                conversion_time < 0.01,
-                throughput > 10,
-                match_time < 0.1
-            ]),
-            'passed': True
+        self.test_results["performance_benchmarks"] = {
+            "query_conversion_time": conversion_time,
+            "execution_throughput": throughput,
+            "pattern_match_time": match_time,
+            "all_benchmarks_passed": all([conversion_time < 0.01, throughput > 10, match_time < 0.1]),
+            "passed": True,
         }
 
-        print(f"✅ Performance: {conversion_time*1000:.1f}ms conversion, {throughput:.1f} patterns/s, {match_time*1000:.1f}ms matching")
+        print(
+            f"✅ Performance: {conversion_time * 1000:.1f}ms conversion, {throughput:.1f} patterns/s, {match_time * 1000:.1f}ms matching"
+        )
 
     def test_integration_end_to_end(self):
         """Test complete end-to-end Phase β integration"""
@@ -346,8 +336,9 @@ class PhaseBetaIntegrationTest(unittest.TestCase):
         self.assertGreater(len(atomspace_queries), 0, "Should generate queries")
 
         # 3. Execute through distributed system
-        patterns = [{"pattern": q.pattern, "variables": q.variables, "constraints": q.constraints}
-                   for q in atomspace_queries]
+        patterns = [
+            {"pattern": q.pattern, "variables": q.variables, "constraints": q.constraints} for q in atomspace_queries
+        ]
         dist_results = self.executor.execute_distributed(patterns)
 
         # 4. Perform pattern matching
@@ -367,17 +358,19 @@ class PhaseBetaIntegrationTest(unittest.TestCase):
         executor_states = self.executor.total_states
         matcher_states = self.matcher.total_states
 
-        self.assertTrue(all(s == 110 for s in [bridge_states, executor_states, matcher_states]),
-                       "All components should cover 110 states")
+        self.assertTrue(
+            all(s == 110 for s in [bridge_states, executor_states, matcher_states]),
+            "All components should cover 110 states",
+        )
 
-        self.test_results['end_to_end_integration'] = {
-            'graphql_parsed': len(graphql_query) > 0,
-            'queries_generated': len(atomspace_queries),
-            'distributed_execution_successful': dist_results["successful_tasks"] > 0,
-            'pattern_matches_found': len(pattern_results),
-            'state_coverage_consistent': all(s == 110 for s in [bridge_states, executor_states, matcher_states]),
-            'pipeline_complete': True,
-            'passed': True
+        self.test_results["end_to_end_integration"] = {
+            "graphql_parsed": len(graphql_query) > 0,
+            "queries_generated": len(atomspace_queries),
+            "distributed_execution_successful": dist_results["successful_tasks"] > 0,
+            "pattern_matches_found": len(pattern_results),
+            "state_coverage_consistent": all(s == 110 for s in [bridge_states, executor_states, matcher_states]),
+            "pipeline_complete": True,
+            "passed": True,
         }
 
         print("✅ End-to-end integration: Complete pipeline working")
@@ -401,7 +394,7 @@ class PhaseBetaIntegrationTest(unittest.TestCase):
             return [self._make_serializable(item) for item in obj]
         elif isinstance(obj, tuple):
             return list(obj)
-        elif hasattr(obj, '__dict__'):
+        elif hasattr(obj, "__dict__"):
             return str(obj)
         else:
             return obj

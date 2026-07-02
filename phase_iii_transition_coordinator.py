@@ -16,6 +16,7 @@ class CognitiveComponent:
     performance_score: float
     integration_level: float
 
+
 @dataclass
 class TransitionMetrics:
     neural_symbolic_accuracy: float
@@ -23,6 +24,7 @@ class TransitionMetrics:
     parallel_processing_speedup: float
     emergent_pattern_count: int
     attention_focus_quality: float
+
 
 class PhaseIIITransitionCoordinator:
     """
@@ -39,41 +41,15 @@ class PhaseIIITransitionCoordinator:
         """Initialize all enhanced components"""
         return {
             "neural_symbolic_bridge": CognitiveComponent(
-                "Enhanced Neural-Symbolic Integration Bridge",
-                "operational",
-                0.95,
-                0.90
+                "Enhanced Neural-Symbolic Integration Bridge", "operational", 0.95, 0.90
             ),
             "distributed_cognition": CognitiveComponent(
-                "Distributed AtomSpace Synchronization",
-                "operational",
-                0.88,
-                0.85
+                "Distributed AtomSpace Synchronization", "operational", 0.88, 0.85
             ),
-            "parallel_execution": CognitiveComponent(
-                "Non-blocking ExecuteThreadedLink",
-                "operational",
-                0.92,
-                0.88
-            ),
-            "pattern_detection": CognitiveComponent(
-                "Emergent Pattern Recognition",
-                "operational",
-                0.87,
-                0.82
-            ),
-            "attention_mechanisms": CognitiveComponent(
-                "Attention-Driven Integration",
-                "operational",
-                0.91,
-                0.86
-            ),
-            "adaptive_learning": CognitiveComponent(
-                "Adaptive Mapping Optimization",
-                "operational",
-                0.89,
-                0.84
-            )
+            "parallel_execution": CognitiveComponent("Non-blocking ExecuteThreadedLink", "operational", 0.92, 0.88),
+            "pattern_detection": CognitiveComponent("Emergent Pattern Recognition", "operational", 0.87, 0.82),
+            "attention_mechanisms": CognitiveComponent("Attention-Driven Integration", "operational", 0.91, 0.86),
+            "adaptive_learning": CognitiveComponent("Adaptive Mapping Optimization", "operational", 0.89, 0.84),
         }
 
     def orchestrate_phase_iii_transition(self):
@@ -128,7 +104,7 @@ class PhaseIIITransitionCoordinator:
         test_cases = [
             {"neural_layer": "visual_cortex", "symbolic_concept": "ConceptNode_Cat"},
             {"neural_layer": "auditory_cortex", "symbolic_concept": "ConceptNode_Sound"},
-            {"neural_layer": "semantic_layer", "symbolic_concept": "RelationNode_IsA"}
+            {"neural_layer": "semantic_layer", "symbolic_concept": "RelationNode_IsA"},
         ]
 
         successful_translations = 0
@@ -136,9 +112,13 @@ class PhaseIIITransitionCoordinator:
             accuracy = random.uniform(0.85, 0.98)
             if accuracy > 0.9:
                 successful_translations += 1
-                print(f"  ✅ Translation {i+1}: {test_case['neural_layer']} ↔ {test_case['symbolic_concept']} (accuracy: {accuracy:.3f})")
+                print(
+                    f"  ✅ Translation {i + 1}: {test_case['neural_layer']} ↔ {test_case['symbolic_concept']} (accuracy: {accuracy:.3f})"
+                )
             else:
-                print(f"  ⚠️  Translation {i+1}: {test_case['neural_layer']} ↔ {test_case['symbolic_concept']} (accuracy: {accuracy:.3f})")
+                print(
+                    f"  ⚠️  Translation {i + 1}: {test_case['neural_layer']} ↔ {test_case['symbolic_concept']} (accuracy: {accuracy:.3f})"
+                )
 
         self.transition_metrics.neural_symbolic_accuracy = successful_translations / len(test_cases)
         print(f"📈 Neural-Symbolic Integration Success Rate: {self.transition_metrics.neural_symbolic_accuracy:.2%}")
@@ -175,7 +155,7 @@ class PhaseIIITransitionCoordinator:
         parallel_configs = [
             {"threads": 2, "expected_speedup": 1.8},
             {"threads": 4, "expected_speedup": 3.2},
-            {"threads": 8, "expected_speedup": 5.5}
+            {"threads": 8, "expected_speedup": 5.5},
         ]
 
         best_speedup = 0
@@ -200,18 +180,16 @@ class PhaseIIITransitionCoordinator:
             "Attention Convergence",
             "Cognitive Resonance",
             "Adaptive Emergence",
-            "Distributed Coherence"
+            "Distributed Coherence",
         ]
 
         detected_patterns = []
         for pattern_type in pattern_types:
             pattern_strength = random.uniform(0.6, 0.95)
             if pattern_strength > 0.75:
-                detected_patterns.append({
-                    "type": pattern_type,
-                    "strength": pattern_strength,
-                    "confidence": random.uniform(0.8, 0.98)
-                })
+                detected_patterns.append(
+                    {"type": pattern_type, "strength": pattern_strength, "confidence": random.uniform(0.8, 0.98)}
+                )
 
         for pattern in detected_patterns:
             print(f"  🔮 {pattern['type']}: strength={pattern['strength']:.3f}, confidence={pattern['confidence']:.3f}")
@@ -229,7 +207,7 @@ class PhaseIIITransitionCoordinator:
             {"component": "visual_processing", "weight": random.uniform(0.7, 0.95)},
             {"component": "language_understanding", "weight": random.uniform(0.6, 0.9)},
             {"component": "reasoning_engine", "weight": random.uniform(0.8, 0.98)},
-            {"component": "memory_retrieval", "weight": random.uniform(0.65, 0.88)}
+            {"component": "memory_retrieval", "weight": random.uniform(0.65, 0.88)},
         ]
 
         total_attention = sum(target["weight"] for target in attention_targets)
@@ -253,12 +231,14 @@ class PhaseIIITransitionCoordinator:
             {"iteration": 2, "accuracy": 0.78, "adaptation": "weight_adjustment"},
             {"iteration": 3, "accuracy": 0.84, "adaptation": "structure_optimization"},
             {"iteration": 4, "accuracy": 0.89, "adaptation": "emergent_tuning"},
-            {"iteration": 5, "accuracy": 0.93, "adaptation": "cognitive_refinement"}
+            {"iteration": 5, "accuracy": 0.93, "adaptation": "cognitive_refinement"},
         ]
 
         for cycle in learning_cycles:
             improvement = "↗️" if cycle["accuracy"] > 0.8 else "→" if cycle["accuracy"] > 0.75 else "↘️"
-            print(f"  {improvement} Cycle {cycle['iteration']}: {cycle['accuracy']:.2%} accuracy ({cycle['adaptation']})")
+            print(
+                f"  {improvement} Cycle {cycle['iteration']}: {cycle['accuracy']:.2%} accuracy ({cycle['adaptation']})"
+            )
 
         final_accuracy = learning_cycles[-1]["accuracy"]
         print(f"📈 Adaptive Learning Convergence: {final_accuracy:.2%}")
@@ -274,7 +254,7 @@ class PhaseIIITransitionCoordinator:
             self.transition_metrics.distributed_sync_efficiency,
             min(self.transition_metrics.parallel_processing_speedup / 6.0, 1.0),  # Normalize speedup
             min(self.transition_metrics.emergent_pattern_count / 5.0, 1.0),  # Normalize pattern count
-            self.transition_metrics.attention_focus_quality
+            self.transition_metrics.attention_focus_quality,
         ]
 
         overall_readiness = sum(metrics_scores) / len(metrics_scores)
@@ -304,16 +284,19 @@ class PhaseIIITransitionCoordinator:
                 "distributed_sync_efficiency": self.transition_metrics.distributed_sync_efficiency,
                 "parallel_processing_speedup": self.transition_metrics.parallel_processing_speedup,
                 "emergent_pattern_count": self.transition_metrics.emergent_pattern_count,
-                "attention_focus_quality": self.transition_metrics.attention_focus_quality
+                "attention_focus_quality": self.transition_metrics.attention_focus_quality,
             },
-            "components": {name: {"performance": comp.performance_score, "integration": comp.integration_level}
-                          for name, comp in self.components.items()}
+            "components": {
+                name: {"performance": comp.performance_score, "integration": comp.integration_level}
+                for name, comp in self.components.items()
+            },
         }
 
         with open("phase_iii_transition_report.json", "w") as f:
             json.dump(report_data, f, indent=2)
 
         print("\n📄 Detailed report saved to: phase_iii_transition_report.json")
+
 
 def main():
     """Main entry point for Phase III transition coordination"""
@@ -328,6 +311,7 @@ def main():
 
     print("\n🎉 Phase III Transition Coordination Complete!")
     print("OpenCog Unified is advancing toward universal cognitive fabric...")
+
 
 if __name__ == "__main__":
     main()

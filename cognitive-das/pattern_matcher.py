@@ -20,6 +20,7 @@ from typing import Any
 
 class AtomType(Enum):
     """AtomSpace atom types"""
+
     CONCEPT_NODE = "ConceptNode"
     PREDICATE_NODE = "PredicateNode"
     VARIABLE_NODE = "VariableNode"
@@ -31,9 +32,11 @@ class AtomType(Enum):
     NOT_LINK = "NotLink"
     EXECUTION_OUTPUT_LINK = "ExecutionOutputLink"
 
+
 @dataclass
 class TruthValue:
     """Truth value with strength and confidence"""
+
     strength: float
     confidence: float
 
@@ -41,9 +44,11 @@ class TruthValue:
         self.strength = max(0.0, min(1.0, self.strength))
         self.confidence = max(0.0, min(1.0, self.confidence))
 
+
 @dataclass
 class HypergraphAtom:
     """Atom in hypergraph with type, name, and truth value"""
+
     atom_id: str
     atom_type: AtomType
     name: str | None = None
@@ -53,9 +58,11 @@ class HypergraphAtom:
     shard_id: int = 0
     coordinates: tuple[int, int, int] = (0, 0, 0)
 
+
 @dataclass
 class HypergraphLink:
     """Link in hypergraph connecting multiple atoms"""
+
     link_id: str
     link_type: AtomType
     targets: list[str]
@@ -63,9 +70,11 @@ class HypergraphLink:
     shard_id: int = 0
     coordinates: tuple[int, int, int] = (0, 0, 0)
 
+
 @dataclass
 class PatternTemplate:
     """Template for hypergraph pattern matching"""
+
     template_id: str
     atoms: list[HypergraphAtom]
     links: list[HypergraphLink]
@@ -73,9 +82,11 @@ class PatternTemplate:
     constraints: list[str]
     expected_bindings: int = 1
 
+
 @dataclass
 class PatternMatch:
     """Result of pattern matching"""
+
     match_id: str
     template_id: str
     bindings: dict[str, str]  # Variable -> Atom ID
@@ -83,6 +94,7 @@ class PatternMatch:
     truth_value: TruthValue | None = None
     shard_id: int = 0
     match_time: float = 0.0
+
 
 class HypergraphPatternMatcher:
     """
@@ -110,7 +122,7 @@ class HypergraphPatternMatcher:
             "total_matches": 0,
             "average_match_time": 0.0,
             "cache_hits": 0,
-            "cache_misses": 0
+            "cache_misses": 0,
         }
 
         # Thread safety
@@ -170,16 +182,17 @@ class HypergraphPatternMatcher:
         match_time = time.time() - start_time
         self.match_statistics["total_matches"] += len(matches)
         self.match_statistics["average_match_time"] = (
-            (self.match_statistics["average_match_time"] * (self.match_statistics["total_patterns"] - 1) + match_time)
-            / self.match_statistics["total_patterns"]
-        )
+            self.match_statistics["average_match_time"] * (self.match_statistics["total_patterns"] - 1) + match_time
+        ) / self.match_statistics["total_patterns"]
 
         # Cache results
         self.match_cache[cache_key] = matches
 
         return matches
 
-    def _execute_pattern_matching(self, template: PatternTemplate, target_shard: int | None = None) -> list[PatternMatch]:
+    def _execute_pattern_matching(
+        self, template: PatternTemplate, target_shard: int | None = None
+    ) -> list[PatternMatch]:
         """
         Execute pattern matching algorithm
 
@@ -239,8 +252,9 @@ class HypergraphPatternMatcher:
 
         return matches
 
-    def _find_variable_candidates(self, template: PatternTemplate, shard_atoms: dict[str, HypergraphAtom],
-                                 shard_links: dict[str, HypergraphLink]) -> dict[str, list[str]]:
+    def _find_variable_candidates(
+        self, template: PatternTemplate, shard_atoms: dict[str, HypergraphAtom], shard_links: dict[str, HypergraphLink]
+    ) -> dict[str, list[str]]:
         """
         Find candidate atoms for each variable in the template
 
@@ -271,8 +285,9 @@ class HypergraphPatternMatcher:
 
         return candidates
 
-    def _generate_binding_combinations(self, variables: dict[str, AtomType],
-                                     candidates: dict[str, list[str]]) -> list[dict[str, str]]:
+    def _generate_binding_combinations(
+        self, variables: dict[str, AtomType], candidates: dict[str, list[str]]
+    ) -> list[dict[str, str]]:
         """
         Generate all possible variable binding combinations
 
@@ -303,9 +318,14 @@ class HypergraphPatternMatcher:
 
         return combinations
 
-    def _test_binding(self, template: PatternTemplate, binding: dict[str, str],
-                     shard_atoms: dict[str, HypergraphAtom], shard_links: dict[str, HypergraphLink],
-                     shard_id: int) -> PatternMatch | None:
+    def _test_binding(
+        self,
+        template: PatternTemplate,
+        binding: dict[str, str],
+        shard_atoms: dict[str, HypergraphAtom],
+        shard_links: dict[str, HypergraphLink],
+        shard_id: int,
+    ) -> PatternMatch | None:
         """
         Test if a variable binding satisfies the template
 
@@ -341,14 +361,18 @@ class HypergraphPatternMatcher:
             bindings=binding,
             confidence=confidence,
             shard_id=shard_id,
-            match_time=time.time()
+            match_time=time.time(),
         )
 
         return match
 
-    def _check_structural_constraints(self, template: PatternTemplate, binding: dict[str, str],
-                                    shard_atoms: dict[str, HypergraphAtom],
-                                    shard_links: dict[str, HypergraphLink]) -> bool:
+    def _check_structural_constraints(
+        self,
+        template: PatternTemplate,
+        binding: dict[str, str],
+        shard_atoms: dict[str, HypergraphAtom],
+        shard_links: dict[str, HypergraphLink],
+    ) -> bool:
         """Check if binding satisfies structural constraints"""
 
         # Check that all bound atoms exist
@@ -363,9 +387,13 @@ class HypergraphPatternMatcher:
 
         return True
 
-    def _validate_link_structure(self, template_link: HypergraphLink, binding: dict[str, str],
-                                shard_atoms: dict[str, HypergraphAtom],
-                                shard_links: dict[str, HypergraphLink]) -> bool:
+    def _validate_link_structure(
+        self,
+        template_link: HypergraphLink,
+        binding: dict[str, str],
+        shard_atoms: dict[str, HypergraphAtom],
+        shard_links: dict[str, HypergraphLink],
+    ) -> bool:
         """Validate that a template link structure is satisfied"""
 
         # Resolve link targets through variable binding
@@ -386,18 +414,26 @@ class HypergraphPatternMatcher:
 
         return False
 
-    def _check_truth_constraints(self, template: PatternTemplate, binding: dict[str, str],
-                               shard_atoms: dict[str, HypergraphAtom],
-                               shard_links: dict[str, HypergraphLink]) -> bool:
+    def _check_truth_constraints(
+        self,
+        template: PatternTemplate,
+        binding: dict[str, str],
+        shard_atoms: dict[str, HypergraphAtom],
+        shard_links: dict[str, HypergraphLink],
+    ) -> bool:
         """Check truth value constraints"""
 
         # For now, accept all truth values
         # In a full implementation, this would check specific truth value constraints
         return True
 
-    def _check_custom_constraints(self, template: PatternTemplate, binding: dict[str, str],
-                                shard_atoms: dict[str, HypergraphAtom],
-                                shard_links: dict[str, HypergraphLink]) -> bool:
+    def _check_custom_constraints(
+        self,
+        template: PatternTemplate,
+        binding: dict[str, str],
+        shard_atoms: dict[str, HypergraphAtom],
+        shard_links: dict[str, HypergraphLink],
+    ) -> bool:
         """Check custom constraints specified in template"""
 
         for constraint in template.constraints:
@@ -406,9 +442,13 @@ class HypergraphPatternMatcher:
 
         return True
 
-    def _evaluate_constraint(self, constraint: str, binding: dict[str, str],
-                           shard_atoms: dict[str, HypergraphAtom],
-                           shard_links: dict[str, HypergraphLink]) -> bool:
+    def _evaluate_constraint(
+        self,
+        constraint: str,
+        binding: dict[str, str],
+        shard_atoms: dict[str, HypergraphAtom],
+        shard_links: dict[str, HypergraphLink],
+    ) -> bool:
         """Evaluate a single constraint"""
 
         # Simple constraint evaluation
@@ -425,9 +465,13 @@ class HypergraphPatternMatcher:
 
         return True
 
-    def _calculate_match_confidence(self, template: PatternTemplate, binding: dict[str, str],
-                                  shard_atoms: dict[str, HypergraphAtom],
-                                  shard_links: dict[str, HypergraphLink]) -> float:
+    def _calculate_match_confidence(
+        self,
+        template: PatternTemplate,
+        binding: dict[str, str],
+        shard_atoms: dict[str, HypergraphAtom],
+        shard_links: dict[str, HypergraphLink],
+    ) -> float:
         """Calculate confidence score for a match"""
 
         confidence_factors = []
@@ -467,7 +511,7 @@ class HypergraphPatternMatcher:
                     name=f"knowledge_{shard_id}_{i}",
                     truth_value=TruthValue(0.7 + (i * 0.1), 0.8 + (shard_id * 0.01)),
                     shard_id=shard_id,
-                    coordinates=(shard_id, i, 0)
+                    coordinates=(shard_id, i, 0),
                 )
                 self.atoms[atom_id] = atom
 
@@ -480,7 +524,7 @@ class HypergraphPatternMatcher:
                     name=f"relates_to_{shard_id}_{i}",
                     truth_value=TruthValue(0.6 + (i * 0.15), 0.75 + (shard_id * 0.02)),
                     shard_id=shard_id,
-                    coordinates=(shard_id, i, 1)
+                    coordinates=(shard_id, i, 1),
                 )
                 self.atoms[atom_id] = atom
 
@@ -499,7 +543,7 @@ class HypergraphPatternMatcher:
                     targets=[predicate_id, concept_id, target_concept_id],
                     truth_value=TruthValue(0.75 + (i * 0.05), 0.85),
                     shard_id=shard_id,
-                    coordinates=(shard_id, i, 1)
+                    coordinates=(shard_id, i, 1),
                 )
                 self.links[link_id] = link
 
@@ -510,16 +554,10 @@ class HypergraphPatternMatcher:
         # Pattern 1: Find concepts
         template1 = PatternTemplate(
             template_id="find_concepts",
-            atoms=[
-                HypergraphAtom(
-                    atom_id="$concept",
-                    atom_type=AtomType.CONCEPT_NODE,
-                    name=None
-                )
-            ],
+            atoms=[HypergraphAtom(atom_id="$concept", atom_type=AtomType.CONCEPT_NODE, name=None)],
             links=[],
             variables={"$concept": AtomType.CONCEPT_NODE},
-            constraints=["strength > 0.5"]
+            constraints=["strength > 0.5"],
         )
         self.add_pattern_template(template1)
         patterns.append(template1.template_id)
@@ -530,22 +568,20 @@ class HypergraphPatternMatcher:
             atoms=[
                 HypergraphAtom(atom_id="$pred", atom_type=AtomType.PREDICATE_NODE),
                 HypergraphAtom(atom_id="$concept1", atom_type=AtomType.CONCEPT_NODE),
-                HypergraphAtom(atom_id="$concept2", atom_type=AtomType.CONCEPT_NODE)
+                HypergraphAtom(atom_id="$concept2", atom_type=AtomType.CONCEPT_NODE),
             ],
             links=[
                 HypergraphLink(
-                    link_id="$eval",
-                    link_type=AtomType.EVALUATION_LINK,
-                    targets=["$pred", "$concept1", "$concept2"]
+                    link_id="$eval", link_type=AtomType.EVALUATION_LINK, targets=["$pred", "$concept1", "$concept2"]
                 )
             ],
             variables={
                 "$pred": AtomType.PREDICATE_NODE,
                 "$concept1": AtomType.CONCEPT_NODE,
                 "$concept2": AtomType.CONCEPT_NODE,
-                "$eval": AtomType.EVALUATION_LINK
+                "$eval": AtomType.EVALUATION_LINK,
             },
-            constraints=[]
+            constraints=[],
         )
         self.add_pattern_template(template2)
         patterns.append(template2.template_id)
@@ -553,12 +589,10 @@ class HypergraphPatternMatcher:
         # Pattern 3: Find high-confidence knowledge
         template3 = PatternTemplate(
             template_id="find_high_confidence",
-            atoms=[
-                HypergraphAtom(atom_id="$knowledge", atom_type=AtomType.CONCEPT_NODE)
-            ],
+            atoms=[HypergraphAtom(atom_id="$knowledge", atom_type=AtomType.CONCEPT_NODE)],
             links=[],
             variables={"$knowledge": AtomType.CONCEPT_NODE},
-            constraints=["confidence > 0.8", "strength > 0.7"]
+            constraints=["confidence > 0.8", "strength > 0.7"],
         )
         self.add_pattern_template(template3)
         patterns.append(template3.template_id)
@@ -572,15 +606,15 @@ class HypergraphPatternMatcher:
                 "total_atoms": len(self.atoms),
                 "total_links": len(self.links),
                 "total_patterns": len(self.patterns),
-                "states_covered": self.total_states
+                "states_covered": self.total_states,
             },
             "performance_stats": self.match_statistics.copy(),
             "cache_stats": {
                 "cache_size": len(self.match_cache),
-                "hit_rate": self.match_statistics["cache_hits"] / max(1,
-                    self.match_statistics["cache_hits"] + self.match_statistics["cache_misses"])
+                "hit_rate": self.match_statistics["cache_hits"]
+                / max(1, self.match_statistics["cache_hits"] + self.match_statistics["cache_misses"]),
             },
-            "shard_distribution": self._analyze_shard_distribution()
+            "shard_distribution": self._analyze_shard_distribution(),
         }
 
     def _analyze_shard_distribution(self) -> dict[str, Any]:
@@ -595,7 +629,7 @@ class HypergraphPatternMatcher:
                 "atoms": shard_atoms,
                 "links": shard_links,
                 "total": shard_atoms + shard_links,
-                "density": (shard_atoms + shard_links) / (self.links_per_shard * 2)
+                "density": (shard_atoms + shard_links) / (self.links_per_shard * 2),
             }
 
         return distribution
@@ -627,7 +661,7 @@ def main():
 
         # Show top 3 matches
         for i, match in enumerate(matches[:3]):
-            print(f"    {i+1}. Match {match.match_id}")
+            print(f"    {i + 1}. Match {match.match_id}")
             print(f"       Confidence: {match.confidence:.3f}")
             print(f"       Shard: {match.shard_id}")
             print(f"       Bindings: {match.bindings}")
@@ -654,9 +688,11 @@ def main():
 
     print("\nShard distribution (first 5 shards):")
     for shard_id in range(min(5, matcher.num_shards)):
-        shard_info = stats['shard_distribution'][shard_id]
-        print(f"  Shard {shard_id}: {shard_info['atoms']} atoms, {shard_info['links']} links "
-              f"(density: {shard_info['density']:.2f})")
+        shard_info = stats["shard_distribution"][shard_id]
+        print(
+            f"  Shard {shard_id}: {shard_info['atoms']} atoms, {shard_info['links']} links "
+            f"(density: {shard_info['density']:.2f})"
+        )
 
     # Validate 110 states
     print("\nValidating 110 quantum states...")
@@ -669,15 +705,12 @@ def main():
 
     # Save results
     results = {
-        "pattern_matches": {
-            pattern_id: len(matcher.match_pattern(pattern_id))
-            for pattern_id in pattern_ids
-        },
+        "pattern_matches": {pattern_id: len(matcher.match_pattern(pattern_id)) for pattern_id in pattern_ids},
         "statistics": stats,
         "validation": {
             "expected_states": expected_states,
             "hypergraph_elements": total_elements,
-            "validation_passed": total_elements >= expected_states
+            "validation_passed": total_elements >= expected_states,
         },
         "sample_matches": [
             {
@@ -685,10 +718,10 @@ def main():
                 "template_id": match.template_id,
                 "confidence": match.confidence,
                 "shard_id": match.shard_id,
-                "bindings": match.bindings
+                "bindings": match.bindings,
             }
             for match in matcher.match_pattern(pattern_ids[0])[:5]
-        ]
+        ],
     }
 
     with open("pattern_matching_results.json", "w") as f:

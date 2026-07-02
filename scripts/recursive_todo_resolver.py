@@ -32,14 +32,17 @@ from pathlib import Path
 # Import GitHub integration (optional)
 try:
     from github_issue_creator import GitHubIssueCreator
+
     GITHUB_INTEGRATION_AVAILABLE = True
 except ImportError:
     GITHUB_INTEGRATION_AVAILABLE = False
     GitHubIssueCreator = None
 
+
 @dataclass
 class TODOItem:
     """Represents a single TODO item from the catalog"""
+
     file: str
     line: int
     content: str
@@ -50,6 +53,7 @@ class TODOItem:
     status: str = "unchecked"  # unchecked, in-progress, completed
     assigned_batch: int | None = None
     resolution_pr: str | None = None
+
 
 class RecursiveTODOResolver:
     """Orchestrates recursive attention-allocation through the TODO catalog"""
@@ -81,13 +85,13 @@ class RecursiveTODOResolver:
             "completed_todos": [],
             "in_progress_todos": [],
             "last_run": None,
-            "total_resolved": 0
+            "total_resolved": 0,
         }
 
     def _save_progress(self):
         """Save progress data to file"""
         self.progress_data["last_run"] = datetime.now().isoformat()
-        with open(self.progress_file, 'w') as f:
+        with open(self.progress_file, "w") as f:
             json.dump(self.progress_data, f, indent=2)
 
     def extract_catalog(self) -> list[TODOItem]:
@@ -104,7 +108,9 @@ class RecursiveTODOResolver:
             content = f.read()
 
         # Extract TODO items using regex patterns
-        todo_pattern = r'- \[ \] \*\*([^:]+):(\d+)\*\* \(([^,]+), ([^)]+)\)\n  - `([^`]+)`\n  - \[Code reference\]\(([^)]+)\)'
+        todo_pattern = (
+            r"- \[ \] \*\*([^:]+):(\d+)\*\* \(([^,]+), ([^)]+)\)\n  - `([^`]+)`\n  - \[Code reference\]\(([^)]+)\)"
+        )
 
         matches = re.findall(todo_pattern, content)
 
@@ -130,7 +136,7 @@ class RecursiveTODOResolver:
                 category=category,
                 subsystem=subsystem,
                 github_link=github_link,
-                status=status
+                status=status,
             )
             self.todos.append(todo_item)
 
@@ -140,26 +146,26 @@ class RecursiveTODOResolver:
     def _determine_subsystem(self, file_path: str) -> str:
         """Determine subsystem from file path"""
         subsystem_map = {
-            'atomspace': 'Memory System',
-            'atomspace-storage': 'Persistence Subsystem',
-            'atomspace-rocks': 'Persistence Subsystem',
-            'atomspace-restful': 'Persistence Subsystem',
-            'cogserver': 'Task System',
-            'cogutil': 'Core Utilities',
-            'moses': 'MOSES Representation/Scoring',
-            'cognitive-patterns': 'AI System',
-            'distributed-cognition': 'Autonomy System',
-            'neural-symbolic-integration': 'AI System',
-            'cognitive-visualization': 'AI System',
-            'ggml-tensor-kernel': 'AI System',
-            'tests': 'Testing Framework',
-            'scripts': 'Build System',
+            "atomspace": "Memory System",
+            "atomspace-storage": "Persistence Subsystem",
+            "atomspace-rocks": "Persistence Subsystem",
+            "atomspace-restful": "Persistence Subsystem",
+            "cogserver": "Task System",
+            "cogutil": "Core Utilities",
+            "moses": "MOSES Representation/Scoring",
+            "cognitive-patterns": "AI System",
+            "distributed-cognition": "Autonomy System",
+            "neural-symbolic-integration": "AI System",
+            "cognitive-visualization": "AI System",
+            "ggml-tensor-kernel": "AI System",
+            "tests": "Testing Framework",
+            "scripts": "Build System",
         }
 
         for key, subsystem in subsystem_map.items():
             if key in file_path:
                 return subsystem
-        return 'Other'
+        return "Other"
 
     def allocate_attention(self) -> list[TODOItem]:
         """Enhanced Attention Allocation Kernel - Integrate with cognitive attention systems"""
@@ -189,20 +195,22 @@ class RecursiveTODOResolver:
                 -attention_scores.get(f"{x.file}:{x.line}", 0),  # Higher attention first
                 x.subsystem,
                 x.file,
-                x.line
-            )
+                x.line,
+            ),
         )
 
         # Select next batch with cognitive optimization
-        batch = self._optimize_batch_selection(sorted_todos[:self.batch_size * 2])
+        batch = self._optimize_batch_selection(sorted_todos[: self.batch_size * 2])
 
         print(f"🎯 Selected {len(batch)} TODOs for Iteration {self.progress_data['current_iteration']}")
         print("🧠 Applied cognitive synergy grouping and attention allocation")
         for todo in batch:
             synergy_score = synergy_groups.get(f"{todo.file}:{todo.line}", 0)
             attention_score = attention_scores.get(f"{todo.file}:{todo.line}", 0)
-            print(f"   • {todo.file}:{todo.line} ({todo.priority}, {todo.category}) "
-                  f"[Synergy: {synergy_score:.2f}, Attention: {attention_score:.2f}]")
+            print(
+                f"   • {todo.file}:{todo.line} ({todo.priority}, {todo.category}) "
+                f"[Synergy: {synergy_score:.2f}, Attention: {attention_score:.2f}]"
+            )
 
         return batch
 
@@ -222,19 +230,19 @@ class RecursiveTODOResolver:
             synergy_score = 1.0
 
             # Boost for related components
-            if any(keyword in todo.file.lower() for keyword in ['moses', 'atomspace', 'attention']):
+            if any(keyword in todo.file.lower() for keyword in ["moses", "atomspace", "attention"]):
                 synergy_score += 2.0
 
             # Boost for thread safety - high cognitive impact
-            if 'thread' in todo.content.lower() or 'sync' in todo.content.lower():
+            if "thread" in todo.content.lower() or "sync" in todo.content.lower():
                 synergy_score += 1.5
 
             # Boost for performance - system-wide impact
-            if 'performance' in todo.content.lower() or 'print' in todo.content.lower():
+            if "performance" in todo.content.lower() or "print" in todo.content.lower():
                 synergy_score += 1.0
 
             # Boost for critical systems
-            if todo.priority in ['CRITICAL', 'HIGH']:
+            if todo.priority in ["CRITICAL", "HIGH"]:
                 synergy_score += 1.0
 
             synergy_scores[f"{todo.file}:{todo.line}"] = synergy_score
@@ -265,42 +273,42 @@ class RecursiveTODOResolver:
             # Long-Term Importance (LTI) based on system impact
             # Following ECAN economic constraints model
             lti = 1.0
-            if 'atomspace' in todo.file.lower():
+            if "atomspace" in todo.file.lower():
                 lti += 3.0  # Core memory system - highest LTI
-            elif 'moses' in todo.file.lower():
+            elif "moses" in todo.file.lower():
                 lti += 2.0  # Learning system
-            elif 'attention' in todo.file.lower():
+            elif "attention" in todo.file.lower():
                 lti += 2.5  # Attention system itself
-            elif 'cogserver' in todo.file.lower():
+            elif "cogserver" in todo.file.lower():
                 lti += 2.0  # Task coordination
-            elif 'distributed' in todo.file.lower():
+            elif "distributed" in todo.file.lower():
                 lti += 1.5  # Distributed cognition
 
             # Cognitive urgency factor (meta-pattern amplification)
             urgency = 1.0
-            if 'crash' in todo.content.lower() or 'fix' in todo.content.lower():
+            if "crash" in todo.content.lower() or "fix" in todo.content.lower():
                 urgency += 2.0  # High urgency for critical fixes
-            if 'thread' in todo.content.lower():
+            if "thread" in todo.content.lower():
                 urgency += 1.5  # Thread safety is urgent
-            if 'performance' in todo.content.lower():
+            if "performance" in todo.content.lower():
                 urgency += 1.2  # Performance optimization
 
             # Economic attention allocation (rent and decay simulation)
             # Inspired by ECAN economic constraints
             rent_factor = 0.9  # Slight decay for older items
-            if todo.priority in ['CRITICAL', 'HIGH']:
+            if todo.priority in ["CRITICAL", "HIGH"]:
                 rent_factor = 0.95  # Less decay for high priority
 
             # Meta-pattern detection bonus
             # Following the pattern emergence threshold logic
             meta_pattern_bonus = 1.0
-            if any(keyword in todo.file.lower() for keyword in ['atomspace', 'moses', 'attention']):
+            if any(keyword in todo.file.lower() for keyword in ["atomspace", "moses", "attention"]):
                 meta_pattern_bonus = 1.3  # Core cognitive systems get bonus
 
             # Apply tensor hypergraph protocol efficiency
             # Inspired by TensorHypergraphProtocol compression and batching
             efficiency_factor = 1.0
-            if todo.category in ['Thread Safety', 'Performance']:
+            if todo.category in ["Thread Safety", "Performance"]:
                 efficiency_factor = 1.4  # High efficiency impact
 
             # Final attention score with ECAN-style computation
@@ -336,7 +344,7 @@ class RecursiveTODOResolver:
                 categories_covered.add(todo.category)
 
             # Select if high priority or adds diversity
-            if todo.priority in ['CRITICAL', 'HIGH'] or diversity_bonus > 0 or len(selected) < 3:
+            if todo.priority in ["CRITICAL", "HIGH"] or diversity_bonus > 0 or len(selected) < 3:
                 selected.append(todo)
 
         return selected
@@ -344,13 +352,12 @@ class RecursiveTODOResolver:
     def generate_actionable_issues(self, batch: list[TODOItem]) -> str:
         """Generate actionable issue content for the selected batch"""
 
-        iteration = self.progress_data['current_iteration']
+        iteration = self.progress_data["current_iteration"]
 
         # Count remaining high-priority TODOs
-        unchecked_high_priority = len([
-            t for t in self.todos
-            if t.status == "unchecked" and t.priority in ["CRITICAL", "HIGH"]
-        ])
+        unchecked_high_priority = len(
+            [t for t in self.todos if t.status == "unchecked" and t.priority in ["CRITICAL", "HIGH"]]
+        )
 
         issue_content = f"""# Iterative TODO Resolution – Batch {iteration}: Highest Priority Items
 
@@ -405,11 +412,11 @@ Each resolved TODO represents not merely completed work, but a note in the compo
 ---
 
 ## 🕰️ Progress Log
-- **Last run:** {datetime.now().strftime('%Y-%m-%d')}
+- **Last run:** {datetime.now().strftime("%Y-%m-%d")}
 - **Remaining high-priority TODOs:** {unchecked_high_priority}
-- **Total TODOs processed:** {self.progress_data['total_resolved']}
+- **Total TODOs processed:** {self.progress_data["total_resolved"]}
 - **Current iteration:** {iteration}
-- **System Status:** {'GitHub-integrated' if self.github_creator else 'Standalone'} recursive enhancement
+- **System Status:** {"GitHub-integrated" if self.github_creator else "Standalone"} recursive enhancement
 
 ---
 
@@ -531,7 +538,9 @@ Each resolved TODO represents not merely completed work, but a note in the compo
         elif "performance" in content_lower and "print" in content_lower:
             return "Replace debug prints with conditional logging using OpenCog logger with runtime log level control"
         elif "performance" in content_lower:
-            return "Profile hotspots, optimize algorithms for O(log n) complexity, and implement caching where appropriate"
+            return (
+                "Profile hotspots, optimize algorithms for O(log n) complexity, and implement caching where appropriate"
+            )
 
         # Backtrace and debugging infrastructure
         elif "backtrace" in content_lower:
@@ -544,7 +553,9 @@ Each resolved TODO represents not merely completed work, but a note in the compo
             elif "link" in file_lower:
                 return "Optimize link traversal algorithms and implement efficient incoming/outgoing set management"
             else:
-                return "Follow AtomSpace patterns for handle management, truth value propagation, and attention allocation"
+                return (
+                    "Follow AtomSpace patterns for handle management, truth value propagation, and attention allocation"
+                )
 
         # MOSES evolutionary optimization
         elif "moses" in file_lower:
@@ -567,7 +578,9 @@ Each resolved TODO represents not merely completed work, but a note in the compo
 
         # Distributed cognition protocols
         elif "distributed" in file_lower:
-            return "Implement fault-tolerant distributed protocols with consensus mechanisms and efficient message passing"
+            return (
+                "Implement fault-tolerant distributed protocols with consensus mechanisms and efficient message passing"
+            )
 
         # Cognitive patterns and PLN
         elif "pln" in file_lower or "logic" in file_lower:
@@ -588,13 +601,17 @@ Each resolved TODO represents not merely completed work, but a note in the compo
         # Common implementation patterns
         elif "not implemented" in content_lower:
             if "interface" in content_lower or "virtual" in content_lower:
-                return "Implement interface methods following the Abstract Factory or Strategy pattern for extensibility"
+                return (
+                    "Implement interface methods following the Abstract Factory or Strategy pattern for extensibility"
+                )
             else:
                 return "Replace placeholder with concrete implementation following existing architectural patterns"
         elif "hack" in content_lower or "fixme" in content_lower:
             return "Refactor temporary solution with proper design patterns, error handling, and maintainable code structure"
         elif "todo" in content_lower and "test" in content_lower:
-            return "Implement comprehensive unit and integration tests with edge case coverage and performance benchmarks"
+            return (
+                "Implement comprehensive unit and integration tests with edge case coverage and performance benchmarks"
+            )
         elif "memory" in content_lower:
             return "Implement proper memory management with RAII patterns, smart pointers, and leak prevention"
         elif "algorithm" in content_lower:
@@ -607,7 +624,9 @@ Each resolved TODO represents not merely completed work, but a note in the compo
         elif todo.subsystem == "AI System":
             return "Implement cognitive AI patterns with proper neural-symbolic integration and learning mechanisms"
         elif todo.subsystem == "MOSES Representation/Scoring":
-            return "Implement evolutionary optimization following MOSES architectural patterns with efficient evaluation"
+            return (
+                "Implement evolutionary optimization following MOSES architectural patterns with efficient evaluation"
+            )
         else:
             return "Analyze requirements thoroughly and implement following OpenCog architectural principles and coding standards"
 
@@ -629,9 +648,13 @@ Each resolved TODO represents not merely completed work, but a note in the compo
             if "valuation" in file_lower:
                 return "Test value storage/retrieval, type validation, and truth value operations with edge cases and large datasets"
             elif "link" in file_lower:
-                return "Test link creation, traversal, incoming/outgoing set consistency, and circular reference handling"
+                return (
+                    "Test link creation, traversal, incoming/outgoing set consistency, and circular reference handling"
+                )
             else:
-                return "Test atom creation/deletion, handle consistency, truth value propagation, and attention allocation"
+                return (
+                    "Test atom creation/deletion, handle consistency, truth value propagation, and attention allocation"
+                )
 
         # MOSES testing
         elif "moses" in file_lower:
@@ -676,7 +699,9 @@ Each resolved TODO represents not merely completed work, but a note in the compo
 
         # Memory management testing
         elif "memory" in content_lower or "leak" in content_lower:
-            return "Test with Valgrind, AddressSanitizer, memory leak detection, and stress testing under memory pressure"
+            return (
+                "Test with Valgrind, AddressSanitizer, memory leak detection, and stress testing under memory pressure"
+            )
 
         # Build system testing
         elif "cmake" in file_lower or "build" in content_lower:
@@ -686,7 +711,9 @@ Each resolved TODO represents not merely completed work, but a note in the compo
         elif "not implemented" in content_lower:
             return "Create comprehensive test suite covering interface contracts, edge cases, error conditions, and integration points"
         elif "algorithm" in content_lower:
-            return "Test algorithmic correctness with known test vectors, complexity validation, and comparative analysis"
+            return (
+                "Test algorithmic correctness with known test vectors, complexity validation, and comparative analysis"
+            )
         # Default based on subsystem
         elif todo.subsystem == "Memory System":
             return "Test memory operations, handle management, concurrent access, and data consistency validation"
@@ -697,7 +724,9 @@ Each resolved TODO represents not merely completed work, but a note in the compo
         elif todo.subsystem == "MOSES Representation/Scoring":
             return "Test evolutionary operators, fitness evaluation, and convergence properties with diverse problems"
         else:
-            return "Create unit tests covering normal operation, edge cases, error conditions, and integration scenarios"
+            return (
+                "Create unit tests covering normal operation, edge cases, error conditions, and integration scenarios"
+            )
 
     def mark_batch_in_progress(self, batch: list[TODOItem]):
         """Mark batch items as in-progress"""
@@ -706,7 +735,7 @@ Each resolved TODO represents not merely completed work, but a note in the compo
             if todo_key not in self.progress_data["in_progress_todos"]:
                 self.progress_data["in_progress_todos"].append(todo_key)
             todo.status = "in-progress"
-            todo.assigned_batch = self.progress_data['current_iteration']
+            todo.assigned_batch = self.progress_data["current_iteration"]
 
     def validate_batch_6_todos(self):
         """Specifically validate and resolve the batch 6 TODOs mentioned in the issue"""
@@ -717,12 +746,12 @@ Each resolved TODO represents not merely completed work, but a note in the compo
             "atomspace/opencog/query/SatisfyMixin.cc:178",
             "atomspace/opencog/scm/opencog/base/debug-trace.scm:9",
             "cogserver/opencog/network/ServerSocket.cc:162",
-            "scripts/generate_todo_catalog.py:289"
+            "scripts/generate_todo_catalog.py:289",
         ]
 
         resolved_count = 0
         for todo_key in batch_6_todos:
-            file_path, line_str = todo_key.split(':')
+            file_path, line_str = todo_key.split(":")
             line_num = int(line_str)
 
             full_path = self.repo_path / file_path
@@ -731,7 +760,7 @@ Each resolved TODO represents not merely completed work, but a note in the compo
                 continue
 
             try:
-                with open(full_path, encoding='utf-8', errors='ignore') as f:
+                with open(full_path, encoding="utf-8", errors="ignore") as f:
                     lines = f.readlines()
 
                 # Check the specific line and surrounding area
@@ -748,7 +777,9 @@ Each resolved TODO represents not merely completed work, but a note in the compo
                             print(f"   ⏳ TODO still pending: {todo_key}")
 
                     elif todo_key == "cogserver/opencog/network/ServerSocket.cc:162":
-                        if "std::jthread" in line_content or "Thread management is now handled" in '\n'.join(lines[max(0, line_num-3):line_num+2]):
+                        if "std::jthread" in line_content or "Thread management is now handled" in "\n".join(
+                            lines[max(0, line_num - 3) : line_num + 2]
+                        ):
                             print(f"   ✅ TODO resolved: {todo_key} - Thread management updated")
                             self._mark_todo_completed(todo_key, "Thread management modernized")
                             resolved_count += 1
@@ -757,8 +788,8 @@ Each resolved TODO represents not merely completed work, but a note in the compo
 
                     else:
                         # For other TODOs, check if they still contain TODO/FIXME markers
-                        context = '\n'.join(lines[max(0, line_num-2):line_num+3])
-                        if any(keyword in context.lower() for keyword in ['todo', 'fixme', 'xxx']):
+                        context = "\n".join(lines[max(0, line_num - 2) : line_num + 3])
+                        if any(keyword in context.lower() for keyword in ["todo", "fixme", "xxx"]):
                             print(f"   ⏳ TODO still pending: {todo_key}")
                         else:
                             print(f"   ❓ TODO status unclear: {todo_key}")
@@ -782,7 +813,7 @@ Each resolved TODO represents not merely completed work, but a note in the compo
         self.progress_data["resolutions"][todo_key] = {
             "resolved_at": datetime.now().isoformat(),
             "resolution_note": resolution_note,
-            "resolved_by": "recursive_todo_resolver_validation"
+            "resolved_by": "recursive_todo_resolver_validation",
         }
 
     def validate_existing_todos(self):
@@ -801,7 +832,7 @@ Each resolved TODO represents not merely completed work, but a note in the compo
 
                 # Read the file and check if the TODO still exists at the expected line
                 try:
-                    with open(file_path, encoding='utf-8', errors='ignore') as f:
+                    with open(file_path, encoding="utf-8", errors="ignore") as f:
                         lines = f.readlines()
 
                     # Check around the line number (±2 lines) for the TODO content
@@ -810,7 +841,9 @@ Each resolved TODO represents not merely completed work, but a note in the compo
 
                     todo_found = False
                     for i in search_range:
-                        if todo.content.strip() in lines[i] or any(keyword in lines[i].lower() for keyword in ['todo', 'fixme', 'xxx', 'not implemented']):
+                        if todo.content.strip() in lines[i] or any(
+                            keyword in lines[i].lower() for keyword in ["todo", "fixme", "xxx", "not implemented"]
+                        ):
                             todo_found = True
                             break
 
@@ -843,7 +876,7 @@ Each resolved TODO represents not merely completed work, but a note in the compo
         # Replace unchecked items with checked ones for completed TODOs
         for todo_key in self.progress_data.get("completed_todos", []):
             # Find the corresponding line and mark as completed
-            file_part, line_part = todo_key.split(':')
+            file_part, line_part = todo_key.split(":")
             pattern = f"- \\[ \\] \\*\\*{re.escape(file_part)}:{line_part}\\*\\*"
             replacement = f"- [x] **{file_part}:{line_part}**"
             content = re.sub(pattern, replacement, content)
@@ -853,11 +886,11 @@ Each resolved TODO represents not merely completed work, but a note in the compo
 
 ## 🔄 Recursive Resolution Progress
 
-**Current Iteration:** {self.progress_data['current_iteration']}
-**Last Run:** {self.progress_data.get('last_run', 'Never')}
-**TODOs Resolved:** {len(self.progress_data.get('completed_todos', []))}
-**TODOs In Progress:** {len(self.progress_data.get('in_progress_todos', []))}
-**Total Remaining:** {len([t for t in self.todos if t.status == 'unchecked'])}
+**Current Iteration:** {self.progress_data["current_iteration"]}
+**Last Run:** {self.progress_data.get("last_run", "Never")}
+**TODOs Resolved:** {len(self.progress_data.get("completed_todos", []))}
+**TODOs In Progress:** {len(self.progress_data.get("in_progress_todos", []))}
+**Total Remaining:** {len([t for t in self.todos if t.status == "unchecked"])}
 
 *Use `python scripts/recursive_todo_resolver.py --next-batch` to continue resolution*
 
@@ -868,10 +901,10 @@ Each resolved TODO represents not merely completed work, but a note in the compo
         if "## Meta-Cognitive Enhancement Instructions" in content:
             content = content.replace(
                 "## Meta-Cognitive Enhancement Instructions",
-                progress_section + "## Meta-Cognitive Enhancement Instructions"
+                progress_section + "## Meta-Cognitive Enhancement Instructions",
             )
 
-        with open(self.catalog_path, 'w') as f:
+        with open(self.catalog_path, "w") as f:
             f.write(content)
 
     def run_iteration(self) -> str | None:
@@ -900,21 +933,20 @@ Each resolved TODO represents not merely completed work, but a note in the compo
         created_issue = None
         if self.github_creator and self.enable_github_integration:
             created_issue = self.github_creator.create_todo_batch_issue(
-                issue_content,
-                self.progress_data['current_iteration']
+                issue_content, self.progress_data["current_iteration"]
             )
             if created_issue:
                 # Store issue URL in progress data for future reference
-                if 'github_issues' not in self.progress_data:
-                    self.progress_data['github_issues'] = {}
-                self.progress_data['github_issues'][self.progress_data['current_iteration']] = {
-                    'issue_number': created_issue['number'],
-                    'issue_url': created_issue['html_url'],
-                    'created_at': created_issue['created_at']
+                if "github_issues" not in self.progress_data:
+                    self.progress_data["github_issues"] = {}
+                self.progress_data["github_issues"][self.progress_data["current_iteration"]] = {
+                    "issue_number": created_issue["number"],
+                    "issue_url": created_issue["html_url"],
+                    "created_at": created_issue["created_at"],
                 }
 
         # Step 6: Update progress and catalog
-        self.progress_data['current_iteration'] += 1
+        self.progress_data["current_iteration"] += 1
         self._save_progress()
         self.update_catalog_with_progress()
 
@@ -941,17 +973,16 @@ Each resolved TODO represents not merely completed work, but a note in the compo
                 break
 
         # Update GitHub issues if available (Meta-Enhancement)
-        if self.github_creator and pr_link and 'github_issues' in self.progress_data:
+        if self.github_creator and pr_link and "github_issues" in self.progress_data:
             # Find which batch this TODO was in and update the corresponding issue
-            for _batch_num, issue_info in self.progress_data['github_issues'].items():
-                if self.github_creator.update_issue_with_completion(
-                    issue_info['issue_number'], todo_key, pr_link
-                ):
+            for _batch_num, issue_info in self.progress_data["github_issues"].items():
+                if self.github_creator.update_issue_with_completion(issue_info["issue_number"], todo_key, pr_link):
                     print(f"📝 Updated GitHub issue #{issue_info['issue_number']}")
                     break
 
         self._save_progress()
         print(f"✅ Marked {todo_key} as completed")
+
 
 def main():
     """Main execution function"""
@@ -961,23 +992,18 @@ def main():
     parser.add_argument("--repo-path", default=".", help="Repository path")
     parser.add_argument("--batch-size", type=int, default=5, help="Number of TODOs per batch")
     parser.add_argument("--next-batch", action="store_true", help="Run next iteration")
-    parser.add_argument("--mark-completed", nargs=2, metavar=("FILE:LINE", "PR_LINK"),
-                       help="Mark a TODO as completed")
+    parser.add_argument("--mark-completed", nargs=2, metavar=("FILE:LINE", "PR_LINK"), help="Mark a TODO as completed")
     parser.add_argument("--status", action="store_true", help="Show current status")
     parser.add_argument("--no-github", action="store_true", help="Disable GitHub integration")
     parser.add_argument("--validate-batch-6", action="store_true", help="Validate and resolve batch 6 TODOs")
 
     args = parser.parse_args()
 
-    resolver = RecursiveTODOResolver(
-        args.repo_path,
-        args.batch_size,
-        enable_github_integration=not args.no_github
-    )
+    resolver = RecursiveTODOResolver(args.repo_path, args.batch_size, enable_github_integration=not args.no_github)
 
     if args.mark_completed:
         file_line, pr_link = args.mark_completed
-        file_path, line = file_line.split(':')
+        file_path, line = file_line.split(":")
         resolver.mark_completed(file_path, int(line), pr_link)
         return
 
@@ -996,8 +1022,8 @@ def main():
         # Show GitHub integration status
         if resolver.github_creator:
             print("   • GitHub Integration: ✅ Enabled")
-            if 'github_issues' in resolver.progress_data:
-                issue_count = len(resolver.progress_data['github_issues'])
+            if "github_issues" in resolver.progress_data:
+                issue_count = len(resolver.progress_data["github_issues"])
                 print(f"   • GitHub Issues Created: {issue_count}")
         else:
             print("   • GitHub Integration: ❌ Disabled")
@@ -1014,15 +1040,16 @@ def main():
 
         if issue_content:
             # Save issue content to file
-            issue_file = resolver.repo_path / f"TODO_BATCH_{resolver.progress_data['current_iteration']-1}_ISSUE.md"
-            with open(issue_file, 'w') as f:
+            issue_file = resolver.repo_path / f"TODO_BATCH_{resolver.progress_data['current_iteration'] - 1}_ISSUE.md"
+            with open(issue_file, "w") as f:
                 f.write(issue_content)
 
             print(f"📝 Generated issue content: {issue_file}")
-            print(f"🎯 Selected batch for iteration {resolver.progress_data['current_iteration']-1}")
+            print(f"🎯 Selected batch for iteration {resolver.progress_data['current_iteration'] - 1}")
             print("📋 Copy the issue content to create a GitHub issue for tracking")
         else:
             print("🎉 All TODOs have been processed!")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

@@ -47,11 +47,11 @@ class EasyWinsImplementer:
         """Determine if an item can be automatically fixed."""
         # Focus on documentation and comment improvements
         return (
-            "documentation" in item.category.lower() or
-            "simple fix" in item.category.lower() or
-            "xxx fixme replace" in item.fixme_text.lower() or
-            "temp hack alert" in item.fixme_text.lower() or
-            "might no longer exist" in item.fixme_text.lower()
+            "documentation" in item.category.lower()
+            or "simple fix" in item.category.lower()
+            or "xxx fixme replace" in item.fixme_text.lower()
+            or "temp hack alert" in item.fixme_text.lower()
+            or "might no longer exist" in item.fixme_text.lower()
         )
 
     def _apply_fix(self, item):
@@ -62,7 +62,7 @@ class EasyWinsImplementer:
             raise FileNotFoundError(f"File not found: {file_path}")
 
         # Read file content
-        with open(file_path, encoding='utf-8') as f:
+        with open(file_path, encoding="utf-8") as f:
             lines = f.readlines()
 
         if item.line_number > len(lines):
@@ -77,7 +77,7 @@ class EasyWinsImplementer:
             lines[item.line_number - 1] = new_line
 
             # Write back to file
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 f.writelines(lines)
 
     def _get_fixed_line(self, line, item):
@@ -86,12 +86,14 @@ class EasyWinsImplementer:
 
         # Handle different types of fixes
         if "xxx fixme replace below by real docs" in line_lower:
-            return line.replace("XXX FIXME replace below by real docs.",
-                              "Documentation updated with proper descriptions.")
+            return line.replace(
+                "XXX FIXME replace below by real docs.", "Documentation updated with proper descriptions."
+            )
 
         elif "might no longer exist" in line_lower:
-            return line.replace("FIXME:", "NOTE:").replace("might no longer exist",
-                              "may no longer exist with current versions")
+            return line.replace("FIXME:", "NOTE:").replace(
+                "might no longer exist", "may no longer exist with current versions"
+            )
 
         elif "temp hack alert" in line_lower:
             return line.replace("XXX Temp hack alert.", "NOTE: Legacy compatibility handling.")
@@ -110,9 +112,7 @@ class EasyWinsImplementer:
         """Update the resolution tracking system."""
         for item in self.completed_fixes:
             self.tracker.complete_resolution(
-                item.file_path,
-                item.line_number,
-                "Automated fix: Improved documentation/comments"
+                item.file_path, item.line_number, "Automated fix: Improved documentation/comments"
             )
 
     def _generate_summary(self):
@@ -128,9 +128,10 @@ class EasyWinsImplementer:
         # Generate updated progress report
         report = self.tracker.generate_next_steps_report()
         report_file = self.repo_root / "FIXME_RESOLUTION_PROGRESS_REPORT.md"
-        with open(report_file, 'w') as f:
+        with open(report_file, "w") as f:
             f.write(report)
         print(f"\n📈 Updated progress report: {report_file}")
+
 
 def main():
     """Main entry point."""
@@ -157,6 +158,7 @@ def main():
                 print(f"  ⊘ {item.file_path}:{item.line_number} (manual fix needed)")
     else:
         implementer.run_easy_fixes()
+
 
 if __name__ == "__main__":
     main()

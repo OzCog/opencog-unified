@@ -64,10 +64,14 @@ ADD_DEFINITIONS(-DGIT_COMMIT_HASH="${GIT_COMMIT_HASH}")
 # The default case for non-profile builds is to use shared libraries. So don't
 # use explicit SHARED in the ADD_LIBRARY calls in CMakeLists.txt instances or
 # this flag won't work since it only affects the default.
+# Respect BUILD_SHARED_LIBS if explicitly passed on the command line (e.g.
+# -DBUILD_SHARED_LIBS=OFF to avoid cyclic-dependency errors in CI).
 IF (CMAKE_BUILD_TYPE STREQUAL "Profile")
 	SET(BUILD_SHARED_LIBS OFF)
 ELSE (CMAKE_BUILD_TYPE STREQUAL "Profile")
-	SET(BUILD_SHARED_LIBS ON)
+	IF (NOT DEFINED BUILD_SHARED_LIBS)
+		SET(BUILD_SHARED_LIBS ON)
+	ENDIF (NOT DEFINED BUILD_SHARED_LIBS)
 ENDIF (CMAKE_BUILD_TYPE STREQUAL "Profile")
 
 # ===============================================================

@@ -11,7 +11,7 @@ def generate_fixme_catalog():
     """Generate the sorted FIXME catalog markdown document."""
 
     # Load the analysis report
-    with open('fixme_analysis_report.json') as f:
+    with open("fixme_analysis_report.json") as f:
         data = json.load(f)
 
     markdown_content = """# OpenCog Unified FIXME Implementation Catalog
@@ -50,32 +50,27 @@ Quick fixes suitable for new contributors or as warm-up tasks.
 ---
 
 """.format(
-        total_instances=data['summary']['total_instances'],
-        very_hard_count=data['summary']['by_difficulty'].get('VERY_HARD', 0),
-        hard_count=data['summary']['by_difficulty'].get('HARD', 0),
-        medium_count=data['summary']['by_difficulty'].get('MEDIUM', 0),
-        easy_count=data['summary']['by_difficulty'].get('EASY', 0),
-        very_hard_pct=(data['summary']['by_difficulty'].get('VERY_HARD', 0) / data['summary']['total_instances'] * 100),
-        hard_pct=(data['summary']['by_difficulty'].get('HARD', 0) / data['summary']['total_instances'] * 100),
-        medium_pct=(data['summary']['by_difficulty'].get('MEDIUM', 0) / data['summary']['total_instances'] * 100),
-        easy_pct=(data['summary']['by_difficulty'].get('EASY', 0) / data['summary']['total_instances'] * 100),
-        files_affected=data['summary']['files_affected']
+        total_instances=data["summary"]["total_instances"],
+        very_hard_count=data["summary"]["by_difficulty"].get("VERY_HARD", 0),
+        hard_count=data["summary"]["by_difficulty"].get("HARD", 0),
+        medium_count=data["summary"]["by_difficulty"].get("MEDIUM", 0),
+        easy_count=data["summary"]["by_difficulty"].get("EASY", 0),
+        very_hard_pct=(data["summary"]["by_difficulty"].get("VERY_HARD", 0) / data["summary"]["total_instances"] * 100),
+        hard_pct=(data["summary"]["by_difficulty"].get("HARD", 0) / data["summary"]["total_instances"] * 100),
+        medium_pct=(data["summary"]["by_difficulty"].get("MEDIUM", 0) / data["summary"]["total_instances"] * 100),
+        easy_pct=(data["summary"]["by_difficulty"].get("EASY", 0) / data["summary"]["total_instances"] * 100),
+        files_affected=data["summary"]["files_affected"],
     )
 
     # Process each difficulty level
-    difficulty_order = ['VERY_HARD', 'HARD', 'MEDIUM', 'EASY']
-    difficulty_icons = {
-        'VERY_HARD': '🚨',
-        'HARD': '⚡',
-        'MEDIUM': '📋',
-        'EASY': '✅'
-    }
+    difficulty_order = ["VERY_HARD", "HARD", "MEDIUM", "EASY"]
+    difficulty_icons = {"VERY_HARD": "🚨", "HARD": "⚡", "MEDIUM": "📋", "EASY": "✅"}
 
     for difficulty in difficulty_order:
-        if difficulty not in data['by_difficulty']:
+        if difficulty not in data["by_difficulty"]:
             continue
 
-        instances = data['by_difficulty'][difficulty]
+        instances = data["by_difficulty"][difficulty]
         icon = difficulty_icons[difficulty]
 
         markdown_content += f"\n## {icon} {difficulty.replace('_', ' ').title()} Priority ({len(instances)} items)\n\n"
@@ -83,7 +78,7 @@ Quick fixes suitable for new contributors or as warm-up tasks.
         # Group by component/category for better organization
         by_component = defaultdict(list)
         for instance in instances:
-            component = instance['file_path'].split('/')[0]
+            component = instance["file_path"].split("/")[0]
             by_component[component].append(instance)
 
         for component, comp_instances in sorted(by_component.items()):
@@ -164,9 +159,9 @@ Quick fixes suitable for new contributors or as warm-up tasks.
 
     # Add component breakdown
     by_component_stats = defaultdict(lambda: defaultdict(int))
-    for difficulty, instances in data['by_difficulty'].items():
+    for difficulty, instances in data["by_difficulty"].items():
         for instance in instances:
-            component = instance['file_path'].split('/')[0]
+            component = instance["file_path"].split("/")[0]
             by_component_stats[component][difficulty] += 1
 
     markdown_content += "| Component | VERY_HARD | HARD | MEDIUM | EASY | Total |\n"
@@ -205,51 +200,51 @@ Quick fixes suitable for new contributors or as warm-up tasks.
 ---
 
 *This catalog was generated automatically by analyzing {total_instances} FIXME instances across {files_affected} files in the OpenCog Unified repository.*
-""".format(
-        total_instances=data['summary']['total_instances'],
-        files_affected=data['summary']['files_affected']
-    )
+""".format(total_instances=data["summary"]["total_instances"], files_affected=data["summary"]["files_affected"])
 
     return markdown_content
+
 
 def format_instance(instance, index):
     """Format a single FIXME instance for the markdown document."""
 
     # Truncate long FIXME text
-    fixme_text = instance['fixme_text']
+    fixme_text = instance["fixme_text"]
     if len(fixme_text) > 100:
         fixme_text = fixme_text[:97] + "..."
 
     # Clean up the FIXME text for display
-    fixme_display = fixme_text.replace('// ', '').replace('/// ', '').replace('; ', '').replace('# ', '').strip()
+    fixme_display = fixme_text.replace("// ", "").replace("/// ", "").replace("; ", "").replace("# ", "").strip()
 
     return f"""
-**{index}.** `{instance['file_path']}:{instance['line_number']}`
+**{index}.** `{instance["file_path"]}:{instance["line_number"]}`
 
 **Issue:** {fixme_display}
 
-**Category:** {instance['category']}
-**Effort:** {instance['estimated_effort']}
-**Reasoning:** {instance['reasoning']}
+**Category:** {instance["category"]}
+**Effort:** {instance["estimated_effort"]}
+**Reasoning:** {instance["reasoning"]}
 
 <details>
 <summary>View Code Context</summary>
 
 ```
-{chr(10).join(instance['context_lines'])}
+{chr(10).join(instance["context_lines"])}
 ```
 </details>
 
 """
 
+
 def main():
     catalog_content = generate_fixme_catalog()
 
-    with open('FIXME-SORTED-CATALOG.md', 'w') as f:
+    with open("FIXME-SORTED-CATALOG.md", "w") as f:
         f.write(catalog_content)
 
     print("Generated FIXME-SORTED-CATALOG.md")
     print("Document contains comprehensive categorization of all FIXME instances")
+
 
 if __name__ == "__main__":
     main()

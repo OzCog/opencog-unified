@@ -25,6 +25,7 @@ from pathlib import Path
 @dataclass
 class MarkerResolution:
     """Tracks resolution of a specific marker."""
+
     file_path: str
     line_number: int
     marker_type: str
@@ -38,13 +39,14 @@ class MarkerResolution:
     resolution_notes: str | None = None
     commit_sha: str | None = None
 
+
 class EntelechyMarkerResolver:
     """Manages systematic resolution of code markers."""
 
-    def __init__(self, repo_root: str, analysis_file: str = 'entelechy_marker_analysis.json'):
+    def __init__(self, repo_root: str, analysis_file: str = "entelechy_marker_analysis.json"):
         self.repo_root = Path(repo_root)
         self.analysis_file = self.repo_root / analysis_file
-        self.tracking_file = self.repo_root / 'entelechy_marker_resolution_tracking.json'
+        self.tracking_file = self.repo_root / "entelechy_marker_resolution_tracking.json"
 
         self.analysis_data = None
         self.resolutions: dict[str, MarkerResolution] = {}
@@ -76,7 +78,7 @@ class EntelechyMarkerResolver:
     def _save_tracking(self):
         """Save resolution tracking data."""
         data = {key: asdict(res) for key, res in self.resolutions.items()}
-        with open(self.tracking_file, 'w') as f:
+        with open(self.tracking_file, "w") as f:
             json.dump(data, f, indent=2)
         print(f"✓ Saved tracking for {len(self.resolutions)} markers")
 
@@ -86,7 +88,7 @@ class EntelechyMarkerResolver:
             print("⚠ No analysis data available")
             return
 
-        markers = self.analysis_data.get('markers', [])
+        markers = self.analysis_data.get("markers", [])
         new_count = 0
 
         for marker in markers:
@@ -94,21 +96,21 @@ class EntelechyMarkerResolver:
 
             if key not in self.resolutions:
                 # Determine priority from severity
-                if marker['severity'] >= 0.8:
-                    priority = 'CRITICAL'
-                elif marker['severity'] >= 0.7:
-                    priority = 'HIGH'
-                elif marker['severity'] >= 0.6:
-                    priority = 'MEDIUM'
+                if marker["severity"] >= 0.8:
+                    priority = "CRITICAL"
+                elif marker["severity"] >= 0.7:
+                    priority = "HIGH"
+                elif marker["severity"] >= 0.6:
+                    priority = "MEDIUM"
                 else:
-                    priority = 'LOW'
+                    priority = "LOW"
 
                 self.resolutions[key] = MarkerResolution(
-                    file_path=marker['file_path'],
-                    line_number=marker['line_number'],
-                    marker_type=marker['marker_type'],
-                    original_content=marker['content'],
-                    priority=priority
+                    file_path=marker["file_path"],
+                    line_number=marker["line_number"],
+                    marker_type=marker["marker_type"],
+                    original_content=marker["content"],
+                    priority=priority,
                 )
                 new_count += 1
 
@@ -118,13 +120,10 @@ class EntelechyMarkerResolver:
     def get_priority_queue(self, status: str = "OPEN", limit: int = 50) -> list[MarkerResolution]:
         """Get prioritized list of markers to resolve."""
         # Priority order
-        priority_order = {'CRITICAL': 0, 'HIGH': 1, 'MEDIUM': 2, 'LOW': 3}
+        priority_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
 
         # Filter by status and sort by priority
-        queue = [
-            res for res in self.resolutions.values()
-            if res.status == status
-        ]
+        queue = [res for res in self.resolutions.values() if res.status == status]
 
         queue.sort(key=lambda r: (priority_order.get(r.priority, 4), r.file_path))
 
@@ -141,9 +140,10 @@ class EntelechyMarkerResolver:
             # Find corresponding marker data
             marker_data = self._find_marker_data(resolution.file_path, resolution.line_number)
             if marker_data:
-                category = marker_data.get('category', '')
-                if category == 'documentation' or \
-                   (resolution.marker_type == 'TODO' and len(resolution.original_content) < 50):
+                category = marker_data.get("category", "")
+                if category == "documentation" or (
+                    resolution.marker_type == "TODO" and len(resolution.original_content) < 50
+                ):
                     easy_wins.append(resolution)
 
         return easy_wins[:limit]
@@ -153,46 +153,41 @@ class EntelechyMarkerResolver:
         if not self.analysis_data:
             return None
 
-        for marker in self.analysis_data.get('markers', []):
-            if marker['file_path'] == file_path and marker['line_number'] == line_number:
+        for marker in self.analysis_data.get("markers", []):
+            if marker["file_path"] == file_path and marker["line_number"] == line_number:
                 return marker
         return None
 
     def get_component_summary(self) -> dict[str, dict]:
         """Get summary of markers by component."""
-        by_component = defaultdict(lambda: {
-            'total': 0,
-            'open': 0,
-            'in_progress': 0,
-            'resolved': 0,
-            'critical': 0,
-            'high': 0
-        })
+        by_component = defaultdict(
+            lambda: {"total": 0, "open": 0, "in_progress": 0, "resolved": 0, "critical": 0, "high": 0}
+        )
 
         for res in self.resolutions.values():
             component = self._extract_component(res.file_path)
-            by_component[component]['total'] += 1
+            by_component[component]["total"] += 1
 
-            if res.status == 'OPEN':
-                by_component[component]['open'] += 1
-            elif res.status == 'IN_PROGRESS':
-                by_component[component]['in_progress'] += 1
-            elif res.status == 'RESOLVED':
-                by_component[component]['resolved'] += 1
+            if res.status == "OPEN":
+                by_component[component]["open"] += 1
+            elif res.status == "IN_PROGRESS":
+                by_component[component]["in_progress"] += 1
+            elif res.status == "RESOLVED":
+                by_component[component]["resolved"] += 1
 
-            if res.priority == 'CRITICAL':
-                by_component[component]['critical'] += 1
-            elif res.priority == 'HIGH':
-                by_component[component]['high'] += 1
+            if res.priority == "CRITICAL":
+                by_component[component]["critical"] += 1
+            elif res.priority == "HIGH":
+                by_component[component]["high"] += 1
 
         return dict(by_component)
 
     def _extract_component(self, file_path: str) -> str:
         """Extract component name from file path."""
-        parts = file_path.split('/')
+        parts = file_path.split("/")
         if len(parts) > 0:
             return parts[0]
-        return 'root'
+        return "root"
 
     def mark_in_progress(self, file_path: str, line_number: int, assignee: str = "entelechy-bot"):
         """Mark a marker as in progress."""
@@ -206,8 +201,7 @@ class EntelechyMarkerResolver:
         return False
 
     def mark_resolved(
-        self, file_path: str, line_number: int,
-        resolution_type: str, notes: str = "", commit_sha: str = ""
+        self, file_path: str, line_number: int, resolution_type: str, notes: str = "", commit_sha: str = ""
     ):
         """Mark a marker as resolved."""
         key = f"{file_path}:{line_number}"
@@ -250,9 +244,9 @@ class EntelechyMarkerResolver:
         report_lines.append("")
 
         # Entelechy improvement
-        if self.analysis_data and stats['total'] > 0:
-            original_impact = self.analysis_data['summary']['actualization_inhibition']
-            current_impact = original_impact * (stats['open'] / stats['total'])
+        if self.analysis_data and stats["total"] > 0:
+            original_impact = self.analysis_data["summary"]["actualization_inhibition"]
+            current_impact = original_impact * (stats["open"] / stats["total"])
             improvement = original_impact - current_impact
 
             report_lines.append("## Entelechy Impact")
@@ -264,7 +258,7 @@ class EntelechyMarkerResolver:
         # Priority breakdown
         report_lines.append("## Priority Breakdown")
         priority_stats = self._calculate_priority_stats()
-        for priority in ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']:
+        for priority in ["CRITICAL", "HIGH", "MEDIUM", "LOW"]:
             if priority in priority_stats:
                 pstats = priority_stats[priority]
                 report_lines.append(f"### {priority}")
@@ -276,10 +270,12 @@ class EntelechyMarkerResolver:
         # Component summary
         report_lines.append("## Component Summary")
         component_summary = self.get_component_summary()
-        for component, cstats in sorted(component_summary.items(), key=lambda x: x[1]['total'], reverse=True)[:10]:
-            resolved_pct = (cstats['resolved'] / cstats['total'] * 100) if cstats['total'] > 0 else 0
+        for component, cstats in sorted(component_summary.items(), key=lambda x: x[1]["total"], reverse=True)[:10]:
+            resolved_pct = (cstats["resolved"] / cstats["total"] * 100) if cstats["total"] > 0 else 0
             report_lines.append(f"### {component}")
-            report_lines.append(f"- Total: {cstats['total']}, Open: {cstats['open']}, Resolved: {cstats['resolved']} ({resolved_pct:.1f}%)")
+            report_lines.append(
+                f"- Total: {cstats['total']}, Open: {cstats['open']}, Resolved: {cstats['resolved']} ({resolved_pct:.1f}%)"
+            )
             report_lines.append("")
 
         # Next actions
@@ -288,14 +284,18 @@ class EntelechyMarkerResolver:
         if easy_wins:
             report_lines.append("### Easy Wins (Quick Resolutions)")
             for win in easy_wins:
-                report_lines.append(f"- `{win.file_path}:{win.line_number}` - {win.marker_type}: {win.original_content[:60]}...")
+                report_lines.append(
+                    f"- `{win.file_path}:{win.line_number}` - {win.marker_type}: {win.original_content[:60]}..."
+                )
             report_lines.append("")
 
         critical_items = self.get_priority_queue(limit=10)
         if critical_items:
             report_lines.append("### Critical Priority Items")
             for item in critical_items[:5]:
-                report_lines.append(f"- `{item.file_path}:{item.line_number}` - {item.marker_type}: {item.original_content[:60]}...")
+                report_lines.append(
+                    f"- `{item.file_path}:{item.line_number}` - {item.marker_type}: {item.original_content[:60]}..."
+                )
             report_lines.append("")
 
         return "\n".join(report_lines)
@@ -306,45 +306,45 @@ class EntelechyMarkerResolver:
         if total == 0:
             # Return empty stats for empty tracking
             return {
-                'total': 0,
-                'open': 0,
-                'in_progress': 0,
-                'resolved': 0,
-                'deferred': 0,
-                'open_pct': 0.0,
-                'in_progress_pct': 0.0,
-                'resolved_pct': 0.0,
-                'deferred_pct': 0.0,
+                "total": 0,
+                "open": 0,
+                "in_progress": 0,
+                "resolved": 0,
+                "deferred": 0,
+                "open_pct": 0.0,
+                "in_progress_pct": 0.0,
+                "resolved_pct": 0.0,
+                "deferred_pct": 0.0,
             }
 
         stats = {
-            'total': total,
-            'open': sum(1 for r in self.resolutions.values() if r.status == 'OPEN'),
-            'in_progress': sum(1 for r in self.resolutions.values() if r.status == 'IN_PROGRESS'),
-            'resolved': sum(1 for r in self.resolutions.values() if r.status == 'RESOLVED'),
-            'deferred': sum(1 for r in self.resolutions.values() if r.status == 'DEFERRED'),
+            "total": total,
+            "open": sum(1 for r in self.resolutions.values() if r.status == "OPEN"),
+            "in_progress": sum(1 for r in self.resolutions.values() if r.status == "IN_PROGRESS"),
+            "resolved": sum(1 for r in self.resolutions.values() if r.status == "RESOLVED"),
+            "deferred": sum(1 for r in self.resolutions.values() if r.status == "DEFERRED"),
         }
 
         # Calculate percentages
-        for key in ['open', 'in_progress', 'resolved', 'deferred']:
-            stats[f'{key}_pct'] = (stats[key] / total * 100)
+        for key in ["open", "in_progress", "resolved", "deferred"]:
+            stats[f"{key}_pct"] = stats[key] / total * 100
 
         return stats
 
     def _calculate_priority_stats(self) -> dict:
         """Calculate statistics by priority."""
-        by_priority = defaultdict(lambda: {'total': 0, 'open': 0, 'resolved': 0})
+        by_priority = defaultdict(lambda: {"total": 0, "open": 0, "resolved": 0})
 
         for res in self.resolutions.values():
-            by_priority[res.priority]['total'] += 1
-            if res.status == 'OPEN':
-                by_priority[res.priority]['open'] += 1
-            elif res.status == 'RESOLVED':
-                by_priority[res.priority]['resolved'] += 1
+            by_priority[res.priority]["total"] += 1
+            if res.status == "OPEN":
+                by_priority[res.priority]["open"] += 1
+            elif res.status == "RESOLVED":
+                by_priority[res.priority]["resolved"] += 1
 
         return dict(by_priority)
 
-    def export_actionable_items(self, output_file: str = 'entelechy_actionable_items.md'):
+    def export_actionable_items(self, output_file: str = "entelechy_actionable_items.md"):
         """Export actionable items in markdown format."""
         lines = []
         lines.append("# Entelechy Marker Resolution - Actionable Items")
@@ -374,28 +374,29 @@ class EntelechyMarkerResolver:
             lines.append("## ✅ Easy Wins (Quick Resolutions)")
             lines.append("")
             for idx, item in enumerate(easy_wins, 1):
-                lines.append(f"{idx}. `{item.file_path}:{item.line_number}` - {item.marker_type}: {item.original_content[:80]}")
+                lines.append(
+                    f"{idx}. `{item.file_path}:{item.line_number}` - {item.marker_type}: {item.original_content[:80]}"
+                )
             lines.append("")
 
         output_path = self.repo_root / output_file
-        with open(output_path, 'w') as f:
-            f.write('\n'.join(lines))
+        with open(output_path, "w") as f:
+            f.write("\n".join(lines))
 
         print(f"✓ Exported actionable items to {output_file}")
+
 
 def main():
     """Main entry point."""
     import argparse
 
-    parser = argparse.ArgumentParser(description='Entelechy Marker Resolver')
-    parser.add_argument('--repo', default='/home/runner/work/opencog-unified/opencog-unified',
-                       help='Repository root path')
-    parser.add_argument('--init', action='store_true',
-                       help='Initialize tracking from analysis')
-    parser.add_argument('--report', action='store_true',
-                       help='Generate progress report')
-    parser.add_argument('--export', action='store_true',
-                       help='Export actionable items')
+    parser = argparse.ArgumentParser(description="Entelechy Marker Resolver")
+    parser.add_argument(
+        "--repo", default="/home/runner/work/opencog-unified/opencog-unified", help="Repository root path"
+    )
+    parser.add_argument("--init", action="store_true", help="Initialize tracking from analysis")
+    parser.add_argument("--report", action="store_true", help="Generate progress report")
+    parser.add_argument("--export", action="store_true", help="Export actionable items")
 
     args = parser.parse_args()
 
@@ -409,13 +410,14 @@ def main():
         print("\n" + report)
 
         # Save to file
-        report_path = resolver.repo_root / 'entelechy_marker_resolution_progress.md'
-        with open(report_path, 'w') as f:
+        report_path = resolver.repo_root / "entelechy_marker_resolution_progress.md"
+        with open(report_path, "w") as f:
             f.write(report)
         print(f"\n✓ Report saved to {report_path}")
 
     if args.export:
         resolver.export_actionable_items()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

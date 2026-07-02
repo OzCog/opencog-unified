@@ -11,7 +11,8 @@ import unittest
 
 
 # Add paths for component testing
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'components'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "components"))
+
 
 class TestAtomspaceRocksIntegration(unittest.TestCase):
     """Test atomspace-rocks integration with OpenCog Unified"""
@@ -27,10 +28,11 @@ class TestAtomspaceRocksIntegration(unittest.TestCase):
         try:
             # Try to import atomspace-rocks related modules
             import opencog.persist.rocks
+
             self.assertTrue(True, "atomspace-rocks module imported successfully")
         except ImportError:
             # If atomspace-rocks is not available, check if it's in the expected location
-            rocks_path = os.path.join(os.path.dirname(__file__), '..', '..', 'components', 'core', 'atomspace-rocks')
+            rocks_path = os.path.join(os.path.dirname(__file__), "..", "..", "components", "core", "atomspace-rocks")
             if os.path.exists(rocks_path):
                 self.assertTrue(True, "atomspace-rocks directory exists, module may need build")
             else:
@@ -41,9 +43,9 @@ class TestAtomspaceRocksIntegration(unittest.TestCase):
         try:
             # Check if rocksdb is available
             import subprocess
-            result = subprocess.run(['rocksdb_ldb', '--help'],
-                                 capture_output=True, text=True, timeout=10)
-            if result.returncode == 0 or 'Usage:' in result.stdout:
+
+            result = subprocess.run(["rocksdb_ldb", "--help"], capture_output=True, text=True, timeout=10)
+            if result.returncode == 0 or "Usage:" in result.stdout:
                 self.assertTrue(True, "rocksdb tools are functional")
             else:
                 self.skipTest("rocksdb tools not functional")
@@ -53,13 +55,12 @@ class TestAtomspaceRocksIntegration(unittest.TestCase):
     def test_atomspace_rocks_dependencies(self):
         """Test atomspace-rocks dependency integration"""
         # Check for required rocksdb dependencies
-        required_deps = ['rocksdb', 'zlib', 'snappy', 'lz4']
+        required_deps = ["rocksdb", "zlib", "snappy", "lz4"]
         missing_deps = []
 
         for dep in required_deps:
             try:
-                result = subprocess.run(['pkg-config', '--exists', dep],
-                                     capture_output=True)
+                result = subprocess.run(["pkg-config", "--exists", dep], capture_output=True)
                 if result.returncode != 0:
                     missing_deps.append(dep)
             except FileNotFoundError:
@@ -71,5 +72,6 @@ class TestAtomspaceRocksIntegration(unittest.TestCase):
         else:
             self.assertTrue(True, "All required atomspace-rocks dependencies are available")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

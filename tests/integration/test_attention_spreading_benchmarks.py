@@ -27,7 +27,7 @@ class AttentionSpreadingBenchmarks:
             atom = {
                 "id": f"atom_{i}",
                 "attention_value": random.uniform(0, 100),
-                "connections": random.sample(range(num_atoms), min(10, num_atoms-1))
+                "connections": random.sample(range(num_atoms), min(10, num_atoms - 1)),
             }
             self.atoms.append(atom)
 
@@ -38,12 +38,16 @@ class AttentionSpreadingBenchmarks:
                 "id": f"agent_{i}",
                 "focus_atoms": random.sample(range(num_atoms), min(50, num_atoms)),
                 "spreading_rate": random.uniform(0.05, 0.15),
-                "processing_capacity": random.uniform(100, 500)  # atoms per cycle
+                "processing_capacity": random.uniform(100, 500),  # atoms per cycle
             }
             self.agents.append(agent)
 
-        print(f"✓ Created {len(self.atoms)} atoms with avg {statistics.mean([len(a['connections']) for a in self.atoms]):.1f} connections")
-        print(f"✓ Created {len(self.agents)} agents with avg {statistics.mean([len(a['focus_atoms']) for a in self.agents]):.1f} focus atoms")
+        print(
+            f"✓ Created {len(self.atoms)} atoms with avg {statistics.mean([len(a['connections']) for a in self.atoms]):.1f} connections"
+        )
+        print(
+            f"✓ Created {len(self.agents)} agents with avg {statistics.mean([len(a['focus_atoms']) for a in self.agents]):.1f} focus atoms"
+        )
 
     def benchmark_single_agent_spreading(self, cycles=100):
         """Benchmark attention spreading within single agent"""
@@ -55,7 +59,7 @@ class AttentionSpreadingBenchmarks:
 
         for _cycle in range(cycles):
             # Simulate attention spreading for one agent
-            focus_atoms = agent["focus_atoms"][:int(agent["processing_capacity"])]
+            focus_atoms = agent["focus_atoms"][: int(agent["processing_capacity"])]
 
             for atom_idx in focus_atoms:
                 atom = self.atoms[atom_idx]
@@ -77,10 +81,10 @@ class AttentionSpreadingBenchmarks:
 
         print(f"✓ Performed {spreads_performed} spreads in {elapsed_time:.3f}s")
         print(f"✓ Spreading rate: {spreads_per_second:.0f} spreads/second")
-        print(f"✓ Average cycle time: {elapsed_time/cycles*1000:.2f}ms")
+        print(f"✓ Average cycle time: {elapsed_time / cycles * 1000:.2f}ms")
 
         self.benchmark_results["single_agent_spreads_per_second"] = spreads_per_second
-        self.benchmark_results["single_agent_cycle_time"] = elapsed_time/cycles*1000
+        self.benchmark_results["single_agent_cycle_time"] = elapsed_time / cycles * 1000
 
         return spreads_per_second
 
@@ -100,7 +104,7 @@ class AttentionSpreadingBenchmarks:
                 agent_start = time.time()
                 spreads = 0
 
-                focus_atoms = agent["focus_atoms"][:int(agent["processing_capacity"] / len(self.agents))]
+                focus_atoms = agent["focus_atoms"][: int(agent["processing_capacity"] / len(self.agents))]
 
                 for atom_idx in focus_atoms:
                     if atom_idx < len(self.atoms):
@@ -147,11 +151,11 @@ class AttentionSpreadingBenchmarks:
         print(f"✓ Sync operations: {sync_operations}")
         print(f"✓ Multi-agent spreading rate: {total_spreads_per_second:.0f} spreads/second")
         print(f"✓ Sync rate: {sync_ops_per_second:.0f} sync ops/second")
-        print(f"✓ Average cycle time: {elapsed_time/cycles*1000:.2f}ms")
+        print(f"✓ Average cycle time: {elapsed_time / cycles * 1000:.2f}ms")
 
         self.benchmark_results["multi_agent_spreads_per_second"] = total_spreads_per_second
         self.benchmark_results["sync_ops_per_second"] = sync_ops_per_second
-        self.benchmark_results["multi_agent_cycle_time"] = elapsed_time/cycles*1000
+        self.benchmark_results["multi_agent_cycle_time"] = elapsed_time / cycles * 1000
 
         return total_spreads_per_second
 
@@ -162,8 +166,9 @@ class AttentionSpreadingBenchmarks:
         # Increase system load
         original_focus_sizes = [len(agent["focus_atoms"]) for agent in self.agents]
         for agent in self.agents:
-            agent["focus_atoms"] = random.sample(range(len(self.atoms)),
-                                               min(len(agent["focus_atoms"]) * load_multiplier, len(self.atoms)))
+            agent["focus_atoms"] = random.sample(
+                range(len(self.atoms)), min(len(agent["focus_atoms"]) * load_multiplier, len(self.atoms))
+            )
 
         # Benchmark under load
         start_time = time.time()
@@ -200,8 +205,8 @@ class AttentionSpreadingBenchmarks:
 
         print(f"✓ High load operations: {total_operations}")
         print(f"✓ Operations per second: {operations_per_second:.0f}")
-        print(f"✓ Simulated memory usage: {memory_usage_sim/1024:.2f} MB")
-        print(f"✓ Average high load cycle: {elapsed_time/cycles*1000:.2f}ms")
+        print(f"✓ Simulated memory usage: {memory_usage_sim / 1024:.2f} MB")
+        print(f"✓ Average high load cycle: {elapsed_time / cycles * 1000:.2f}ms")
 
         # Performance degradation analysis
         baseline_ops = self.benchmark_results.get("single_agent_spreads_per_second", 1000)
@@ -215,7 +220,7 @@ class AttentionSpreadingBenchmarks:
 
         self.benchmark_results["high_load_ops_per_second"] = operations_per_second
         self.benchmark_results["high_load_performance_ratio"] = performance_ratio
-        self.benchmark_results["memory_usage_mb"] = memory_usage_sim/1024
+        self.benchmark_results["memory_usage_mb"] = memory_usage_sim / 1024
 
         return operations_per_second
 
@@ -226,9 +231,9 @@ class AttentionSpreadingBenchmarks:
         # Calculate initial attention distribution
         initial_distribution = {}
         for _i, agent in enumerate(self.agents):
-            agent_total_attention = sum(self.atoms[idx]["attention_value"]
-                                      for idx in agent["focus_atoms"]
-                                      if idx < len(self.atoms))
+            agent_total_attention = sum(
+                self.atoms[idx]["attention_value"] for idx in agent["focus_atoms"] if idx < len(self.atoms)
+            )
             initial_distribution[agent["id"]] = agent_total_attention
 
         # Run fairness-oriented spreading
@@ -239,9 +244,9 @@ class AttentionSpreadingBenchmarks:
             # Calculate current distribution
             current_distribution = {}
             for agent in self.agents:
-                agent_total_attention = sum(self.atoms[idx]["attention_value"]
-                                          for idx in agent["focus_atoms"]
-                                          if idx < len(self.atoms))
+                agent_total_attention = sum(
+                    self.atoms[idx]["attention_value"] for idx in agent["focus_atoms"] if idx < len(self.atoms)
+                )
                 current_distribution[agent["id"]] = agent_total_attention
 
             # Calculate Gini coefficient for fairness
@@ -279,9 +284,9 @@ class AttentionSpreadingBenchmarks:
 
         final_distribution = {}
         for agent in self.agents:
-            agent_total_attention = sum(self.atoms[idx]["attention_value"]
-                                      for idx in agent["focus_atoms"]
-                                      if idx < len(self.atoms))
+            agent_total_attention = sum(
+                self.atoms[idx]["attention_value"] for idx in agent["focus_atoms"] if idx < len(self.atoms)
+            )
             final_distribution[agent["id"]] = agent_total_attention
             print(f"  {agent['id']}: {agent_total_attention:.1f}")
 
@@ -292,9 +297,9 @@ class AttentionSpreadingBenchmarks:
 
     def generate_performance_report(self):
         """Generate comprehensive performance report"""
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print("ATTENTION SPREADING PERFORMANCE REPORT")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
 
         # Performance summary
         print("\n📊 PERFORMANCE METRICS:")
@@ -321,7 +326,9 @@ class AttentionSpreadingBenchmarks:
         fairness_score = self.benchmark_results.get("attention_fairness_score", 0)
         if fairness_score > 0:
             print("\n⚖️ FAIRNESS ANALYSIS:")
-            print(f"  Overall fairness rating: {'Excellent' if fairness_score > 0.8 else 'Good' if fairness_score > 0.6 else 'Fair'}")
+            print(
+                f"  Overall fairness rating: {'Excellent' if fairness_score > 0.8 else 'Good' if fairness_score > 0.6 else 'Fair'}"
+            )
 
         # Performance rating
         high_load_ratio = self.benchmark_results.get("high_load_performance_ratio", 0)
@@ -342,6 +349,7 @@ class AttentionSpreadingBenchmarks:
             print("  • Optimize attention spreading algorithms")
 
         print("\n✅ Benchmark completed successfully!")
+
 
 def main():
     """Run attention spreading benchmarks"""
@@ -364,6 +372,7 @@ def main():
 
     # Generate final report
     benchmarks.generate_performance_report()
+
 
 if __name__ == "__main__":
     main()

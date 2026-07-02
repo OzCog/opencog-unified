@@ -10,7 +10,8 @@ import unittest
 
 
 # Add paths for component testing
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'components'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "components"))
+
 
 class TestAtomspaceRestfulIntegration(unittest.TestCase):
     """Test atomspace-restful integration with OpenCog Unified"""
@@ -26,10 +27,13 @@ class TestAtomspaceRestfulIntegration(unittest.TestCase):
         try:
             # Try to import atomspace-restful related modules
             import opencog.restapi
+
             self.assertTrue(True, "atomspace-restful module imported successfully")
         except ImportError:
             # If atomspace-restful is not available, check if it's in the expected location
-            restful_path = os.path.join(os.path.dirname(__file__), '..', '..', 'components', 'core', 'atomspace-restful')
+            restful_path = os.path.join(
+                os.path.dirname(__file__), "..", "..", "components", "core", "atomspace-restful"
+            )
             if os.path.exists(restful_path):
                 self.assertTrue(True, "atomspace-restful directory exists, module may need build")
             else:
@@ -42,9 +46,8 @@ class TestAtomspaceRestfulIntegration(unittest.TestCase):
             import subprocess
 
             # Try to start a simple HTTP server to test basic functionality
-            result = subprocess.run(['python3', '-m', 'http.server', '0'],
-                                 capture_output=True, text=True, timeout=5)
-            if result.returncode == 0 or 'Serving HTTP' in result.stderr:
+            result = subprocess.run(["python3", "-m", "http.server", "0"], capture_output=True, text=True, timeout=5)
+            if result.returncode == 0 or "Serving HTTP" in result.stderr:
                 self.assertTrue(True, "HTTP server functionality is available")
             else:
                 self.skipTest("HTTP server functionality not available")
@@ -54,7 +57,7 @@ class TestAtomspaceRestfulIntegration(unittest.TestCase):
     def test_atomspace_restful_dependencies(self):
         """Test atomspace-restful dependency integration"""
         # Check for required REST API dependencies
-        required_deps = ['flask', 'requests', 'json']
+        required_deps = ["flask", "requests", "json"]
         missing_deps = []
 
         for dep in required_deps:
@@ -68,5 +71,6 @@ class TestAtomspaceRestfulIntegration(unittest.TestCase):
         else:
             self.assertTrue(True, "All required atomspace-restful dependencies are available")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

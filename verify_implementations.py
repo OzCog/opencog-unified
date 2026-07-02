@@ -20,6 +20,7 @@ class Priority(Enum):
     MEDIUM = "MEDIUM"
     LOW = "LOW"
 
+
 class Category(Enum):
     THREAD_SAFETY = "Thread Safety"
     PERFORMANCE = "Performance"
@@ -28,6 +29,7 @@ class Category(Enum):
     FEATURE_COMPLETION = "Feature Completion"
     ERROR_HANDLING = "Error Handling"
     DOCUMENTATION = "Documentation"
+
 
 @dataclass
 class TodoItem:
@@ -39,6 +41,7 @@ class TodoItem:
     estimated_effort_hours: int
     dependencies: list[str]
     implementation_status: str = "TODO"
+
 
 class ImplementationVerifier:
     """Verifies that TODO/FIXME items have been properly implemented"""
@@ -53,14 +56,14 @@ class ImplementationVerifier:
         print("🔍 Scanning repository for TODO/FIXME items...")
 
         todo_patterns = [
-            r'//\s*(TODO|FIXME|XXX)[\s:]*(.+)',
-            r'#\s*(TODO|FIXME|XXX)[\s:]*(.+)',
-            r';\s*(TODO|FIXME|XXX)[\s:]*(.+)',
+            r"//\s*(TODO|FIXME|XXX)[\s:]*(.+)",
+            r"#\s*(TODO|FIXME|XXX)[\s:]*(.+)",
+            r";\s*(TODO|FIXME|XXX)[\s:]*(.+)",
         ]
 
-        file_extensions = ['.cc', '.h', '.cpp', '.hpp', '.scm', '.py']
+        file_extensions = [".cc", ".h", ".cpp", ".hpp", ".scm", ".py"]
 
-        for file_path in self.repo_path.rglob('*'):
+        for file_path in self.repo_path.rglob("*"):
             if file_path.suffix in file_extensions:
                 self._scan_file(file_path, todo_patterns)
 
@@ -70,7 +73,7 @@ class ImplementationVerifier:
     def _scan_file(self, file_path: Path, patterns: list[str]):
         """Scan a single file for TODO/FIXME items"""
         try:
-            with open(file_path, encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding="utf-8", errors="ignore") as f:
                 lines = f.readlines()
 
             for line_num, line in enumerate(lines, 1):
@@ -89,35 +92,35 @@ class ImplementationVerifier:
 
         # Determine category based on file path and comment content
         category = Category.DOCUMENTATION  # default
-        if 'thread' in comment.lower() or 'race' in comment.lower() or 'atomic' in comment.lower():
+        if "thread" in comment.lower() or "race" in comment.lower() or "atomic" in comment.lower():
             category = Category.THREAD_SAFETY
-        elif 'performance' in comment.lower() or 'optimize' in comment.lower() or 'faster' in comment.lower():
+        elif "performance" in comment.lower() or "optimize" in comment.lower() or "faster" in comment.lower():
             category = Category.PERFORMANCE
-        elif 'distributed' in comment.lower() or 'sync' in comment.lower() or 'conflict' in comment.lower():
+        elif "distributed" in comment.lower() or "sync" in comment.lower() or "conflict" in comment.lower():
             category = Category.DISTRIBUTED
-        elif 'pattern' in comment.lower() or 'match' in comment.lower():
+        elif "pattern" in comment.lower() or "match" in comment.lower():
             category = Category.PATTERN_MATCHING
-        elif 'implement' in comment.lower() or 'complete' in comment.lower():
+        elif "implement" in comment.lower() or "complete" in comment.lower():
             category = Category.FEATURE_COMPLETION
-        elif 'error' in comment.lower() or 'exception' in comment.lower():
+        elif "error" in comment.lower() or "exception" in comment.lower():
             category = Category.ERROR_HANDLING
 
         # Determine priority based on keywords
         priority = Priority.MEDIUM  # default
-        if any(word in comment.lower() for word in ['critical', 'urgent', 'blocking', 'crash']):
+        if any(word in comment.lower() for word in ["critical", "urgent", "blocking", "crash"]):
             priority = Priority.CRITICAL
-        elif any(word in comment.lower() for word in ['important', 'major', 'performance']):
+        elif any(word in comment.lower() for word in ["important", "major", "performance"]):
             priority = Priority.HIGH
-        elif any(word in comment.lower() for word in ['minor', 'cleanup', 'style']):
+        elif any(word in comment.lower() for word in ["minor", "cleanup", "style"]):
             priority = Priority.LOW
 
         # Estimate effort based on complexity keywords
         effort_hours = 8  # default
-        if any(word in comment.lower() for word in ['simple', 'trivial', 'easy']):
+        if any(word in comment.lower() for word in ["simple", "trivial", "easy"]):
             effort_hours = 2
-        elif any(word in comment.lower() for word in ['complex', 'difficult', 'major']):
+        elif any(word in comment.lower() for word in ["complex", "difficult", "major"]):
             effort_hours = 40
-        elif any(word in comment.lower() for word in ['implement', 'algorithm', 'protocol']):
+        elif any(word in comment.lower() for word in ["implement", "algorithm", "protocol"]):
             effort_hours = 20
 
         return TodoItem(
@@ -127,16 +130,16 @@ class ImplementationVerifier:
             priority=priority,
             category=category,
             estimated_effort_hours=effort_hours,
-            dependencies=self._extract_dependencies(comment)
+            dependencies=self._extract_dependencies(comment),
         )
 
     def _extract_dependencies(self, comment: str) -> list[str]:
         """Extract dependencies from comment text"""
         dependencies = []
-        if 'depends on' in comment.lower():
+        if "depends on" in comment.lower():
             # Extract text after "depends on"
-            dep_text = comment.lower().split('depends on')[1]
-            dependencies.extend(re.findall(r'\b\w+\b', dep_text))
+            dep_text = comment.lower().split("depends on")[1]
+            dependencies.extend(re.findall(r"\b\w+\b", dep_text))
         return dependencies
 
     def verify_implementations(self) -> dict[str, any]:
@@ -144,23 +147,23 @@ class ImplementationVerifier:
         print("🧪 Verifying implementations...")
 
         results = {
-            'total_items': len(self.todo_items),
-            'verified_implementations': 0,
-            'remaining_todos': 0,
-            'placeholder_implementations': 0,
-            'verification_details': []
+            "total_items": len(self.todo_items),
+            "verified_implementations": 0,
+            "remaining_todos": 0,
+            "placeholder_implementations": 0,
+            "verification_details": [],
         }
 
         for item in self.todo_items:
             verification = self._verify_single_item(item)
-            results['verification_details'].append(verification)
+            results["verification_details"].append(verification)
 
-            if verification['is_implemented']:
-                results['verified_implementations'] += 1
-            elif verification['is_placeholder']:
-                results['placeholder_implementations'] += 1
+            if verification["is_implemented"]:
+                results["verified_implementations"] += 1
+            elif verification["is_placeholder"]:
+                results["placeholder_implementations"] += 1
             else:
-                results['remaining_todos'] += 1
+                results["remaining_todos"] += 1
 
         return results
 
@@ -169,62 +172,62 @@ class ImplementationVerifier:
         file_path = self.repo_path / item.file_path
 
         verification = {
-            'item': item,
-            'is_implemented': False,
-            'is_placeholder': False,
-            'implementation_quality': 'Unknown',
-            'details': []
+            "item": item,
+            "is_implemented": False,
+            "is_placeholder": False,
+            "implementation_quality": "Unknown",
+            "details": [],
         }
 
         try:
-            with open(file_path, encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding="utf-8", errors="ignore") as f:
                 content = f.read()
 
             # Check if TODO comment still exists
             todo_still_exists = self._check_todo_exists(content, item)
             if todo_still_exists:
-                verification['details'].append("TODO comment still present")
-                verification['remaining_todo'] = True
+                verification["details"].append("TODO comment still present")
+                verification["remaining_todo"] = True
                 return verification
 
             # Check for placeholder implementations
             is_placeholder = self._check_for_placeholders(content, item)
             if is_placeholder:
-                verification['is_placeholder'] = True
-                verification['details'].append("Placeholder implementation detected")
+                verification["is_placeholder"] = True
+                verification["details"].append("Placeholder implementation detected")
                 return verification
 
             # Check for real implementation
             has_implementation = self._check_for_implementation(content, item)
             if has_implementation:
-                verification['is_implemented'] = True
-                verification['implementation_quality'] = self._assess_implementation_quality(content, item)
-                verification['details'].append("Real implementation found")
+                verification["is_implemented"] = True
+                verification["implementation_quality"] = self._assess_implementation_quality(content, item)
+                verification["details"].append("Real implementation found")
 
         except Exception as e:
-            verification['details'].append(f"Error verifying: {e}")
+            verification["details"].append(f"Error verifying: {e}")
 
         return verification
 
     def _check_todo_exists(self, content: str, item: TodoItem) -> bool:
         """Check if the TODO comment still exists in the file"""
-        lines = content.split('\n')
+        lines = content.split("\n")
         if item.line_number <= len(lines):
             line = lines[item.line_number - 1]
-            return 'TODO' in line or 'FIXME' in line or 'XXX' in line
+            return "TODO" in line or "FIXME" in line or "XXX" in line
         return False
 
     def _check_for_placeholders(self, content: str, item: TodoItem) -> bool:
         """Check for placeholder implementations"""
         placeholder_patterns = [
-            r'throw.*not\s+implemented',
-            r'return.*TODO',
-            r'return.*STUB',
-            r'return.*PLACEHOLDER',
-            r'assert\s*\(\s*false',
-            r'assert\s*\(\s*0\s*\)',
-            r'return\s+nullptr;',
-            r'return\s+false;\s*//.*todo',
+            r"throw.*not\s+implemented",
+            r"return.*TODO",
+            r"return.*STUB",
+            r"return.*PLACEHOLDER",
+            r"assert\s*\(\s*false",
+            r"assert\s*\(\s*0\s*\)",
+            r"return\s+nullptr;",
+            r"return\s+false;\s*//.*todo",
         ]
 
         return any(re.search(pattern, content, re.IGNORECASE) for pattern in placeholder_patterns)
@@ -244,13 +247,13 @@ class ImplementationVerifier:
     def _check_thread_safety_implementation(self, content: str) -> bool:
         """Check for thread safety implementation patterns"""
         thread_safety_patterns = [
-            r'std::mutex',
-            r'std::shared_mutex',
-            r'std::atomic',
-            r'std::lock_guard',
-            r'std::unique_lock',
-            r'std::shared_lock',
-            r'memory_order_',
+            r"std::mutex",
+            r"std::shared_mutex",
+            r"std::atomic",
+            r"std::lock_guard",
+            r"std::unique_lock",
+            r"std::shared_lock",
+            r"memory_order_",
         ]
 
         return any(re.search(pattern, content) for pattern in thread_safety_patterns)
@@ -258,13 +261,13 @@ class ImplementationVerifier:
     def _check_performance_implementation(self, content: str) -> bool:
         """Check for performance optimization patterns"""
         performance_patterns = [
-            r'unordered_set',
-            r'unordered_map',
-            r'hash_table',
-            r'reserve\(',
-            r'cache',
-            r'memoize',
-            r'O\(1\)',
+            r"unordered_set",
+            r"unordered_map",
+            r"hash_table",
+            r"reserve\(",
+            r"cache",
+            r"memoize",
+            r"O\(1\)",
         ]
 
         return any(re.search(pattern, content) for pattern in performance_patterns)
@@ -272,12 +275,12 @@ class ImplementationVerifier:
     def _check_distributed_implementation(self, content: str) -> bool:
         """Check for distributed systems implementation patterns"""
         distributed_patterns = [
-            r'vector_clock',
-            r'consensus',
-            r'quorum',
-            r'byzantine',
-            r'partition',
-            r'sync_protocol',
+            r"vector_clock",
+            r"consensus",
+            r"quorum",
+            r"byzantine",
+            r"partition",
+            r"sync_protocol",
         ]
 
         return any(re.search(pattern, content) for pattern in distributed_patterns)
@@ -285,19 +288,18 @@ class ImplementationVerifier:
     def _check_general_implementation(self, content: str) -> bool:
         """Check for general implementation patterns"""
         implementation_patterns = [
-            r'class\s+\w+',
-            r'struct\s+\w+',
-            r'function\s+\w+',
-            r'def\s+\w+',
-            r'if\s*\(',
-            r'for\s*\(',
-            r'while\s*\(',
+            r"class\s+\w+",
+            r"struct\s+\w+",
+            r"function\s+\w+",
+            r"def\s+\w+",
+            r"if\s*\(",
+            r"for\s*\(",
+            r"while\s*\(",
         ]
 
         # Count implementation patterns vs comment lines
-        impl_lines = sum(1 for pattern in implementation_patterns
-                        if re.search(pattern, content))
-        comment_lines = len(re.findall(r'//|#|;', content))
+        impl_lines = sum(1 for pattern in implementation_patterns if re.search(pattern, content))
+        comment_lines = len(re.findall(r"//|#|;", content))
 
         # Heuristic: more implementation than comments suggests real implementation
         return impl_lines > comment_lines * 0.3
@@ -305,10 +307,10 @@ class ImplementationVerifier:
     def _assess_implementation_quality(self, content: str, item: TodoItem) -> str:
         """Assess the quality of the implementation"""
         quality_indicators = {
-            'error_handling': bool(re.search(r'try\s*{|catch\s*\(|except:', content)),
-            'documentation': bool(re.search(r'/\*\*|///|"""', content)),
-            'testing': bool(re.search(r'test|assert|expect', content, re.IGNORECASE)),
-            'logging': bool(re.search(r'log|print|cout', content, re.IGNORECASE)),
+            "error_handling": bool(re.search(r"try\s*{|catch\s*\(|except:", content)),
+            "documentation": bool(re.search(r'/\*\*|///|"""', content)),
+            "testing": bool(re.search(r"test|assert|expect", content, re.IGNORECASE)),
+            "logging": bool(re.search(r"log|print|cout", content, re.IGNORECASE)),
         }
 
         score = sum(quality_indicators.values())
@@ -327,56 +329,57 @@ class ImplementationVerifier:
 # OpenCog Unified TODO/FIXME Implementation Verification Report
 
 ## Executive Summary
-- **Total TODO/FIXME items found**: {results['total_items']}
-- **Verified implementations**: {results['verified_implementations']}
-- **Remaining TODOs**: {results['remaining_todos']}
-- **Placeholder implementations**: {results['placeholder_implementations']}
-- **Implementation completion**: {(results['verified_implementations'] / max(results['total_items'], 1) * 100):.1f}%
+- **Total TODO/FIXME items found**: {results["total_items"]}
+- **Verified implementations**: {results["verified_implementations"]}
+- **Remaining TODOs**: {results["remaining_todos"]}
+- **Placeholder implementations**: {results["placeholder_implementations"]}
+- **Implementation completion**: {(results["verified_implementations"] / max(results["total_items"], 1) * 100):.1f}%
 
 ## Category Breakdown
 """
 
         # Category statistics
         category_stats = {}
-        for detail in results['verification_details']:
-            category = detail['item'].category.value
+        for detail in results["verification_details"]:
+            category = detail["item"].category.value
             if category not in category_stats:
-                category_stats[category] = {'total': 0, 'implemented': 0}
-            category_stats[category]['total'] += 1
-            if detail.get('is_implemented', False):
-                category_stats[category]['implemented'] += 1
+                category_stats[category] = {"total": 0, "implemented": 0}
+            category_stats[category]["total"] += 1
+            if detail.get("is_implemented", False):
+                category_stats[category]["implemented"] += 1
 
         for category, stats in category_stats.items():
-            completion = stats['implemented'] / stats['total'] * 100
+            completion = stats["implemented"] / stats["total"] * 100
             report += f"- **{category}**: {stats['implemented']}/{stats['total']} ({completion:.1f}%)\n"
 
         report += "\n## Priority Breakdown\n"
 
         # Priority statistics
         priority_stats = {}
-        for detail in results['verification_details']:
-            priority = detail['item'].priority.value
+        for detail in results["verification_details"]:
+            priority = detail["item"].priority.value
             if priority not in priority_stats:
-                priority_stats[priority] = {'total': 0, 'implemented': 0}
-            priority_stats[priority]['total'] += 1
-            if detail.get('is_implemented', False):
-                priority_stats[priority]['implemented'] += 1
+                priority_stats[priority] = {"total": 0, "implemented": 0}
+            priority_stats[priority]["total"] += 1
+            if detail.get("is_implemented", False):
+                priority_stats[priority]["implemented"] += 1
 
         for priority, stats in priority_stats.items():
-            completion = stats['implemented'] / stats['total'] * 100
+            completion = stats["implemented"] / stats["total"] * 100
             report += f"- **{priority}**: {stats['implemented']}/{stats['total']} ({completion:.1f}%)\n"
 
         report += "\n## Critical Issues Requiring Attention\n"
 
         # List remaining critical issues
         critical_remaining = [
-            detail for detail in results['verification_details']
-            if detail['item'].priority == Priority.CRITICAL and not detail.get('is_implemented', False)
+            detail
+            for detail in results["verification_details"]
+            if detail["item"].priority == Priority.CRITICAL and not detail.get("is_implemented", False)
         ]
 
         if critical_remaining:
             for detail in critical_remaining:
-                item = detail['item']
+                item = detail["item"]
                 report += f"- **{item.file_path}:{item.line_number}** - {item.comment}\n"
         else:
             report += "✅ No critical issues remaining!\n"
@@ -384,9 +387,9 @@ class ImplementationVerifier:
         report += "\n## Implementation Quality Assessment\n"
 
         quality_stats = {}
-        for detail in results['verification_details']:
-            if detail.get('is_implemented', False):
-                quality = detail.get('implementation_quality', 'Unknown')
+        for detail in results["verification_details"]:
+            if detail.get("is_implemented", False):
+                quality = detail.get("implementation_quality", "Unknown")
                 quality_stats[quality] = quality_stats.get(quality, 0) + 1
 
         for quality, count in quality_stats.items():
@@ -406,8 +409,7 @@ class ImplementationVerifier:
 
         for cmd in test_commands:
             try:
-                result = subprocess.run(cmd, cwd=self.repo_path,
-                                      capture_output=True, text=True)
+                result = subprocess.run(cmd, cwd=self.repo_path, capture_output=True, text=True)
                 if result.returncode == 0:
                     print(f"✅ Tests passed: {' '.join(cmd)}")
                     return True
@@ -418,6 +420,7 @@ class ImplementationVerifier:
                 print(f"⚠️  Test command not found: {' '.join(cmd)}")
 
         return False
+
 
 def main():
     """Main verification function"""
@@ -446,7 +449,7 @@ def main():
     tests_passed = verifier.run_tests()
 
     # Final assessment
-    completion_rate = results['verified_implementations'] / results['total_items'] * 100
+    completion_rate = results["verified_implementations"] / results["total_items"] * 100
 
     print("\n🎯 FINAL ASSESSMENT")
     print(f"Implementation completion: {completion_rate:.1f}%")
@@ -461,6 +464,7 @@ def main():
     else:
         print("❌ FAILURE: Significant work remaining")
         return 2
+
 
 if __name__ == "__main__":
     sys.exit(main())

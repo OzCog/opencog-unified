@@ -12,19 +12,13 @@ from pathlib import Path
 def run_command(cmd, cwd=None, capture_output=True):
     """Run a command and return the result."""
     try:
-        result = subprocess.run(
-            cmd,
-            shell=True,
-            cwd=cwd,
-            capture_output=capture_output,
-            text=True,
-            timeout=300
-        )
+        result = subprocess.run(cmd, shell=True, cwd=cwd, capture_output=capture_output, text=True, timeout=300)
         return result.returncode == 0, result.stdout, result.stderr
     except subprocess.TimeoutExpired:
         return False, "", "Command timed out"
     except Exception as e:
         return False, "", str(e)
+
 
 def test_ure_dependencies():
     """Test that URE properly declares its dependencies in its config file."""
@@ -44,7 +38,7 @@ def test_ure_dependencies():
         "include(CMakeFindDependencyMacro)",
         "find_dependency(CogUtil CONFIG REQUIRED)",
         "find_dependency(AtomSpace CONFIG REQUIRED)",
-        "find_dependency(Unify CONFIG REQUIRED)"
+        "find_dependency(Unify CONFIG REQUIRED)",
     ]
 
     missing_patterns = []
@@ -60,6 +54,7 @@ def test_ure_dependencies():
 
     print("SUCCESS: URE config properly declares dependencies on CogUtil, AtomSpace, and Unify")
     return True
+
 
 def test_unify_dependencies():
     """Test that Unify properly declares its dependencies in its config file."""
@@ -78,7 +73,7 @@ def test_unify_dependencies():
     required_patterns = [
         "include(CMakeFindDependencyMacro)",
         "find_dependency(CogUtil CONFIG REQUIRED)",
-        "find_dependency(AtomSpace CONFIG REQUIRED)"
+        "find_dependency(AtomSpace CONFIG REQUIRED)",
     ]
 
     missing_patterns = []
@@ -95,6 +90,7 @@ def test_unify_dependencies():
     print("SUCCESS: Unify config properly declares dependencies on CogUtil and AtomSpace")
     return True
 
+
 def test_cmake_dependency_order():
     """Test that the main CMakeLists.txt has proper dependency order."""
     print("Testing CMake dependency order...")
@@ -109,10 +105,7 @@ def test_cmake_dependency_order():
     content = main_cmake.read_text()
 
     # Check that dependencies are set up correctly
-    expected_deps = [
-        "add_dependencies(unify atomspace)",
-        "add_dependencies(ure unify)"
-    ]
+    expected_deps = ["add_dependencies(unify atomspace)", "add_dependencies(ure unify)"]
 
     missing_deps = []
     for dep in expected_deps:
@@ -128,17 +121,14 @@ def test_cmake_dependency_order():
     print("SUCCESS: Main CMakeLists.txt has proper dependency order")
     return True
 
+
 def main():
     """Main test function."""
     print("=" * 60)
     print("URE DEPENDENCY CONFIGURATION TEST")
     print("=" * 60)
 
-    tests = [
-        test_ure_dependencies,
-        test_unify_dependencies,
-        test_cmake_dependency_order
-    ]
+    tests = [test_ure_dependencies, test_unify_dependencies, test_cmake_dependency_order]
 
     passed = 0
     total = len(tests)
@@ -161,6 +151,7 @@ def main():
     else:
         print("FAILURE: Some URE dependency tests failed!")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

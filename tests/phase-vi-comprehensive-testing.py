@@ -27,9 +27,11 @@ from typing import Any
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+
 @dataclass
 class TestResult:
     """Comprehensive test result with metrics"""
+
     test_name: str
     success: bool
     duration: float
@@ -45,9 +47,11 @@ class TestResult:
         if self.cognitive_metrics is None:
             self.cognitive_metrics = {}
 
+
 @dataclass
 class CognitiveLoadMetrics:
     """Metrics for cognitive load stress testing"""
+
     total_atoms: int
     attentional_focus_size: int
     processing_threads: int
@@ -58,6 +62,7 @@ class CognitiveLoadMetrics:
     coherence_score: float
     stability_score: float
 
+
 class PhaseVIComprehensiveTesting:
     """Comprehensive testing framework for Phase VI cognitive unification"""
 
@@ -66,10 +71,10 @@ class PhaseVIComprehensiveTesting:
         self.cognitive_metrics: dict[str, Any] = {}
         self.performance_baselines: dict[str, float] = {}
         self.stress_test_limits: dict[str, int] = {
-            'max_atoms': 10000,
-            'max_threads': 32,
-            'max_memory_mb': 1024,
-            'max_duration_sec': 300
+            "max_atoms": 10000,
+            "max_threads": 32,
+            "max_memory_mb": 1024,
+            "max_duration_sec": 300,
         }
 
     def run_comprehensive_testing(self) -> dict[str, Any]:
@@ -90,7 +95,7 @@ class PhaseVIComprehensiveTesting:
             ("Performance Benchmarking", self.run_performance_benchmarking),
             ("Cognitive Load Testing", self.run_cognitive_load_testing),
             ("Error Handling Validation", self.run_error_handling_validation),
-            ("Unification Metrics", self.run_unification_metrics)
+            ("Unification Metrics", self.run_unification_metrics),
         ]
 
         overall_success = True
@@ -113,7 +118,7 @@ class PhaseVIComprehensiveTesting:
         tracemalloc.stop()
 
         report = self.generate_comprehensive_report(total_time, memory_peak)
-        report['overall_success'] = overall_success
+        report["overall_success"] = overall_success
 
         return report
 
@@ -127,7 +132,7 @@ class PhaseVIComprehensiveTesting:
             ("attention_conservation", self.test_attention_conservation_property),
             ("pattern_consistency", self.test_pattern_consistency_property),
             ("tensor_invariance", self.test_tensor_invariance_property),
-            ("recursive_stability", self.test_recursive_stability_property)
+            ("recursive_stability", self.test_recursive_stability_property),
         ]
 
         all_passed = True
@@ -164,7 +169,7 @@ class PhaseVIComprehensiveTesting:
             ("Memory Pressure", self.stress_test_memory_pressure),
             ("Concurrent Processing", self.stress_test_concurrent_processing),
             ("Pattern Complexity", self.stress_test_pattern_complexity),
-            ("Attention Overload", self.stress_test_attention_overload)
+            ("Attention Overload", self.stress_test_attention_overload),
         ]
 
         all_passed = True
@@ -186,12 +191,12 @@ class PhaseVIComprehensiveTesting:
                     success=result,
                     duration=duration,
                     memory_peak=memory_peak,
-                    memory_average=memory_peak // 2
+                    memory_average=memory_peak // 2,
                 )
                 self.test_results.append(stress_result)
 
                 if result:
-                    print(f"         ✅ {scenario_name} passed ({duration:.2f}s, {memory_peak//1024}KB)")
+                    print(f"         ✅ {scenario_name} passed ({duration:.2f}s, {memory_peak // 1024}KB)")
                 else:
                     print(f"         ❌ {scenario_name} failed")
                     all_passed = False
@@ -215,7 +220,7 @@ class PhaseVIComprehensiveTesting:
             ("Phase II-III Integration", self.test_phase_2_3_integration),
             ("Phase III-IV Integration", self.test_phase_3_4_integration),
             ("Phase IV-V Integration", self.test_phase_4_5_integration),
-            ("End-to-End Integration", self.test_end_to_end_integration)
+            ("End-to-End Integration", self.test_end_to_end_integration),
         ]
 
         all_passed = True
@@ -244,7 +249,7 @@ class PhaseVIComprehensiveTesting:
             ("Extreme Values", self.validate_extreme_values),
             ("Null Conditions", self.validate_null_conditions),
             ("Resource Exhaustion", self.validate_resource_exhaustion),
-            ("Concurrent Modification", self.validate_concurrent_modification)
+            ("Concurrent Modification", self.validate_concurrent_modification),
         ]
 
         all_passed = True
@@ -273,7 +278,7 @@ class PhaseVIComprehensiveTesting:
             ("Pattern Matching", self.benchmark_pattern_matching),
             ("Attention Processing", self.benchmark_attention_processing),
             ("Memory Operations", self.benchmark_memory_operations),
-            ("Integration Overhead", self.benchmark_integration_overhead)
+            ("Integration Overhead", self.benchmark_integration_overhead),
         ]
 
         all_passed = True
@@ -287,15 +292,17 @@ class PhaseVIComprehensiveTesting:
                 baseline_key = benchmark_name.lower().replace(" ", "_")
                 if baseline_key in self.performance_baselines:
                     baseline = self.performance_baselines[baseline_key]
-                    performance_ratio = metrics.get('avg_time', 0) / baseline
+                    performance_ratio = metrics.get("avg_time", 0) / baseline
 
                     if performance_ratio <= 1.2:  # Within 20% of baseline
                         print(f"         ✅ {benchmark_name}: {metrics['avg_time']:.3f}s (baseline: {baseline:.3f}s)")
                     else:
-                        print(f"         ⚠️  {benchmark_name}: {metrics['avg_time']:.3f}s (baseline: {baseline:.3f}s, {performance_ratio:.1f}x)")
+                        print(
+                            f"         ⚠️  {benchmark_name}: {metrics['avg_time']:.3f}s (baseline: {baseline:.3f}s, {performance_ratio:.1f}x)"
+                        )
                 else:
                     print(f"         ℹ️  {benchmark_name}: {metrics['avg_time']:.3f}s (no baseline)")
-                    self.performance_baselines[baseline_key] = metrics['avg_time']
+                    self.performance_baselines[baseline_key] = metrics["avg_time"]
 
                 # Record performance metrics
                 self.cognitive_metrics[benchmark_name] = metrics
@@ -311,10 +318,10 @@ class PhaseVIComprehensiveTesting:
         print("   🧠 Cognitive Load Testing")
 
         load_scenarios = [
-            ("Minimal Load", 100, 1, 50),     # atoms, threads, memory_mb
+            ("Minimal Load", 100, 1, 50),  # atoms, threads, memory_mb
             ("Moderate Load", 1000, 4, 200),
             ("Heavy Load", 5000, 8, 500),
-            ("Maximum Load", 10000, 16, 1000)
+            ("Maximum Load", 10000, 16, 1000),
         ]
 
         all_passed = True
@@ -325,11 +332,15 @@ class PhaseVIComprehensiveTesting:
                 metrics = self.measure_cognitive_load(atoms, threads, memory_mb)
 
                 # Evaluate cognitive load metrics
-                if (metrics.coherence_score >= 0.8 and
-                    metrics.stability_score >= 0.7 and
-                    metrics.response_time_ms <= 1000):
-                    print(f"         ✅ {scenario_name}: Coherence={metrics.coherence_score:.2f}, "
-                          f"Stability={metrics.stability_score:.2f}, Response={metrics.response_time_ms:.1f}ms")
+                if (
+                    metrics.coherence_score >= 0.8
+                    and metrics.stability_score >= 0.7
+                    and metrics.response_time_ms <= 1000
+                ):
+                    print(
+                        f"         ✅ {scenario_name}: Coherence={metrics.coherence_score:.2f}, "
+                        f"Stability={metrics.stability_score:.2f}, Response={metrics.response_time_ms:.1f}ms"
+                    )
                 else:
                     print(f"         ❌ {scenario_name}: Performance degraded")
                     all_passed = False
@@ -349,7 +360,7 @@ class PhaseVIComprehensiveTesting:
             ("Invalid Input", self.test_invalid_input_handling),
             ("Network Failures", self.test_network_failure_handling),
             ("Memory Corruption", self.test_memory_corruption_handling),
-            ("Concurrent Errors", self.test_concurrent_error_handling)
+            ("Concurrent Errors", self.test_concurrent_error_handling),
         ]
 
         all_passed = True
@@ -383,18 +394,18 @@ class PhaseVIComprehensiveTesting:
 
             # Unified Cognitive Tensor Signature
             unified_tensor = {
-                'phase_integration': [1, 2, 3, 4, 5, 6],
-                'cognitive_coherence': coherence_score,
-                'emergent_properties': emergent_properties,
-                'system_stability': system_stability,
-                'documentation_completeness': self.calculate_documentation_completeness(),
-                'test_coverage': self.calculate_test_coverage(),
-                'unification_degree': integration_degree,
-                'cognitive_maturity': self.assess_cognitive_maturity(),
-                'transcendence_level': transcendence_level
+                "phase_integration": [1, 2, 3, 4, 5, 6],
+                "cognitive_coherence": coherence_score,
+                "emergent_properties": emergent_properties,
+                "system_stability": system_stability,
+                "documentation_completeness": self.calculate_documentation_completeness(),
+                "test_coverage": self.calculate_test_coverage(),
+                "unification_degree": integration_degree,
+                "cognitive_maturity": self.assess_cognitive_maturity(),
+                "transcendence_level": transcendence_level,
             }
 
-            self.cognitive_metrics['unified_tensor_signature'] = unified_tensor
+            self.cognitive_metrics["unified_tensor_signature"] = unified_tensor
 
             print("      🧮 Unified Tensor Metrics:")
             print(f"         Cognitive Coherence: {coherence_score:.3f}")
@@ -405,11 +416,11 @@ class PhaseVIComprehensiveTesting:
 
             # Validate unification criteria
             unification_success = (
-                coherence_score >= 0.8 and
-                integration_degree in ['integrated', 'unified'] and
-                len(emergent_properties) >= 3 and
-                system_stability >= 0.75 and
-                transcendence_level >= 1.0
+                coherence_score >= 0.8
+                and integration_degree in ["integrated", "unified"]
+                and len(emergent_properties) >= 3
+                and system_stability >= 0.75
+                and transcendence_level >= 1.0
             )
 
             if unification_success:
@@ -448,10 +459,10 @@ class PhaseVIComprehensiveTesting:
     def generate_random_cognitive_input(self) -> dict:
         """Generate random test input for property testing"""
         return {
-            'atoms': random.randint(10, 1000),
-            'attention_values': [random.random() for _ in range(random.randint(5, 50))],
-            'pattern_complexity': random.randint(1, 10),
-            'tensor_dimensions': [random.randint(2, 8) for _ in range(random.randint(3, 7))]
+            "atoms": random.randint(10, 1000),
+            "attention_values": [random.random() for _ in range(random.randint(5, 50))],
+            "pattern_complexity": random.randint(1, 10),
+            "tensor_dimensions": [random.randint(2, 8) for _ in range(random.randint(3, 7))],
         }
 
     # Stress test implementations
@@ -533,10 +544,10 @@ class PhaseVIComprehensiveTesting:
             times.append(time.time() - start)
 
         return {
-            'avg_time': statistics.mean(times),
-            'min_time': min(times),
-            'max_time': max(times),
-            'std_dev': statistics.stdev(times) if len(times) > 1 else 0
+            "avg_time": statistics.mean(times),
+            "min_time": min(times),
+            "max_time": max(times),
+            "std_dev": statistics.stdev(times) if len(times) > 1 else 0,
         }
 
     def benchmark_pattern_matching(self) -> dict[str, float]:
@@ -548,10 +559,10 @@ class PhaseVIComprehensiveTesting:
             times.append(time.time() - start)
 
         return {
-            'avg_time': statistics.mean(times),
-            'min_time': min(times),
-            'max_time': max(times),
-            'std_dev': statistics.stdev(times) if len(times) > 1 else 0
+            "avg_time": statistics.mean(times),
+            "min_time": min(times),
+            "max_time": max(times),
+            "std_dev": statistics.stdev(times) if len(times) > 1 else 0,
         }
 
     def benchmark_attention_processing(self) -> dict[str, float]:
@@ -563,10 +574,10 @@ class PhaseVIComprehensiveTesting:
             times.append(time.time() - start)
 
         return {
-            'avg_time': statistics.mean(times),
-            'min_time': min(times),
-            'max_time': max(times),
-            'std_dev': statistics.stdev(times) if len(times) > 1 else 0
+            "avg_time": statistics.mean(times),
+            "min_time": min(times),
+            "max_time": max(times),
+            "std_dev": statistics.stdev(times) if len(times) > 1 else 0,
         }
 
     def benchmark_memory_operations(self) -> dict[str, float]:
@@ -578,10 +589,10 @@ class PhaseVIComprehensiveTesting:
             times.append(time.time() - start)
 
         return {
-            'avg_time': statistics.mean(times),
-            'min_time': min(times),
-            'max_time': max(times),
-            'std_dev': statistics.stdev(times) if len(times) > 1 else 0
+            "avg_time": statistics.mean(times),
+            "min_time": min(times),
+            "max_time": max(times),
+            "std_dev": statistics.stdev(times) if len(times) > 1 else 0,
         }
 
     def benchmark_integration_overhead(self) -> dict[str, float]:
@@ -593,10 +604,10 @@ class PhaseVIComprehensiveTesting:
             times.append(time.time() - start)
 
         return {
-            'avg_time': statistics.mean(times),
-            'min_time': min(times),
-            'max_time': max(times),
-            'std_dev': statistics.stdev(times) if len(times) > 1 else 0
+            "avg_time": statistics.mean(times),
+            "min_time": min(times),
+            "max_time": max(times),
+            "std_dev": statistics.stdev(times) if len(times) > 1 else 0,
         }
 
     def measure_cognitive_load(self, atoms: int, threads: int, memory_mb: int) -> CognitiveLoadMetrics:
@@ -613,7 +624,7 @@ class PhaseVIComprehensiveTesting:
             response_time_ms=50 + (atoms / 100),
             throughput_ops_sec=max(1000 - (atoms / 10), 100),
             coherence_score=max(0.9 - (atoms / 20000), 0.5),
-            stability_score=max(0.85 - (threads / 40), 0.4)
+            stability_score=max(0.85 - (threads / 40), 0.4),
         )
 
     # Error handling test implementations
@@ -648,22 +659,22 @@ class PhaseVIComprehensiveTesting:
         """Calculate integration degree"""
         # Simulate integration degree assessment
         if len(self.test_results) >= 20:
-            return 'unified'
+            return "unified"
         elif len(self.test_results) >= 10:
-            return 'integrated'
+            return "integrated"
         else:
-            return 'fragmented'
+            return "fragmented"
 
     def detect_emergent_properties(self) -> list[str]:
         """Detect emergent cognitive properties"""
         # Simulate emergent property detection
         properties = []
         if len(self.test_results) >= 5:
-            properties.append('self_organization')
+            properties.append("self_organization")
         if len(self.test_results) >= 10:
-            properties.append('adaptive_learning')
+            properties.append("adaptive_learning")
         if len(self.test_results) >= 15:
-            properties.append('recursive_optimization')
+            properties.append("recursive_optimization")
         return properties
 
     def measure_system_stability(self) -> float:
@@ -690,24 +701,24 @@ class PhaseVIComprehensiveTesting:
     def calculate_documentation_completeness(self) -> float:
         """Calculate documentation completeness score"""
         # Count documentation files
-        doc_files = list(Path().glob('**/*.md'))
+        doc_files = list(Path().glob("**/*.md"))
         return min(len(doc_files) / 50, 1.0)
 
     def calculate_test_coverage(self) -> float:
         """Calculate test coverage percentage"""
         # Count test files
-        test_files = list(Path().glob('**/test*.py')) + list(Path().glob('**/test*.sh'))
+        test_files = list(Path().glob("**/test*.py")) + list(Path().glob("**/test*.sh"))
         return min(len(test_files) / 100, 1.0)
 
     def assess_cognitive_maturity(self) -> str:
         """Assess cognitive system maturity"""
         success_rate = len([r for r in self.test_results if r.success]) / max(len(self.test_results), 1)
         if success_rate >= 0.9:
-            return 'mature'
+            return "mature"
         elif success_rate >= 0.7:
-            return 'developing'
+            return "developing"
         else:
-            return 'nascent'
+            return "nascent"
 
     def generate_comprehensive_report(self, total_time: float, memory_peak: int) -> dict[str, Any]:
         """Generate comprehensive testing report"""
@@ -715,30 +726,31 @@ class PhaseVIComprehensiveTesting:
         failed_tests = [r for r in self.test_results if not r.success]
 
         report = {
-            'phase_vi_testing': {
-                'execution_time': total_time,
-                'memory_peak_bytes': memory_peak,
-                'total_tests': len(self.test_results),
-                'successful_tests': len(successful_tests),
-                'failed_tests': len(failed_tests),
-                'success_rate': len(successful_tests) / max(len(self.test_results), 1),
-                'test_coverage': self.calculate_test_coverage()
+            "phase_vi_testing": {
+                "execution_time": total_time,
+                "memory_peak_bytes": memory_peak,
+                "total_tests": len(self.test_results),
+                "successful_tests": len(successful_tests),
+                "failed_tests": len(failed_tests),
+                "success_rate": len(successful_tests) / max(len(self.test_results), 1),
+                "test_coverage": self.calculate_test_coverage(),
             },
-            'cognitive_metrics': self.cognitive_metrics,
-            'performance_baselines': self.performance_baselines,
-            'test_results': [
+            "cognitive_metrics": self.cognitive_metrics,
+            "performance_baselines": self.performance_baselines,
+            "test_results": [
                 {
-                    'name': r.test_name,
-                    'success': r.success,
-                    'duration': r.duration,
-                    'memory_peak': r.memory_peak,
-                    'error': r.error_message
+                    "name": r.test_name,
+                    "success": r.success,
+                    "duration": r.duration,
+                    "memory_peak": r.memory_peak,
+                    "error": r.error_message,
                 }
                 for r in self.test_results
-            ]
+            ],
         }
 
         return report
+
 
 def main():
     """Main test execution"""
@@ -754,30 +766,30 @@ def main():
         report = testing_framework.run_comprehensive_testing()
 
         # Save detailed report
-        report_file = 'phase-vi-comprehensive-testing-report.json'
-        with open(report_file, 'w') as f:
+        report_file = "phase-vi-comprehensive-testing-report.json"
+        with open(report_file, "w") as f:
             json.dump(report, f, indent=2)
 
         # Print summary
         print("\n🎯 PHASE VI TESTING SUMMARY")
         print("=" * 50)
 
-        phase_vi_metrics = report['phase_vi_testing']
+        phase_vi_metrics = report["phase_vi_testing"]
         print(f"Total Tests: {phase_vi_metrics['total_tests']}")
         print(f"Success Rate: {phase_vi_metrics['success_rate']:.1%}")
         print(f"Execution Time: {phase_vi_metrics['execution_time']:.2f}s")
-        print(f"Memory Peak: {phase_vi_metrics['memory_peak_bytes']//1024}KB")
+        print(f"Memory Peak: {phase_vi_metrics['memory_peak_bytes'] // 1024}KB")
         print(f"Test Coverage: {phase_vi_metrics['test_coverage']:.1%}")
 
-        if 'unified_tensor_signature' in report['cognitive_metrics']:
-            tensor_sig = report['cognitive_metrics']['unified_tensor_signature']
+        if "unified_tensor_signature" in report["cognitive_metrics"]:
+            tensor_sig = report["cognitive_metrics"]["unified_tensor_signature"]
             print("\n🧮 Unified Tensor Signature:")
             print(f"   Cognitive Coherence: {tensor_sig['cognitive_coherence']:.3f}")
             print(f"   Integration Degree: {tensor_sig['unification_degree']}")
             print(f"   Cognitive Maturity: {tensor_sig['cognitive_maturity']}")
             print(f"   Transcendence Level: {tensor_sig['transcendence_level']:.3f}")
 
-        success = report.get('overall_success', False)
+        success = report.get("overall_success", False)
         if success:
             print("\n✅ PHASE VI TESTING COMPLETED SUCCESSFULLY")
             print("🌊 Cognitive unification validated and verified!")
@@ -791,8 +803,10 @@ def main():
     except Exception as e:
         print(f"\n❌ PHASE VI TESTING ERROR: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

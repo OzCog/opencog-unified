@@ -19,46 +19,35 @@ class PhaseBuilder:
 
         # Phase-based build order with dependencies
         self.phases = {
-            "foundation": {
-                "description": "Foundation Layer - Core Dependencies",
-                "components": ["cogutil"]
-            },
-            "core": {
-                "description": "Core Layer - Knowledge Representation",
-                "components": ["atomspace", "cogserver"]
-            },
+            "foundation": {"description": "Foundation Layer - Core Dependencies", "components": ["cogutil"]},
+            "core": {"description": "Core Layer - Knowledge Representation", "components": ["atomspace", "cogserver"]},
             "phase_1": {
                 "description": "Phase 1: Core Extensions (Weeks 1-4)",
-                "components": ["atomspace-rocks", "atomspace-restful", "moses"]
+                "components": ["atomspace-rocks", "atomspace-restful", "moses"],
             },
             "phase_2": {
                 "description": "Phase 2: Logic Systems (Weeks 5-8)",
-                "components": ["unify", "ure", "language-learning"]
+                "components": ["unify", "ure", "language-learning"],
             },
             "phase_3": {
                 "description": "Phase 3: Cognitive Systems (Weeks 9-12)",
-                "components": ["attention", "spacetime"]
+                "components": ["attention", "spacetime"],
             },
             "phase_4": {
                 "description": "Phase 4: Advanced & Learning (Weeks 13-16)",
-                "components": ["pln", "miner", "asmoses"]
+                "components": ["pln", "miner", "asmoses"],
             },
             "phase_5": {
                 "description": "Phase 5: Language & Integration (Weeks 17-20)",
-                "components": ["lg-atomese", "learn", "opencog"]
-            }
+                "components": ["lg-atomese", "learn", "opencog"],
+            },
         }
 
     def run_command(self, cmd, cwd=None, timeout=600):
         """Run a command with proper error handling"""
         try:
             result = subprocess.run(
-                cmd,
-                cwd=cwd or self.base_dir,
-                capture_output=True,
-                text=True,
-                timeout=timeout,
-                shell=True
+                cmd, cwd=cwd or self.base_dir, capture_output=True, text=True, timeout=timeout, shell=True
             )
             return result.returncode == 0, result.stdout, result.stderr
         except subprocess.TimeoutExpired:
@@ -74,10 +63,7 @@ class PhaseBuilder:
         self.build_dir.mkdir(exist_ok=True)
 
         # Clean previous build
-        _success, _stdout, _stderr = self.run_command(
-            "rm -rf *",
-            cwd=self.build_dir
-        )
+        _success, _stdout, _stderr = self.run_command("rm -rf *", cwd=self.build_dir)
 
         return True
 
@@ -85,10 +71,7 @@ class PhaseBuilder:
         """Configure CMake for the unified build"""
         print("⚙️ Configuring CMake...")
 
-        success, stdout, stderr = self.run_command(
-            "cmake ..",
-            cwd=self.build_dir
-        )
+        success, stdout, stderr = self.run_command("cmake ..", cwd=self.build_dir)
 
         if not success:
             print("❌ CMake configuration failed:")
@@ -106,7 +89,7 @@ class PhaseBuilder:
         success, _stdout, stderr = self.run_command(
             f"make {component} -j$(nproc)",
             cwd=self.build_dir,
-            timeout=1200  # 20 minutes
+            timeout=1200,  # 20 minutes
         )
 
         if not success:
@@ -140,7 +123,7 @@ class PhaseBuilder:
         success, _stdout, stderr = self.run_command(
             f"make {target} -j$(nproc)",
             cwd=self.build_dir,
-            timeout=1800  # 30 minutes
+            timeout=1800,  # 30 minutes
         )
 
         if not success:
@@ -179,10 +162,7 @@ class PhaseBuilder:
 
         test_script = self.base_dir / f"test-{phase_name}.sh"
         if test_script.exists():
-            success, _stdout, _stderr = self.run_command(
-                f"bash {test_script}",
-                timeout=300
-            )
+            success, _stdout, _stderr = self.run_command(f"bash {test_script}", timeout=300)
 
             if not success:
                 print(f"❌ Integration tests failed for {phase_name}")
@@ -251,6 +231,7 @@ class PhaseBuilder:
         print(f"\n📊 Validation Summary: {success_count}/{total_count} components ready")
         return success_count == total_count
 
+
 def main():
     """Main entry point"""
     builder = PhaseBuilder()
@@ -271,6 +252,7 @@ def main():
     else:
         success = builder.build_all_phases()
         sys.exit(0 if success else 1)
+
 
 if __name__ == "__main__":
     main()

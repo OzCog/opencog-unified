@@ -66,7 +66,7 @@ runs:
 
             def scan_cognitive_topology(self):
                 """Scan the cognitive topology across the enterprise"""
-                print(f"ðŸŒ Scanning cognitive topology for enterprise: {self.enterprise}")
+                print(f"ðŸŒ Scanning cognitive topology for enterprise: {self.enterprise}")
 
                 organizations = ['cogpilot', 'OzCog', 'cosmos']
                 topology = {
@@ -183,7 +183,7 @@ runs:
       env:
         INPUT_ENTERPRISE: ${{ inputs.enterprise }}
       run: |
-        echo "ðŸŒ Executing enterprise cognitive topology scan..."
+        echo "ðŸŒ Executing enterprise cognitive topology scan..."
         python enterprise_cognitive_scanner.py
 
         if [ -f "enterprise-topology.json" ]; then

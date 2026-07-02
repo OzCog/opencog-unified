@@ -25,6 +25,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+
 class CognitivePrimitiveTests:
     """Comprehensive test suite for cognitive primitive functionality"""
 
@@ -50,7 +51,7 @@ class CognitivePrimitiveTests:
             ("Scheme Integration", self.test_scheme_integration),
             ("AtomSpace Integration", self.test_atomspace_integration),
             ("Performance Benchmarks", self.test_performance_benchmarks),
-            ("Memory Usage Analysis", self.test_memory_usage)
+            ("Memory Usage Analysis", self.test_memory_usage),
         ]
 
         overall_success = True
@@ -70,8 +71,8 @@ class CognitivePrimitiveTests:
         # Stop memory tracing and get final stats
         current, peak = tracemalloc.get_traced_memory()
         tracemalloc.stop()
-        self.memory_metrics['final_memory'] = current
-        self.memory_metrics['peak_memory'] = peak
+        self.memory_metrics["final_memory"] = current
+        self.memory_metrics["peak_memory"] = peak
 
         # Generate test report
         self.generate_test_report(overall_success)
@@ -98,9 +99,9 @@ class CognitivePrimitiveTests:
         print(f"    PASS: Tensor shape validation - Expected shape {expected_shape} is valid")
 
         # Test dimensional constraints
-        modality_types = ['visual', 'auditory', 'textual', 'symbolic']
-        depth_types = ['surface', 'semantic', 'pragmatic']
-        context_types = ['local', 'global', 'temporal']
+        modality_types = ["visual", "auditory", "textual", "symbolic"]
+        depth_types = ["surface", "semantic", "pragmatic"]
+        context_types = ["local", "global", "temporal"]
 
         if len(modality_types) != expected_shape[0]:
             print(f"    FAIL: Modality types count {len(modality_types)} != shape[0] {expected_shape[0]}")
@@ -121,29 +122,29 @@ class CognitivePrimitiveTests:
         """Test creation of cognitive primitives with various parameters"""
         test_cases = [
             {
-                'name': 'test-visual-primitive',
-                'modality': 'visual',
-                'depth': 'surface',
-                'context': 'local',
-                'salience': 0.8,
-                'autonomy': 0.6
+                "name": "test-visual-primitive",
+                "modality": "visual",
+                "depth": "surface",
+                "context": "local",
+                "salience": 0.8,
+                "autonomy": 0.6,
             },
             {
-                'name': 'test-auditory-primitive',
-                'modality': 'auditory',
-                'depth': 'semantic',
-                'context': 'global',
-                'salience': 0.5,
-                'autonomy': 0.7
+                "name": "test-auditory-primitive",
+                "modality": "auditory",
+                "depth": "semantic",
+                "context": "global",
+                "salience": 0.5,
+                "autonomy": 0.7,
             },
             {
-                'name': 'test-symbolic-primitive',
-                'modality': 'symbolic',
-                'depth': 'pragmatic',
-                'context': 'temporal',
-                'salience': 0.9,
-                'autonomy': 0.4
-            }
+                "name": "test-symbolic-primitive",
+                "modality": "symbolic",
+                "depth": "pragmatic",
+                "context": "temporal",
+                "salience": 0.9,
+                "autonomy": 0.4,
+            },
         ]
 
         # Test valid primitives
@@ -156,15 +157,15 @@ class CognitivePrimitiveTests:
 
         # Test boundary values
         boundary_cases = [
-            {'salience': 0.0, 'autonomy': 0.0},  # Minimum values
-            {'salience': 1.0, 'autonomy': 1.0},  # Maximum values
+            {"salience": 0.0, "autonomy": 0.0},  # Minimum values
+            {"salience": 1.0, "autonomy": 1.0},  # Maximum values
         ]
 
         for boundary in boundary_cases:
-            if boundary['salience'] < 0.0 or boundary['salience'] > 1.0:
+            if boundary["salience"] < 0.0 or boundary["salience"] > 1.0:
                 print(f"    FAIL: Invalid salience boundary {boundary['salience']}")
                 return False
-            if boundary['autonomy'] < 0.0 or boundary['autonomy'] > 1.0:
+            if boundary["autonomy"] < 0.0 or boundary["autonomy"] > 1.0:
                 print(f"    FAIL: Invalid autonomy boundary {boundary['autonomy']}")
                 return False
 
@@ -173,27 +174,39 @@ class CognitivePrimitiveTests:
 
     def validate_primitive_parameters(self, params):
         """Validate cognitive primitive parameters"""
-        modality_types = ['visual', 'auditory', 'textual', 'symbolic']
-        depth_types = ['surface', 'semantic', 'pragmatic']
-        context_types = ['local', 'global', 'temporal']
+        modality_types = ["visual", "auditory", "textual", "symbolic"]
+        depth_types = ["surface", "semantic", "pragmatic"]
+        context_types = ["local", "global", "temporal"]
 
-        if params['modality'] not in modality_types:
+        if params["modality"] not in modality_types:
             return False
-        if params['depth'] not in depth_types:
+        if params["depth"] not in depth_types:
             return False
-        if params['context'] not in context_types:
+        if params["context"] not in context_types:
             return False
-        if not (0.0 <= params['salience'] <= 1.0):
+        if not (0.0 <= params["salience"] <= 1.0):
             return False
-        return 0.0 <= params['autonomy'] <= 1.0
+        return 0.0 <= params["autonomy"] <= 1.0
 
     def test_round_trip_translation(self):
         """Test round-trip translation between different representations"""
         test_primitives = [
-            {'name': 'round-trip-1', 'modality': 'visual', 'depth': 'surface',
-             'context': 'local', 'salience': 0.8, 'autonomy': 0.6},
-            {'name': 'round-trip-2', 'modality': 'symbolic', 'depth': 'pragmatic',
-             'context': 'temporal', 'salience': 0.3, 'autonomy': 0.9}
+            {
+                "name": "round-trip-1",
+                "modality": "visual",
+                "depth": "surface",
+                "context": "local",
+                "salience": 0.8,
+                "autonomy": 0.6,
+            },
+            {
+                "name": "round-trip-2",
+                "modality": "symbolic",
+                "depth": "pragmatic",
+                "context": "temporal",
+                "salience": 0.3,
+                "autonomy": 0.9,
+            },
         ]
 
         accuracy_threshold = 0.01  # 1% tolerance for floating point values
@@ -218,39 +231,39 @@ class CognitivePrimitiveTests:
 
     def compare_primitives(self, original, recovered, threshold):
         """Compare two primitives for round-trip accuracy"""
-        if original['name'] != recovered['name']:
+        if original["name"] != recovered["name"]:
             return False
-        if original['modality'] != recovered['modality']:
+        if original["modality"] != recovered["modality"]:
             return False
-        if original['depth'] != recovered['depth']:
+        if original["depth"] != recovered["depth"]:
             return False
-        if original['context'] != recovered['context']:
+        if original["context"] != recovered["context"]:
             return False
-        if abs(original['salience'] - recovered['salience']) > threshold:
+        if abs(original["salience"] - recovered["salience"]) > threshold:
             return False
-        return not abs(original['autonomy'] - recovered['autonomy']) > threshold
+        return not abs(original["autonomy"] - recovered["autonomy"]) > threshold
 
     def test_prime_factorization(self):
         """Test prime factorization mapping for tensor signatures"""
         # Prime mapping as specified in the implementation
-        modality_primes = {'visual': 2, 'auditory': 3, 'textual': 5, 'symbolic': 7}
-        depth_primes = {'surface': 11, 'semantic': 13, 'pragmatic': 17}
-        context_primes = {'local': 19, 'global': 23, 'temporal': 29}
+        modality_primes = {"visual": 2, "auditory": 3, "textual": 5, "symbolic": 7}
+        depth_primes = {"surface": 11, "semantic": 13, "pragmatic": 17}
+        context_primes = {"local": 19, "global": 23, "temporal": 29}
 
         test_primitive = {
-            'modality': 'symbolic',
-            'depth': 'semantic',
-            'context': 'temporal',
-            'salience': 0.7,
-            'autonomy': 0.5
+            "modality": "symbolic",
+            "depth": "semantic",
+            "context": "temporal",
+            "salience": 0.7,
+            "autonomy": 0.5,
         }
 
         expected_primes = [
-            modality_primes[test_primitive['modality']],      # 7
-            depth_primes[test_primitive['depth']],            # 13
-            context_primes[test_primitive['context']],        # 29
-            31 + int(test_primitive['salience'] * 10),        # 31 + 7 = 38
-            41 + int(test_primitive['autonomy'] * 10)         # 41 + 5 = 46
+            modality_primes[test_primitive["modality"]],  # 7
+            depth_primes[test_primitive["depth"]],  # 13
+            context_primes[test_primitive["context"]],  # 29
+            31 + int(test_primitive["salience"] * 10),  # 31 + 7 = 38
+            41 + int(test_primitive["autonomy"] * 10),  # 41 + 5 = 46
         ]
 
         calculated_primes = self.calculate_prime_factorization(test_primitive)
@@ -267,16 +280,16 @@ class CognitivePrimitiveTests:
 
     def calculate_prime_factorization(self, primitive):
         """Calculate prime factorization for a cognitive primitive"""
-        modality_primes = {'visual': 2, 'auditory': 3, 'textual': 5, 'symbolic': 7}
-        depth_primes = {'surface': 11, 'semantic': 13, 'pragmatic': 17}
-        context_primes = {'local': 19, 'global': 23, 'temporal': 29}
+        modality_primes = {"visual": 2, "auditory": 3, "textual": 5, "symbolic": 7}
+        depth_primes = {"surface": 11, "semantic": 13, "pragmatic": 17}
+        context_primes = {"local": 19, "global": 23, "temporal": 29}
 
         return [
-            modality_primes[primitive['modality']],
-            depth_primes[primitive['depth']],
-            context_primes[primitive['context']],
-            31 + int(primitive['salience'] * 10),
-            41 + int(primitive['autonomy'] * 10)
+            modality_primes[primitive["modality"]],
+            depth_primes[primitive["depth"]],
+            context_primes[primitive["context"]],
+            31 + int(primitive["salience"] * 10),
+            41 + int(primitive["autonomy"] * 10),
         ]
 
     def test_degrees_of_freedom(self):
@@ -300,10 +313,10 @@ class CognitivePrimitiveTests:
         # Categorical variables: DOF = n_categories - 1
         # Continuous variables: DOF = 1
         modality_dof = 4 - 1  # 4 modality types
-        depth_dof = 3 - 1     # 3 depth types
-        context_dof = 3 - 1   # 3 context types
-        salience_dof = 1      # continuous [0,1]
-        autonomy_dof = 1      # continuous [0,1]
+        depth_dof = 3 - 1  # 3 depth types
+        context_dof = 3 - 1  # 3 context types
+        salience_dof = 1  # continuous [0,1]
+        autonomy_dof = 1  # continuous [0,1]
 
         return modality_dof + depth_dof + context_dof + salience_dof + autonomy_dof
 
@@ -323,11 +336,11 @@ class CognitivePrimitiveTests:
 
             # Basic checks for required functions
             required_functions = [
-                'make-cognitive-primitive',
-                'scheme-primitive-to-hypergraph',
-                'hypergraph-to-scheme-primitive',
-                'cognitive-primitive-round-trip',
-                'validate-round-trip-accuracy'
+                "make-cognitive-primitive",
+                "scheme-primitive-to-hypergraph",
+                "hypergraph-to-scheme-primitive",
+                "cognitive-primitive-round-trip",
+                "validate-round-trip-accuracy",
             ]
 
             for func in required_functions:
@@ -346,19 +359,19 @@ class CognitivePrimitiveTests:
         """Test AtomSpace integration"""
         # Test conversion to AtomSpace node structure
         test_primitive = {
-            'name': 'atomspace-test',
-            'modality': 'symbolic',
-            'depth': 'semantic',
-            'context': 'global',
-            'salience': 0.75,
-            'autonomy': 0.85
+            "name": "atomspace-test",
+            "modality": "symbolic",
+            "depth": "semantic",
+            "context": "global",
+            "salience": 0.75,
+            "autonomy": 0.85,
         }
 
         # Simulate AtomSpace node creation
         atomspace_nodes = self.simulate_atomspace_conversion(test_primitive)
 
         # Validate AtomSpace structure
-        required_predicates = ['modality', 'depth', 'context', 'salience', 'autonomy-index']
+        required_predicates = ["modality", "depth", "context", "salience", "autonomy-index"]
 
         for predicate in required_predicates:
             if predicate not in str(atomspace_nodes):
@@ -372,12 +385,12 @@ class CognitivePrimitiveTests:
         """Simulate conversion to AtomSpace structure"""
         # This simulates the AtomSpace node structure that would be created
         return {
-            'concept_node': f"(Concept \"{primitive['name']}\")",
-            'modality_eval': f"(Evaluation (Predicate \"modality\") (List (Concept \"{primitive['name']}\") (Concept \"{primitive['modality']}\")))",
-            'depth_eval': f"(Evaluation (Predicate \"depth\") (List (Concept \"{primitive['name']}\") (Concept \"{primitive['depth']}\")))",
-            'context_eval': f"(Evaluation (Predicate \"context\") (List (Concept \"{primitive['name']}\") (Concept \"{primitive['context']}\")))",
-            'salience_eval': f"(Evaluation (Predicate \"salience\") (List (Concept \"{primitive['name']}\") (Number {primitive['salience']})))",
-            'autonomy_eval': f"(Evaluation (Predicate \"autonomy-index\") (List (Concept \"{primitive['name']}\") (Number {primitive['autonomy']})))"
+            "concept_node": f'(Concept "{primitive["name"]}")',
+            "modality_eval": f'(Evaluation (Predicate "modality") (List (Concept "{primitive["name"]}") (Concept "{primitive["modality"]}")))',
+            "depth_eval": f'(Evaluation (Predicate "depth") (List (Concept "{primitive["name"]}") (Concept "{primitive["depth"]}")))',
+            "context_eval": f'(Evaluation (Predicate "context") (List (Concept "{primitive["name"]}") (Concept "{primitive["context"]}")))',
+            "salience_eval": f'(Evaluation (Predicate "salience") (List (Concept "{primitive["name"]}") (Number {primitive["salience"]})))',
+            "autonomy_eval": f'(Evaluation (Predicate "autonomy-index") (List (Concept "{primitive["name"]}") (Number {primitive["autonomy"]})))',
         }
 
     def test_performance_benchmarks(self):
@@ -388,12 +401,12 @@ class CognitivePrimitiveTests:
         start_time = time.time()
         for i in range(num_primitives):
             primitive = {
-                'name': f'benchmark-{i}',
-                'modality': 'symbolic',
-                'depth': 'semantic',
-                'context': 'local',
-                'salience': 0.5,
-                'autonomy': 0.5
+                "name": f"benchmark-{i}",
+                "modality": "symbolic",
+                "depth": "semantic",
+                "context": "local",
+                "salience": 0.5,
+                "autonomy": 0.5,
             }
             # Simulate primitive creation overhead
             _ = self.validate_primitive_parameters(primitive)
@@ -402,12 +415,12 @@ class CognitivePrimitiveTests:
         # Benchmark round-trip translation
         start_time = time.time()
         test_primitive = {
-            'name': 'benchmark-round-trip',
-            'modality': 'visual',
-            'depth': 'surface',
-            'context': 'temporal',
-            'salience': 0.8,
-            'autonomy': 0.3
+            "name": "benchmark-round-trip",
+            "modality": "visual",
+            "depth": "surface",
+            "context": "temporal",
+            "salience": 0.8,
+            "autonomy": 0.3,
         }
         for i in range(100):
             _ = self.simulate_round_trip_translation(test_primitive)
@@ -421,17 +434,19 @@ class CognitivePrimitiveTests:
 
         # Store performance metrics
         self.performance_metrics = {
-            'primitive_creation_per_sec': num_primitives / creation_time,
-            'round_trip_per_sec': 100 / round_trip_time,
-            'prime_calculation_per_sec': 1000 / prime_calc_time,
-            'creation_time_total': creation_time,
-            'round_trip_time_total': round_trip_time,
-            'prime_calc_time_total': prime_calc_time
+            "primitive_creation_per_sec": num_primitives / creation_time,
+            "round_trip_per_sec": 100 / round_trip_time,
+            "prime_calculation_per_sec": 1000 / prime_calc_time,
+            "creation_time_total": creation_time,
+            "round_trip_time_total": round_trip_time,
+            "prime_calc_time_total": prime_calc_time,
         }
 
         # Validate performance is reasonable
-        if self.performance_metrics['primitive_creation_per_sec'] < 100:
-            print(f"    WARN: Primitive creation rate seems slow: {self.performance_metrics['primitive_creation_per_sec']:.2f} ops/sec")
+        if self.performance_metrics["primitive_creation_per_sec"] < 100:
+            print(
+                f"    WARN: Primitive creation rate seems slow: {self.performance_metrics['primitive_creation_per_sec']:.2f} ops/sec"
+            )
 
         print("    PASS: Performance benchmarks completed")
         print(f"      Primitive creation: {self.performance_metrics['primitive_creation_per_sec']:.2f} ops/sec")
@@ -452,13 +467,13 @@ class CognitivePrimitiveTests:
             primitives = []
             for i in range(num_primitives):
                 primitive = {
-                    'name': f'memory-test-{i}',
-                    'modality': 'symbolic',
-                    'depth': 'semantic',
-                    'context': 'local',
-                    'salience': 0.5,
-                    'autonomy': 0.5,
-                    'tensor_data': [0.0] * 36  # Simulate tensor data (4*3*3*1*1 = 36 elements)
+                    "name": f"memory-test-{i}",
+                    "modality": "symbolic",
+                    "depth": "semantic",
+                    "context": "local",
+                    "salience": 0.5,
+                    "autonomy": 0.5,
+                    "tensor_data": [0.0] * 36,  # Simulate tensor data (4*3*3*1*1 = 36 elements)
                 }
                 primitives.append(primitive)
 
@@ -466,7 +481,7 @@ class CognitivePrimitiveTests:
             tracemalloc.stop()
 
             memory_per_primitive = current / num_primitives
-            self.memory_metrics[f'memory_per_primitive_{num_primitives}'] = memory_per_primitive
+            self.memory_metrics[f"memory_per_primitive_{num_primitives}"] = memory_per_primitive
 
             print(f"      {num_primitives} primitives: {memory_per_primitive:.2f} bytes/primitive")
 
@@ -476,23 +491,23 @@ class CognitivePrimitiveTests:
     def generate_test_report(self, overall_success):
         """Generate comprehensive test report"""
         report = {
-            'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
-            'overall_result': 'PASS' if overall_success else 'FAIL',
-            'test_results': self.test_results,
-            'performance_metrics': self.performance_metrics,
-            'memory_metrics': self.memory_metrics,
-            'cognitive_primitive_specs': {
-                'tensor_shape': [4, 3, 3, 1, 1],
-                'degrees_of_freedom': 9,
-                'modality_types': ['visual', 'auditory', 'textual', 'symbolic'],
-                'depth_types': ['surface', 'semantic', 'pragmatic'],
-                'context_types': ['local', 'global', 'temporal']
-            }
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "overall_result": "PASS" if overall_success else "FAIL",
+            "test_results": self.test_results,
+            "performance_metrics": self.performance_metrics,
+            "memory_metrics": self.memory_metrics,
+            "cognitive_primitive_specs": {
+                "tensor_shape": [4, 3, 3, 1, 1],
+                "degrees_of_freedom": 9,
+                "modality_types": ["visual", "auditory", "textual", "symbolic"],
+                "depth_types": ["surface", "semantic", "pragmatic"],
+                "context_types": ["local", "global", "temporal"],
+            },
         }
 
         # Save report to file
         report_file = project_root / "cognitive_primitive_test_report.json"
-        with open(report_file, 'w') as f:
+        with open(report_file, "w") as f:
             json.dump(report, f, indent=2)
 
         # Print summary
@@ -509,7 +524,8 @@ class CognitivePrimitiveTests:
 
         if self.memory_metrics:
             print("\nMemory Summary:")
-            print(f"  Peak Memory Usage: {self.memory_metrics.get('peak_memory', 0)/1024:.2f} KB")
+            print(f"  Peak Memory Usage: {self.memory_metrics.get('peak_memory', 0) / 1024:.2f} KB")
+
 
 def main():
     """Main test execution"""
@@ -517,6 +533,7 @@ def main():
     success = tester.run_all_tests()
 
     sys.exit(0 if success else 1)
+
 
 if __name__ == "__main__":
     main()

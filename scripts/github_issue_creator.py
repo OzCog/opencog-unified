@@ -32,19 +32,14 @@ class GitHubIssueCreator:
             return None
 
         # Extract title from content
-        lines = batch_content.split('\n')
-        title = lines[0].strip('# ')
+        lines = batch_content.split("\n")
+        title = lines[0].strip("# ")
 
         # Prepare issue data
         issue_data = {
             "title": title,
             "body": batch_content,
-            "labels": [
-                "todo-resolution",
-                "cognitive-enhancement",
-                "recursive-attention",
-                f"batch-{batch_number}"
-            ],
+            "labels": ["todo-resolution", "cognitive-enhancement", "recursive-attention", f"batch-{batch_number}"],
             "assignees": [],  # Can be configured
         }
 
@@ -66,7 +61,7 @@ class GitHubIssueCreator:
 
         except requests.exceptions.RequestException as e:
             print(f"❌ Failed to create GitHub issue: {e}")
-            if hasattr(e, 'response') and e.response is not None:
+            if hasattr(e, "response") and e.response is not None:
                 print(f"   Response: {e.response.text}")
             return None
 
@@ -89,10 +84,7 @@ class GitHubIssueCreator:
             issue = response.json()
 
             # Update the issue body to mark the TODO as completed
-            updated_body = issue['body'].replace(
-                f"**[ ] {todo_key}",
-                f"**[x] {todo_key} ✅ [Resolved]({pr_link})"
-            )
+            updated_body = issue["body"].replace(f"**[ ] {todo_key}", f"**[x] {todo_key} ✅ [Resolved]({pr_link})")
 
             # Update the issue
             update_data = {"body": updated_body}
@@ -110,9 +102,10 @@ class GitHubIssueCreator:
         """Create a PR stub/draft for a TODO item (future enhancement)"""
         # This could be implemented to auto-create PR drafts
         # For now, just return a suggested branch name
-        file_part = todo_item.split(':', maxsplit=1)[0]
-        safe_name = file_part.replace('/', '-').replace('.', '-')
+        file_part = todo_item.split(":", maxsplit=1)[0]
+        safe_name = file_part.replace("/", "-").replace(".", "-")
         return f"fix-todo-{safe_name}"
+
 
 def main():
     """Test the GitHub issue creator"""
@@ -136,5 +129,6 @@ Testing GitHub integration
     else:
         print("No GitHub token available for testing")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

@@ -46,12 +46,12 @@ class PhaseAlphaIntegrationTest(unittest.TestCase):
         # Validate uniqueness
         self.assertEqual(len(set(states)), 343, "All states should be unique")
 
-        self.test_results['state_enumeration'] = {
-            'total_states': len(states),
-            'min_state': min(states),
-            'max_state': max(states),
-            'unique_states': len(set(states)),
-            'passed': True
+        self.test_results["state_enumeration"] = {
+            "total_states": len(states),
+            "min_state": min(states),
+            "max_state": max(states),
+            "unique_states": len(set(states)),
+            "passed": True,
         }
 
         print(f"✅ State enumeration: {len(states)} states")
@@ -71,12 +71,12 @@ class PhaseAlphaIntegrationTest(unittest.TestCase):
             product *= factor
         self.assertEqual(product, 343, "Product of factors should equal 343")
 
-        self.test_results['prime_factorization'] = {
-            'target': 343,
-            'factors': factors,
-            'expected': expected_factors,
-            'product': product,
-            'passed': factors == expected_factors
+        self.test_results["prime_factorization"] = {
+            "target": 343,
+            "factors": factors,
+            "expected": expected_factors,
+            "product": product,
+            "passed": factors == expected_factors,
         }
 
         print(f"✅ Prime factorization: 343 = {' × '.join(map(str, factors))}")
@@ -110,15 +110,16 @@ class PhaseAlphaIntegrationTest(unittest.TestCase):
         expected_min_edges = 300  # Conservative estimate accounting for boundaries
         expected_max_edges = 2500  # Liberal estimate
 
-        self.assertTrue(expected_min_edges <= edge_count <= expected_max_edges,
-                       f"Edge count {edge_count} outside expected range")
+        self.assertTrue(
+            expected_min_edges <= edge_count <= expected_max_edges, f"Edge count {edge_count} outside expected range"
+        )
 
-        self.test_results['neural_graph_creation'] = {
-            'node_count': len(graph.nodes),
-            'edge_count': edge_count,
-            'tensor_shape': graph.tensor_shape,
-            'embedding_dim': len(next(iter(graph.nodes.values())).embedding),
-            'passed': True
+        self.test_results["neural_graph_creation"] = {
+            "node_count": len(graph.nodes),
+            "edge_count": edge_count,
+            "tensor_shape": graph.tensor_shape,
+            "embedding_dim": len(next(iter(graph.nodes.values())).embedding),
+            "passed": True,
         }
 
         print(f"✅ Neural graph: {len(graph.nodes)} nodes, {edge_count} edges")
@@ -143,26 +144,31 @@ class PhaseAlphaIntegrationTest(unittest.TestCase):
 
         # Validate attention scores were updated
         attention_scores = [node.attention_score for node in updated_graph.nodes.values()]
-        self.assertTrue(all(0.0 <= score <= 1.0 for score in attention_scores),
-                       "Attention scores should be in [0, 1] range")
+        self.assertTrue(
+            all(0.0 <= score <= 1.0 for score in attention_scores), "Attention scores should be in [0, 1] range"
+        )
 
         # Performance benchmark: should process 343 nodes in reasonable time
         max_allowed_time = 30.0  # 30 seconds
-        self.assertTrue(processing_time <= max_allowed_time,
-                       f"Processing took {processing_time:.2f}s, should be <= {max_allowed_time}s")
+        self.assertTrue(
+            processing_time <= max_allowed_time,
+            f"Processing took {processing_time:.2f}s, should be <= {max_allowed_time}s",
+        )
 
         # Benchmark: nodes per second
         nodes_per_second = 343 / processing_time
         min_throughput = 10  # At least 10 nodes per second
-        self.assertTrue(nodes_per_second >= min_throughput,
-                       f"Throughput {nodes_per_second:.1f} nodes/s should be >= {min_throughput}")
+        self.assertTrue(
+            nodes_per_second >= min_throughput,
+            f"Throughput {nodes_per_second:.1f} nodes/s should be >= {min_throughput}",
+        )
 
-        self.test_results['message_passing_performance'] = {
-            'processing_time': processing_time,
-            'nodes_per_second': nodes_per_second,
-            'attention_score_range': [min(attention_scores), max(attention_scores)],
-            'final_state': updated_graph.current_state,
-            'passed': True
+        self.test_results["message_passing_performance"] = {
+            "processing_time": processing_time,
+            "nodes_per_second": nodes_per_second,
+            "attention_score_range": [min(attention_scores), max(attention_scores)],
+            "final_state": updated_graph.current_state,
+            "passed": True,
         }
 
         print(f"✅ Message passing: {processing_time:.2f}s, {nodes_per_second:.1f} nodes/s")
@@ -193,12 +199,12 @@ class PhaseAlphaIntegrationTest(unittest.TestCase):
         for query in required_queries:
             self.assertIn(query, schema, f"Schema should contain {query} query")
 
-        self.test_results['graphql_schema'] = {
-            'schema_length': len(schema),
-            'types_found': len([t for t in required_types if f"type {t}" in schema]),
-            'directives_found': len([d for d in required_directives if d in schema]),
-            'operations_found': len([o for o in required_operations if f"type {o}" in schema]),
-            'passed': True
+        self.test_results["graphql_schema"] = {
+            "schema_length": len(schema),
+            "types_found": len([t for t in required_types if f"type {t}" in schema]),
+            "directives_found": len([d for d in required_directives if d in schema]),
+            "operations_found": len([o for o in required_operations if f"type {o}" in schema]),
+            "passed": True,
         }
 
         print(f"✅ GraphQL schema: {len(schema)} characters")
@@ -248,15 +254,15 @@ class PhaseAlphaIntegrationTest(unittest.TestCase):
         # Validate attention weights
         self.assertEqual(neural_graph.attention_weights.shape, (7, 7), "Attention weights should be 7×7")
 
-        self.test_results['query_parsing'] = {
-            'operation_type': parsed_query.operation_type.value,
-            'operation_name': parsed_query.operation_name,
-            'field_count': len(parsed_query.fields),
-            'node_count': len(neural_graph.nodes),
-            'edge_count': len(neural_graph.edges),
-            'embedding_shape': neural_graph.query_embedding.shape,
-            'attention_shape': neural_graph.attention_weights.shape,
-            'passed': True
+        self.test_results["query_parsing"] = {
+            "operation_type": parsed_query.operation_type.value,
+            "operation_name": parsed_query.operation_name,
+            "field_count": len(parsed_query.fields),
+            "node_count": len(neural_graph.nodes),
+            "edge_count": len(neural_graph.edges),
+            "embedding_shape": neural_graph.query_embedding.shape,
+            "attention_shape": neural_graph.attention_weights.shape,
+            "passed": True,
         }
 
         print(f"✅ Query parsing: {len(neural_graph.nodes)} nodes, {len(neural_graph.edges)} edges")
@@ -273,8 +279,10 @@ class PhaseAlphaIntegrationTest(unittest.TestCase):
 
                 # Validate coordinates are in bounds
                 self.assertEqual(len(coords), 3, "Should return 3D coordinates")
-                self.assertTrue(all(0 <= c < 7 for c in coords),
-                               f"Coordinates {coords} out of bounds for layer={layer}, head={head}")
+                self.assertTrue(
+                    all(0 <= c < 7 for c in coords),
+                    f"Coordinates {coords} out of bounds for layer={layer}, head={head}",
+                )
 
                 valid_encodings += 1
 
@@ -288,11 +296,11 @@ class PhaseAlphaIntegrationTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.schema_generator.encode_attention_state(0, 7)
 
-        self.test_results['attention_encoding'] = {
-            'valid_encodings': valid_encodings,
-            'expected_encodings': 49,
-            'bounds_checking': True,
-            'passed': True
+        self.test_results["attention_encoding"] = {
+            "valid_encodings": valid_encodings,
+            "expected_encodings": 49,
+            "bounds_checking": True,
+            "passed": True,
         }
 
         print(f"✅ Attention encoding: {valid_encodings}/49 combinations valid")
@@ -303,8 +311,8 @@ class PhaseAlphaIntegrationTest(unittest.TestCase):
 
         # Schema generator
         metadata = self.schema_generator.get_state_metadata()
-        self.assertEqual(metadata['tensor_shape'], (7, 7, 7), "Schema generator tensor shape")
-        self.assertEqual(metadata['total_states'], 343, "Schema generator total states")
+        self.assertEqual(metadata["tensor_shape"], (7, 7, 7), "Schema generator tensor shape")
+        self.assertEqual(metadata["total_states"], 343, "Schema generator total states")
 
         # Message passing engine
         graph = self.message_engine.create_test_graph()
@@ -315,17 +323,17 @@ class PhaseAlphaIntegrationTest(unittest.TestCase):
         self.assertEqual(parser_shape, (7, 7, 7), "Query parser tensor shape")
 
         # Test neural graph from query
-        test_query = "query { getNeuralGraph(id: \"test\") { nodes { id } } }"
+        test_query = 'query { getNeuralGraph(id: "test") { nodes { id } } }'
         neural_graph = self.query_parser.query_to_neural_graph(test_query)
         self.assertEqual(neural_graph.tensor_shape, (7, 7, 7), "Neural graph tensor shape")
 
-        self.test_results['tensor_consistency'] = {
-            'schema_generator_shape': metadata['tensor_shape'],
-            'message_engine_shape': graph.tensor_shape,
-            'query_parser_shape': parser_shape,
-            'neural_graph_shape': neural_graph.tensor_shape,
-            'all_consistent': True,
-            'passed': True
+        self.test_results["tensor_consistency"] = {
+            "schema_generator_shape": metadata["tensor_shape"],
+            "message_engine_shape": graph.tensor_shape,
+            "query_parser_shape": parser_shape,
+            "neural_graph_shape": neural_graph.tensor_shape,
+            "all_consistent": True,
+            "passed": True,
         }
 
         print("✅ Tensor shape consistency: All components use (7, 7, 7)")
@@ -381,20 +389,21 @@ class PhaseAlphaIntegrationTest(unittest.TestCase):
 
         # 6. Validate attention allocation
         attention_scores = [node.attention_score for node in result_graph.nodes.values()]
-        self.assertTrue(all(0.0 <= score <= 1.0 for score in attention_scores),
-                       "All attention scores should be normalized")
+        self.assertTrue(
+            all(0.0 <= score <= 1.0 for score in attention_scores), "All attention scores should be normalized"
+        )
 
         total_attention = sum(attention_scores)
         self.assertGreater(total_attention, 0, "Should have non-zero total attention")
 
-        self.test_results['end_to_end_integration'] = {
-            'schema_generated': len(schema) > 1000,
-            'query_parsed': len(parsed.fields) > 0,
-            'neural_graph_created': len(neural_graph.nodes) > 0,
-            'processing_completed': len(result_graph.nodes) == 343,
-            'attention_allocated': total_attention > 0,
-            'current_state_valid': 0 <= result_graph.current_state < 343,
-            'passed': True
+        self.test_results["end_to_end_integration"] = {
+            "schema_generated": len(schema) > 1000,
+            "query_parsed": len(parsed.fields) > 0,
+            "neural_graph_created": len(neural_graph.nodes) > 0,
+            "processing_completed": len(result_graph.nodes) == 343,
+            "attention_allocated": total_attention > 0,
+            "current_state_valid": 0 <= result_graph.current_state < 343,
+            "passed": True,
         }
 
         print("✅ End-to-end integration: Complete pipeline working")
@@ -404,7 +413,7 @@ class PhaseAlphaIntegrationTest(unittest.TestCase):
 
         # Convert numpy arrays and other non-serializable objects
         def make_serializable(obj):
-            if hasattr(obj, 'tolist'):  # numpy arrays
+            if hasattr(obj, "tolist"):  # numpy arrays
                 return obj.tolist()
             elif isinstance(obj, (np.integer, int)):
                 return int(obj)
@@ -430,10 +439,7 @@ class PhaseAlphaIntegrationTest(unittest.TestCase):
         except Exception as e:
             print(f"Warning: Could not save test results: {e}")
             # Save simple summary instead
-            summary = {
-                "test_count": len(self.test_results),
-                "tests_run": list(self.test_results.keys())
-            }
+            summary = {"test_count": len(self.test_results), "tests_run": list(self.test_results.keys())}
             with open("phase_alpha_test_results.json", "w") as f:
                 json.dump(summary, f, indent=2)
 

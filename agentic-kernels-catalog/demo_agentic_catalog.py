@@ -24,115 +24,115 @@ class AgenticKernelDemo:
 
         # GHOST - Goal-oriented Hierarchical OpenCog Scripting Technology
         ghost = {
-            'kernel_name': 'GHOST',
-            'description': 'Goal-oriented Hierarchical OpenCog Scripting Technology',
-            'version': '1.0.0',
-            'status': 'production',
-            'implementation_language': 'C++/Scheme',
-            'source_location': 'opencog/ghost',
-            'functional_roles': ['conversational', 'nlp_processing'],
-            'cognitive_subsystems': ['working_memory', 'semantic_memory'],
-            'parameters': [
-                {'name': 'dialogue_depth', 'type': 'int', 'default': 5, 'range': [1, 10]},
-                {'name': 'response_confidence', 'type': 'float', 'default': 0.7, 'range': [0.0, 1.0]},
-                {'name': 'context_window', 'type': 'int', 'default': 20, 'range': [1, 100]},
-                {'name': 'goal_satisfaction_threshold', 'type': 'float', 'default': 0.8, 'range': [0.0, 1.0]}
-            ]
+            "kernel_name": "GHOST",
+            "description": "Goal-oriented Hierarchical OpenCog Scripting Technology",
+            "version": "1.0.0",
+            "status": "production",
+            "implementation_language": "C++/Scheme",
+            "source_location": "opencog/ghost",
+            "functional_roles": ["conversational", "nlp_processing"],
+            "cognitive_subsystems": ["working_memory", "semantic_memory"],
+            "parameters": [
+                {"name": "dialogue_depth", "type": "int", "default": 5, "range": [1, 10]},
+                {"name": "response_confidence", "type": "float", "default": 0.7, "range": [0.0, 1.0]},
+                {"name": "context_window", "type": "int", "default": 20, "range": [1, 100]},
+                {"name": "goal_satisfaction_threshold", "type": "float", "default": 0.8, "range": [0.0, 1.0]},
+            ],
         }
         kernels.append(ghost)
 
         # PLN - Probabilistic Logic Networks
         pln = {
-            'kernel_name': 'PLN',
-            'description': 'Probabilistic Logic Networks for reasoning',
-            'version': '1.0.0',
-            'status': 'production',
-            'implementation_language': 'C++/Scheme',
-            'source_location': 'opencog/pln',
-            'functional_roles': ['reasoning_inference'],
-            'cognitive_subsystems': ['working_memory', 'semantic_memory', 'executive_control'],
-            'parameters': [
-                {'name': 'inference_depth', 'type': 'int', 'default': 15, 'range': [1, 50]},
-                {'name': 'confidence_threshold', 'type': 'float', 'default': 0.5, 'range': [0.0, 1.0]},
-                {'name': 'truth_value_precision', 'type': 'float', 'default': 0.01, 'range': [0.001, 0.1]},
-                {'name': 'rule_strength', 'type': 'float', 'default': 0.8, 'range': [0.0, 1.0]}
-            ]
+            "kernel_name": "PLN",
+            "description": "Probabilistic Logic Networks for reasoning",
+            "version": "1.0.0",
+            "status": "production",
+            "implementation_language": "C++/Scheme",
+            "source_location": "opencog/pln",
+            "functional_roles": ["reasoning_inference"],
+            "cognitive_subsystems": ["working_memory", "semantic_memory", "executive_control"],
+            "parameters": [
+                {"name": "inference_depth", "type": "int", "default": 15, "range": [1, 50]},
+                {"name": "confidence_threshold", "type": "float", "default": 0.5, "range": [0.0, 1.0]},
+                {"name": "truth_value_precision", "type": "float", "default": 0.01, "range": [0.001, 0.1]},
+                {"name": "rule_strength", "type": "float", "default": 0.8, "range": [0.0, 1.0]},
+            ],
         }
         kernels.append(pln)
 
         # ECAN - Economic Attention Networks
         ecan = {
-            'kernel_name': 'ECAN',
-            'description': 'Economic Attention Networks',
-            'version': '1.0.0',
-            'status': 'production',
-            'implementation_language': 'C++',
-            'source_location': 'opencog/attention',
-            'functional_roles': ['attention_allocation'],
-            'cognitive_subsystems': ['attention_system', 'working_memory'],
-            'parameters': [
-                {'name': 'attention_allocation_rate', 'type': 'float', 'default': 0.1, 'range': [0.01, 1.0]},
-                {'name': 'forgetting_rate', 'type': 'float', 'default': 0.01, 'range': [0.001, 0.1]},
-                {'name': 'max_atom_attention', 'type': 'float', 'default': 100.0, 'range': [1.0, 1000.0]},
-                {'name': 'hebbian_learning_rate', 'type': 'float', 'default': 0.01, 'range': [0.001, 0.1]}
-            ]
+            "kernel_name": "ECAN",
+            "description": "Economic Attention Networks",
+            "version": "1.0.0",
+            "status": "production",
+            "implementation_language": "C++",
+            "source_location": "opencog/attention",
+            "functional_roles": ["attention_allocation"],
+            "cognitive_subsystems": ["attention_system", "working_memory"],
+            "parameters": [
+                {"name": "attention_allocation_rate", "type": "float", "default": 0.1, "range": [0.01, 1.0]},
+                {"name": "forgetting_rate", "type": "float", "default": 0.01, "range": [0.001, 0.1]},
+                {"name": "max_atom_attention", "type": "float", "default": 100.0, "range": [1.0, 1000.0]},
+                {"name": "hebbian_learning_rate", "type": "float", "default": 0.01, "range": [0.001, 0.1]},
+            ],
         }
         kernels.append(ecan)
 
         # Eva - Expressive Virtual Avatar
         eva = {
-            'kernel_name': 'Eva',
-            'description': 'Expressive Virtual Avatar',
-            'version': '1.0.0',
-            'status': 'prototype',
-            'implementation_language': 'Python/C++',
-            'source_location': 'hansonrobotics/eva',
-            'functional_roles': ['conversational', 'emotional_affective'],
-            'cognitive_subsystems': ['emotional_system', 'social_cognition', 'motor_output'],
-            'parameters': [
-                {'name': 'emotional_expressiveness', 'type': 'float', 'default': 0.7, 'range': [0.0, 1.0]},
-                {'name': 'facial_animation_speed', 'type': 'float', 'default': 1.0, 'range': [0.1, 2.0]},
-                {'name': 'voice_emotion_strength', 'type': 'float', 'default': 0.6, 'range': [0.0, 1.0]},
-                {'name': 'personality_traits', 'type': 'int', 'default': 10, 'range': [5, 20]}
-            ]
+            "kernel_name": "Eva",
+            "description": "Expressive Virtual Avatar",
+            "version": "1.0.0",
+            "status": "prototype",
+            "implementation_language": "Python/C++",
+            "source_location": "hansonrobotics/eva",
+            "functional_roles": ["conversational", "emotional_affective"],
+            "cognitive_subsystems": ["emotional_system", "social_cognition", "motor_output"],
+            "parameters": [
+                {"name": "emotional_expressiveness", "type": "float", "default": 0.7, "range": [0.0, 1.0]},
+                {"name": "facial_animation_speed", "type": "float", "default": 1.0, "range": [0.1, 2.0]},
+                {"name": "voice_emotion_strength", "type": "float", "default": 0.6, "range": [0.0, 1.0]},
+                {"name": "personality_traits", "type": "int", "default": 10, "range": [5, 20]},
+            ],
         }
         kernels.append(eva)
 
         # Loving AI
         loving_ai = {
-            'kernel_name': 'Loving AI',
-            'description': 'Compassionate AI for therapeutic interactions',
-            'version': '1.0.0',
-            'status': 'experimental',
-            'implementation_language': 'Python',
-            'source_location': 'opencog/loving-ai',
-            'functional_roles': ['emotional_affective', 'conversational', 'social_interaction'],
-            'cognitive_subsystems': ['emotional_system', 'social_cognition'],
-            'parameters': [
-                {'name': 'compassion_level', 'type': 'float', 'default': 0.9, 'range': [0.0, 1.0]},
-                {'name': 'empathy_sensitivity', 'type': 'float', 'default': 0.8, 'range': [0.0, 1.0]},
-                {'name': 'therapeutic_style', 'type': 'int', 'default': 3, 'range': [1, 5]},
-                {'name': 'emotional_validation', 'type': 'float', 'default': 0.85, 'range': [0.0, 1.0]}
-            ]
+            "kernel_name": "Loving AI",
+            "description": "Compassionate AI for therapeutic interactions",
+            "version": "1.0.0",
+            "status": "experimental",
+            "implementation_language": "Python",
+            "source_location": "opencog/loving-ai",
+            "functional_roles": ["emotional_affective", "conversational", "social_interaction"],
+            "cognitive_subsystems": ["emotional_system", "social_cognition"],
+            "parameters": [
+                {"name": "compassion_level", "type": "float", "default": 0.9, "range": [0.0, 1.0]},
+                {"name": "empathy_sensitivity", "type": "float", "default": 0.8, "range": [0.0, 1.0]},
+                {"name": "therapeutic_style", "type": "int", "default": 3, "range": [1, 5]},
+                {"name": "emotional_validation", "type": "float", "default": 0.85, "range": [0.0, 1.0]},
+            ],
         }
         kernels.append(loving_ai)
 
         # Game AI
         game_ai = {
-            'kernel_name': 'Game AI',
-            'description': 'Strategic game playing artificial intelligence',
-            'version': '1.0.0',
-            'status': 'prototype',
-            'implementation_language': 'C++/Python',
-            'source_location': 'opencog/game-ai',
-            'functional_roles': ['game_strategy', 'reasoning_inference'],
-            'cognitive_subsystems': ['executive_control', 'working_memory'],
-            'parameters': [
-                {'name': 'search_depth', 'type': 'int', 'default': 8, 'range': [1, 20]},
-                {'name': 'exploration_rate', 'type': 'float', 'default': 0.3, 'range': [0.0, 1.0]},
-                {'name': 'strategic_patience', 'type': 'float', 'default': 0.7, 'range': [0.0, 1.0]},
-                {'name': 'risk_tolerance', 'type': 'float', 'default': 0.5, 'range': [0.0, 1.0]}
-            ]
+            "kernel_name": "Game AI",
+            "description": "Strategic game playing artificial intelligence",
+            "version": "1.0.0",
+            "status": "prototype",
+            "implementation_language": "C++/Python",
+            "source_location": "opencog/game-ai",
+            "functional_roles": ["game_strategy", "reasoning_inference"],
+            "cognitive_subsystems": ["executive_control", "working_memory"],
+            "parameters": [
+                {"name": "search_depth", "type": "int", "default": 8, "range": [1, 20]},
+                {"name": "exploration_rate", "type": "float", "default": 0.3, "range": [0.0, 1.0]},
+                {"name": "strategic_patience", "type": "float", "default": 0.7, "range": [0.0, 1.0]},
+                {"name": "risk_tolerance", "type": "float", "default": 0.5, "range": [0.0, 1.0]},
+            ],
         }
         kernels.append(game_ai)
 
@@ -143,24 +143,24 @@ class AgenticKernelDemo:
         dof = 0
 
         # Parameter space degrees of freedom
-        for param in kernel.get('parameters', []):
-            param_type = param.get('type', 'float')
-            param_range = param.get('range', [0, 1])
+        for param in kernel.get("parameters", []):
+            param_type = param.get("type", "float")
+            param_range = param.get("range", [0, 1])
 
-            if param_type == 'float':
+            if param_type == "float":
                 range_size = param_range[1] - param_range[0] if len(param_range) >= 2 else 1.0
                 dof += max(1, int(range_size * 100))
-            elif param_type == 'int':
+            elif param_type == "int":
                 range_size = param_range[1] - param_range[0] if len(param_range) >= 2 else 10
                 dof += max(1, int(range_size))
-            elif param_type == 'bool':
+            elif param_type == "bool":
                 dof += 2
             else:
                 dof += 5  # Default estimate
 
         # Structural complexity
-        dof += len(kernel.get('functional_roles', [])) * 2
-        dof += len(kernel.get('cognitive_subsystems', [])) * 3
+        dof += len(kernel.get("functional_roles", [])) * 2
+        dof += len(kernel.get("cognitive_subsystems", [])) * 3
 
         # Base complexity
         dof += 10
@@ -247,14 +247,14 @@ class AgenticKernelDemo:
         complexity_score = math.log10(max(1, dof))
 
         return {
-            'kernel_name': kernel['kernel_name'],
-            'degrees_of_freedom': dof,
-            'prime_factors': prime_factors,
-            'optimal_tensor_shape': tensor_shape,
-            'total_tensor_elements': dof,
-            'memory_efficiency': memory_eff,
-            'computational_efficiency': compute_eff,
-            'complexity_score': complexity_score
+            "kernel_name": kernel["kernel_name"],
+            "degrees_of_freedom": dof,
+            "prime_factors": prime_factors,
+            "optimal_tensor_shape": tensor_shape,
+            "total_tensor_elements": dof,
+            "memory_efficiency": memory_eff,
+            "computational_efficiency": compute_eff,
+            "complexity_score": complexity_score,
         }
 
     def test_round_trip_serialization(self, kernel: dict[str, Any]) -> bool:
@@ -267,9 +267,11 @@ class AgenticKernelDemo:
             deserialized = json.loads(json_str)
 
             # Basic validation
-            return (deserialized.get('kernel_name') == kernel.get('kernel_name') and
-                   deserialized.get('description') == kernel.get('description') and
-                   len(deserialized.get('parameters', [])) == len(kernel.get('parameters', [])))
+            return (
+                deserialized.get("kernel_name") == kernel.get("kernel_name")
+                and deserialized.get("description") == kernel.get("description")
+                and len(deserialized.get("parameters", [])) == len(kernel.get("parameters", []))
+            )
 
         except Exception as e:
             print(f"    ✗ Serialization error: {e}")
@@ -283,9 +285,9 @@ class AgenticKernelDemo:
 
         # Catalog overview
         total_kernels = len(self.kernels)
-        production_kernels = [k for k in self.kernels if k['status'] == 'production']
-        prototype_kernels = [k for k in self.kernels if k['status'] == 'prototype']
-        experimental_kernels = [k for k in self.kernels if k['status'] == 'experimental']
+        production_kernels = [k for k in self.kernels if k["status"] == "production"]
+        prototype_kernels = [k for k in self.kernels if k["status"] == "prototype"]
+        experimental_kernels = [k for k in self.kernels if k["status"] == "experimental"]
 
         report.append("Catalog Overview:")
         report.append(f"  Total Kernels: {total_kernels}")
@@ -308,10 +310,10 @@ class AgenticKernelDemo:
             report.append("")
 
         # Statistics
-        avg_dof = sum(a['degrees_of_freedom'] for a in analyses) / len(analyses)
-        avg_complexity = sum(a['complexity_score'] for a in analyses) / len(analyses)
-        avg_memory_eff = sum(a['memory_efficiency'] for a in analyses) / len(analyses)
-        avg_compute_eff = sum(a['computational_efficiency'] for a in analyses) / len(analyses)
+        avg_dof = sum(a["degrees_of_freedom"] for a in analyses) / len(analyses)
+        avg_complexity = sum(a["complexity_score"] for a in analyses) / len(analyses)
+        avg_memory_eff = sum(a["memory_efficiency"] for a in analyses) / len(analyses)
+        avg_compute_eff = sum(a["computational_efficiency"] for a in analyses) / len(analyses)
 
         report.append("Summary Statistics:")
         report.append(f"  Average DOF: {avg_dof:.1f}")
@@ -459,21 +461,19 @@ class AgenticKernelDemo:
             "catalog_version": "1.0",
             "timestamp": "2025-01-01T00:00:00Z",
             "total_kernels": len(self.kernels),
-            "kernels": []
+            "kernels": [],
         }
 
         for kernel in self.kernels:
             analysis = self.analyze_kernel_complexity(kernel)
-            kernel_entry = {
-                **kernel,
-                "analysis": analysis
-            }
+            kernel_entry = {**kernel, "analysis": analysis}
             catalog_data["kernels"].append(kernel_entry)
 
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             json.dump(catalog_data, f, indent=2)
 
         print(f"Catalog saved to {filename}")
+
 
 def main():
     """Main demonstration function"""
@@ -507,6 +507,7 @@ def main():
         print("⚠️  Some components need attention before full deployment.")
 
     return 0 if success else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

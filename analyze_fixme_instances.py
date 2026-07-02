@@ -39,26 +39,27 @@ class FIXMEInstance:
         if self.dependencies is None:
             self.dependencies = []
 
+
 class FIXMEAnalyzer:
     def __init__(self, repo_root: str):
         self.repo_root = Path(repo_root)
         self.fixme_instances = []
         self.patterns = {
-            'thread_safety': r'thread[_\-\s]safe|race\s+condition|atomic|mutex|lock|concurrent|synchroniz',
-            'performance': r'performance|optimization|O\(|efficient|speed|fast|slow|bottleneck|cache',
-            'distributed': r'distributed|cluster|consensus|partition|byzantine|quorum|node|network',
-            'algorithm': r'algorithm|implement|complex|exponential|quadratic|recursive|stack',
-            'documentation': r'docs?|documentation|comment|explain|describe',
-            'simple_todo': r'simple|easy|quick|straightforward|minor|small',
-            'architecture': r'architecture|design|refactor|restructure|framework|system',
-            'research': r'research|paper|theory|mathematical|proof|novel'
+            "thread_safety": r"thread[_\-\s]safe|race\s+condition|atomic|mutex|lock|concurrent|synchroniz",
+            "performance": r"performance|optimization|O\(|efficient|speed|fast|slow|bottleneck|cache",
+            "distributed": r"distributed|cluster|consensus|partition|byzantine|quorum|node|network",
+            "algorithm": r"algorithm|implement|complex|exponential|quadratic|recursive|stack",
+            "documentation": r"docs?|documentation|comment|explain|describe",
+            "simple_todo": r"simple|easy|quick|straightforward|minor|small",
+            "architecture": r"architecture|design|refactor|restructure|framework|system",
+            "research": r"research|paper|theory|mathematical|proof|novel",
         }
 
     def extract_fixme_instances(self):
         """Extract all FIXME instances from source files."""
-        file_extensions = {'.cc', '.cpp', '.h', '.hpp', '.scm', '.py', '.c'}
+        file_extensions = {".cc", ".cpp", ".h", ".hpp", ".scm", ".py", ".c"}
 
-        for file_path in self.repo_root.rglob('*'):
+        for file_path in self.repo_root.rglob("*"):
             if file_path.suffix.lower() in file_extensions:
                 self._process_file(file_path)
 
@@ -67,7 +68,7 @@ class FIXMEAnalyzer:
     def _process_file(self, file_path: Path):
         """Process a single file for FIXME instances."""
         try:
-            with open(file_path, encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding="utf-8", errors="ignore") as f:
                 lines = f.readlines()
 
             for i, line in enumerate(lines):
@@ -80,7 +81,7 @@ class FIXMEAnalyzer:
                         file_path=str(file_path.relative_to(self.repo_root)),
                         line_number=i + 1,
                         fixme_text=line.strip(),
-                        context_lines=context
+                        context_lines=context,
                     )
 
                     self.fixme_instances.append(fixme_instance)
@@ -94,49 +95,70 @@ class FIXMEAnalyzer:
         line_lower = line_stripped.lower()
 
         # Skip string literals and regex patterns
-        if (line_stripped.startswith('"') and line_stripped.endswith('"')) or \
-           (line_stripped.startswith("'") and line_stripped.endswith("'")) or \
-           ("r'" in line_stripped) or ('r"' in line_stripped):
+        if (
+            (line_stripped.startswith('"') and line_stripped.endswith('"'))
+            or (line_stripped.startswith("'") and line_stripped.endswith("'"))
+            or ("r'" in line_stripped)
+            or ('r"' in line_stripped)
+        ):
             return False
 
         # Skip meta-comments about FIXME processing
-        if ('fixme instances' in line_lower) or \
-           ('fixme text' in line_lower) or \
-           ('todo/fixme' in line_lower and ('pattern' in line_lower or 'report' in line_lower or 'verification' in line_lower or 'marker' in line_lower)) or \
-           ('analyze' in line_lower and 'fixme' in line_lower) or \
-           ('catalog' in line_lower and 'fixme' in line_lower) or \
-           ('contain' in line_lower and 'todo/fixme' in line_lower) or \
-           ('check' in line_lower and 'todo/fixme' in line_lower) or \
-           ('skip meta-comments about fix-me processing' in line_lower) or \
-           ('look for actual fix-me patterns in comments' in line_lower) or \
-           ('for other cases, convert fixme to descriptive' in line_lower) or \
-           ('pre-commit hook to prevent new fixmes' in line_lower) or \
-           ('include this in your main makefile' in line_lower) or \
-           ('{' in line_stripped and '}' in line_stripped):  # template variables
+        if (
+            ("fixme instances" in line_lower)
+            or ("fixme text" in line_lower)
+            or (
+                "todo/fixme" in line_lower
+                and (
+                    "pattern" in line_lower
+                    or "report" in line_lower
+                    or "verification" in line_lower
+                    or "marker" in line_lower
+                )
+            )
+            or ("analyze" in line_lower and "fixme" in line_lower)
+            or ("catalog" in line_lower and "fixme" in line_lower)
+            or ("contain" in line_lower and "todo/fixme" in line_lower)
+            or ("check" in line_lower and "todo/fixme" in line_lower)
+            or ("skip meta-comments about fix-me processing" in line_lower)
+            or ("look for actual fix-me patterns in comments" in line_lower)
+            or ("for other cases, convert fixme to descriptive" in line_lower)
+            or ("pre-commit hook to prevent new fixmes" in line_lower)
+            or ("include this in your main makefile" in line_lower)
+            or ("{" in line_stripped and "}" in line_stripped)
+        ):  # template variables
             return False
 
         # Must start with comment syntax (not just contain it)
-        comment_starts = line_stripped.startswith('//') or \
-                        line_stripped.startswith('#') or \
-                        line_stripped.startswith(';') or \
-                        line_stripped.startswith('/*') or \
-                        line_stripped.startswith('*')  # for multi-line comments
+        comment_starts = (
+            line_stripped.startswith("//")
+            or line_stripped.startswith("#")
+            or line_stripped.startswith(";")
+            or line_stripped.startswith("/*")
+            or line_stripped.startswith("*")
+        )  # for multi-line comments
 
         if not comment_starts:
             return False
 
         # Must not be metadata about FIXME processing
-        if ('clean up' in line_lower and 'fixme' in line_lower) or \
-           ('issue:' in line_lower) or \
-           ('markdown' in line_lower) or \
-           ('metadata about fixme' in line_lower):
+        if (
+            ("clean up" in line_lower and "fixme" in line_lower)
+            or ("issue:" in line_lower)
+            or ("markdown" in line_lower)
+            or ("metadata about fixme" in line_lower)
+        ):
             return False
 
         # Look for actual FIXME patterns in comments
-        return (('fixme' in line_lower) or
-                ('xxx' in line_lower and (line_lower.strip().startswith('#') or line_lower.strip().startswith('//'))) or  # XXX comments
-                ('xxx' in line_lower and ('fix' in line_lower or 'todo' in line_lower)) or
-                ('todo' in line_lower and 'fixme' in line_lower))
+        return (
+            ("fixme" in line_lower)
+            or (
+                "xxx" in line_lower and (line_lower.strip().startswith("#") or line_lower.strip().startswith("//"))
+            )  # XXX comments
+            or ("xxx" in line_lower and ("fix" in line_lower or "todo" in line_lower))
+            or ("todo" in line_lower and "fixme" in line_lower)
+        )
 
     def categorize_instances(self):
         """Categorize each FIXME instance by difficulty."""
@@ -145,7 +167,7 @@ class FIXMEAnalyzer:
 
     def _analyze_instance(self, instance: FIXMEInstance):
         """Analyze a single FIXME instance to determine difficulty."""
-        full_text = (instance.fixme_text + ' ' + ' '.join(instance.context_lines)).lower()
+        full_text = (instance.fixme_text + " " + " ".join(instance.context_lines)).lower()
 
         # Count pattern matches
         pattern_matches = {}
@@ -155,9 +177,7 @@ class FIXMEAnalyzer:
                 pattern_matches[pattern_name] = matches
 
         # Determine difficulty based on patterns and context
-        difficulty, category, effort, reasoning = self._classify_difficulty(
-            instance, pattern_matches, full_text
-        )
+        difficulty, category, effort, reasoning = self._classify_difficulty(instance, pattern_matches, full_text)
 
         instance.difficulty = difficulty
         instance.category = category
@@ -168,55 +188,76 @@ class FIXMEAnalyzer:
         """Classify the difficulty of implementing the FIXME."""
 
         # Very Hard criteria
-        if (patterns.get('distributed', 0) >= 2 or
-            patterns.get('research', 0) >= 1 or
-            'byzantine' in full_text or
-            'consensus' in full_text or
-            'exponential time' in full_text):
-            return "VERY_HARD", "Distributed Systems/Research", "2-6 months", \
-                   "Requires distributed systems expertise or research-level work"
+        if (
+            patterns.get("distributed", 0) >= 2
+            or patterns.get("research", 0) >= 1
+            or "byzantine" in full_text
+            or "consensus" in full_text
+            or "exponential time" in full_text
+        ):
+            return (
+                "VERY_HARD",
+                "Distributed Systems/Research",
+                "2-6 months",
+                "Requires distributed systems expertise or research-level work",
+            )
 
         # Hard criteria
-        if (patterns.get('thread_safety', 0) >= 2 or
-            patterns.get('performance', 0) >= 2 or
-            patterns.get('algorithm', 0) >= 2 or
-            'thread-safe' in full_text or
-            'race condition' in full_text or
-            'recursive design' in full_text):
-            return "HARD", "Performance/Threading/Complex Algorithm", "2-8 weeks", \
-                   "Requires deep technical expertise and careful implementation"
+        if (
+            patterns.get("thread_safety", 0) >= 2
+            or patterns.get("performance", 0) >= 2
+            or patterns.get("algorithm", 0) >= 2
+            or "thread-safe" in full_text
+            or "race condition" in full_text
+            or "recursive design" in full_text
+        ):
+            return (
+                "HARD",
+                "Performance/Threading/Complex Algorithm",
+                "2-8 weeks",
+                "Requires deep technical expertise and careful implementation",
+            )
 
         # Medium criteria
-        if (patterns.get('algorithm', 0) >= 1 or
-            patterns.get('performance', 0) >= 1 or
-            patterns.get('architecture', 0) >= 1 or
-            'implement' in full_text or
-            'not implemented' in full_text or
-            'missing feature' in full_text):
-            return "MEDIUM", "Feature Implementation/Algorithm", "1-4 weeks", \
-                   "Requires moderate technical knowledge and implementation effort"
+        if (
+            patterns.get("algorithm", 0) >= 1
+            or patterns.get("performance", 0) >= 1
+            or patterns.get("architecture", 0) >= 1
+            or "implement" in full_text
+            or "not implemented" in full_text
+            or "missing feature" in full_text
+        ):
+            return (
+                "MEDIUM",
+                "Feature Implementation/Algorithm",
+                "1-4 weeks",
+                "Requires moderate technical knowledge and implementation effort",
+            )
 
         # Easy criteria
-        if (patterns.get('documentation', 0) >= 1 or
-            patterns.get('simple_todo', 0) >= 1 or
-            'documentation' in full_text or
-            'comment' in full_text or
-            'explain' in full_text or
-            'minor' in full_text):
-            return "EASY", "Documentation/Simple Fix", "1-3 days", \
-                   "Simple documentation updates or minor code changes"
+        if (
+            patterns.get("documentation", 0) >= 1
+            or patterns.get("simple_todo", 0) >= 1
+            or "documentation" in full_text
+            or "comment" in full_text
+            or "explain" in full_text
+            or "minor" in full_text
+        ):
+            return "EASY", "Documentation/Simple Fix", "1-3 days", "Simple documentation updates or minor code changes"
 
         # Default classification based on file type and content
-        if instance.file_path.endswith('.scm'):
-            return "MEDIUM", "Scheme/Logic Implementation", "1-2 weeks", \
-                   "Scheme code implementation or logic system update"
+        if instance.file_path.endswith(".scm"):
+            return (
+                "MEDIUM",
+                "Scheme/Logic Implementation",
+                "1-2 weeks",
+                "Scheme code implementation or logic system update",
+            )
 
-        if 'stub' in full_text or 'placeholder' in full_text or 'mock' in full_text:
-            return "MEDIUM", "Stub Implementation", "1-3 weeks", \
-                   "Replace stub/placeholder with real implementation"
+        if "stub" in full_text or "placeholder" in full_text or "mock" in full_text:
+            return "MEDIUM", "Stub Implementation", "1-3 weeks", "Replace stub/placeholder with real implementation"
 
-        return "MEDIUM", "General Implementation", "1-2 weeks", \
-               "General implementation task requiring moderate effort"
+        return "MEDIUM", "General Implementation", "1-2 weeks", "General implementation task requiring moderate effort"
 
     def generate_report(self) -> dict:
         """Generate a comprehensive report of FIXME instances."""
@@ -232,27 +273,28 @@ class FIXMEAnalyzer:
 
         # Create summary statistics
         stats = {
-            'total_instances': len(self.fixme_instances),
-            'by_difficulty': {k: len(v) for k, v in by_difficulty.items()},
-            'by_category': {k: len(v) for k, v in by_category.items()},
-            'files_affected': len(by_file),
+            "total_instances": len(self.fixme_instances),
+            "by_difficulty": {k: len(v) for k, v in by_difficulty.items()},
+            "by_category": {k: len(v) for k, v in by_category.items()},
+            "files_affected": len(by_file),
         }
 
         return {
-            'summary': stats,
-            'by_difficulty': {k: [asdict(i) for i in v] for k, v in by_difficulty.items()},
-            'by_category': {k: [asdict(i) for i in v] for k, v in by_category.items()},
-            'by_file': {k: [asdict(i) for i in v] for k, v in by_file.items()}
+            "summary": stats,
+            "by_difficulty": {k: [asdict(i) for i in v] for k, v in by_difficulty.items()},
+            "by_category": {k: [asdict(i) for i in v] for k, v in by_category.items()},
+            "by_file": {k: [asdict(i) for i in v] for k, v in by_file.items()},
         }
 
     def save_report(self, output_file: str):
         """Save the analysis report to a JSON file."""
         report = self.generate_report()
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             json.dump(report, f, indent=2, default=str)
 
         print(f"Report saved to {output_file}")
         return report
+
 
 def main():
     """Main analysis function."""
@@ -269,17 +311,18 @@ def main():
     report = analyzer.save_report("fixme_analysis_report.json")
 
     # Print summary
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("FIXME ANALYSIS SUMMARY")
-    print("="*60)
+    print("=" * 60)
     print(f"Total FIXME instances found: {report['summary']['total_instances']}")
     print("\nBy Difficulty:")
-    for difficulty, count in sorted(report['summary']['by_difficulty'].items()):
+    for difficulty, count in sorted(report["summary"]["by_difficulty"].items()):
         print(f"  {difficulty}: {count} instances")
 
     print(f"\nFiles affected: {report['summary']['files_affected']}")
 
     return analyzer
+
 
 if __name__ == "__main__":
     main()

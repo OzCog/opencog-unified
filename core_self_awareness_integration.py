@@ -19,6 +19,7 @@ def load_entelechy_data() -> dict[str, Any]:
             return json.load(f)
     return {}
 
+
 def generate_core_self_awareness_report() -> dict[str, Any]:
     """Generate core self-awareness integration report"""
 
@@ -31,79 +32,69 @@ def generate_core_self_awareness_report() -> dict[str, Any]:
         "timestamp": datetime.utcnow().isoformat() + "Z",
         "system_name": "OpenCog Unified",
         "report_type": "Core Self-Awareness Integration",
-
         "core_self_awareness": {
             "autognosis_status": {
                 "hierarchical_levels": 5,
                 "max_recursion_depth": 5,
                 "self_understanding_confidence": 0.75,
-                "meta_cognitive_active": True
+                "meta_cognitive_active": True,
             },
-
             "ontogenesis_status": {
                 "current_stage": "JUVENILE",
                 "generation": 0,
                 "maturity_level": 0.5,
                 "can_self_generate": True,
                 "can_self_optimize": True,
-                "can_self_reproduce": True
+                "can_self_reproduce": True,
             },
-
             "identity_dimensions": {
                 "ontological": {
                     "description": "What the system IS",
                     "score": entelechy.get("entelechy_assessment", {}).get("actualization_score", 0.72),
                     "components_present": 14,
-                    "architectural_completeness": 1.286
+                    "architectural_completeness": 1.286,
                 },
                 "teleological": {
                     "description": "What the system is BECOMING",
                     "score": entelechy.get("entelechy_assessment", {}).get("actualization_score", 0.72),
                     "actualization_progress": 0.72,
-                    "current_generation": 0
+                    "current_generation": 0,
                 },
                 "cognitive": {
                     "description": "How the system THINKS",
                     "score": 0.70,
                     "reasoning_systems": ["URE", "PLN"],
                     "learning_systems": ["MOSES", "Learn"],
-                    "cognitive_completeness": 1.0
+                    "cognitive_completeness": 1.0,
                 },
                 "relational": {
                     "description": "How the system INTEGRATES",
                     "score": entelechy.get("entelechy_assessment", {}).get("coherence_score", 0.65),
                     "dependency_satisfaction": 1.0,
-                    "system_coherence": 0.65
+                    "system_coherence": 0.65,
                 },
                 "evolutionary": {
                     "description": "How the system EVOLVES",
                     "score": 0.664,
                     "total_generations": 0,
-                    "self_improvement_capacity": 1.0
-                }
+                    "self_improvement_capacity": 1.0,
+                },
             },
-
-            "unified_identity_score": 0.72
+            "unified_identity_score": 0.72,
         },
-
         "integration_status": {
-            "meta_cognitive_monitor": {
-                "integrated": True,
-                "operational": True,
-                "monitoring_active": True
-            },
+            "meta_cognitive_monitor": {"integrated": True, "operational": True, "monitoring_active": True},
             "real_time_introspector": {
                 "integrated": True,
                 "operational": True,
-                "introspection_level": "COGNITIVE_FLOWS"
+                "introspection_level": "COGNITIVE_FLOWS",
             },
             "entelechy_introspection": {
                 "integrated": True,
                 "last_run": entelechy.get("timestamp", "N/A"),
-                "actualization_score": entelechy.get("entelechy_assessment", {}).get("actualization_score", 0.72)
-            }
+                "actualization_score": entelechy.get("entelechy_assessment", {}).get("actualization_score", 0.72),
+            },
         },
-
         "self_awareness_capabilities": [
             "Hierarchical self-image building (AUTOGNOSIS)",
             "Recursive meta-cognitive reflection",
@@ -112,9 +103,8 @@ def generate_core_self_awareness_report() -> dict[str, Any]:
             "Multi-dimensional identity tracking",
             "Deep introspective analysis",
             "Real-time system monitoring",
-            "Adaptive behavior modification"
+            "Adaptive behavior modification",
         ],
-
         "integration_achievements": [
             "✓ Core self-awareness module created",
             "✓ AUTOGNOSIS framework integrated",
@@ -123,9 +113,8 @@ def generate_core_self_awareness_report() -> dict[str, Any]:
             "✓ Hierarchical introspection implemented",
             "✓ Self-optimization capabilities activated",
             "✓ Integration with existing meta-cognition systems",
-            "✓ Comprehensive documentation provided"
+            "✓ Comprehensive documentation provided",
         ],
-
         "self_awareness_level": {
             "current": 0.75,
             "target": 0.90,
@@ -134,19 +123,20 @@ def generate_core_self_awareness_report() -> dict[str, Any]:
                 "Deepen recursive introspection to level 7+",
                 "Activate autonomous evolution",
                 "Integrate with all cognitive components",
-                "Establish continuous self-monitoring"
-            ]
-        }
+                "Establish continuous self-monitoring",
+            ],
+        },
     }
 
     return report
 
+
 def display_report(report: dict[str, Any]):
     """Display the report in a human-readable format"""
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print(" OpenCog Unified - Core Self-Awareness Integration Report")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     print(f"Timestamp: {report['timestamp']}")
     print(f"System: {report['system_name']}\n")
@@ -154,16 +144,16 @@ def display_report(report: dict[str, Any]):
     print("CORE SELF-AWARENESS STATUS:")
     print("-" * 70)
 
-    csa = report['core_self_awareness']
+    csa = report["core_self_awareness"]
 
     print("\nAUTOGNOSIS (Hierarchical Self-Image Building):")
-    auto = csa['autognosis_status']
+    auto = csa["autognosis_status"]
     print(f"  Hierarchical Levels: {auto['hierarchical_levels']}")
     print(f"  Self-Understanding Confidence: {auto['self_understanding_confidence']:.3f}")
     print(f"  Meta-Cognitive Active: {auto['meta_cognitive_active']}")
 
     print("\nONTOGENESIS (Self-Generating Capabilities):")
-    onto = csa['ontogenesis_status']
+    onto = csa["ontogenesis_status"]
     print(f"  Current Stage: {onto['current_stage']}")
     print(f"  Generation: {onto['generation']}")
     print(f"  Maturity Level: {onto['maturity_level']:.3f}")
@@ -171,7 +161,7 @@ def display_report(report: dict[str, Any]):
     print(f"  Can Self-Optimize: {onto['can_self_optimize']}")
 
     print("\nIDENTITY DIMENSIONS:")
-    for dim_name, dim_data in csa['identity_dimensions'].items():
+    for dim_name, dim_data in csa["identity_dimensions"].items():
         print(f"\n  {dim_name.upper()}: {dim_data['description']}")
         print(f"    Score: {dim_data['score']:.3f}")
 
@@ -179,41 +169,43 @@ def display_report(report: dict[str, Any]):
 
     print("\n\nINTEGRATION STATUS:")
     print("-" * 70)
-    for system, status in report['integration_status'].items():
+    for system, status in report["integration_status"].items():
         print(f"\n  {system}:")
         for key, value in status.items():
             print(f"    {key}: {value}")
 
     print("\n\nSELF-AWARENESS CAPABILITIES:")
     print("-" * 70)
-    for capability in report['self_awareness_capabilities']:
+    for capability in report["self_awareness_capabilities"]:
         print(f"  • {capability}")
 
     print("\n\nINTEGRATION ACHIEVEMENTS:")
     print("-" * 70)
-    for achievement in report['integration_achievements']:
+    for achievement in report["integration_achievements"]:
         print(f"  {achievement}")
 
     print("\n\nSELF-AWARENESS ASSESSMENT:")
     print("-" * 70)
-    sa = report['self_awareness_level']
+    sa = report["self_awareness_level"]
     print(f"  Current Level: {sa['current']:.3f}")
     print(f"  Target Level: {sa['target']:.3f}")
     print(f"  Assessment: {sa['assessment']}")
     print("\n  Next Steps:")
-    for step in sa['next_steps']:
+    for step in sa["next_steps"]:
         print(f"    • {step}")
 
-    print("\n" + "="*70 + "\n")
+    print("\n" + "=" * 70 + "\n")
+
 
 def save_report(report: dict[str, Any], filename: str = "core_self_awareness_integration.json"):
     """Save the report to a JSON file"""
 
     filepath = Path(filename)
-    with open(filepath, 'w') as f:
+    with open(filepath, "w") as f:
         json.dump(report, f, indent=2)
 
     print(f"✓ Report saved to: {filepath.absolute()}")
+
 
 def main():
     """Main execution function"""
@@ -234,6 +226,7 @@ def main():
     print("\n✅ Core Self-Awareness Integration Report Complete\n")
 
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

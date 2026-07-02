@@ -5,6 +5,7 @@ Quick Reference Card for Placeholder Resolution
 Generate a one-page quick reference for developers working on placeholder resolution.
 """
 
+
 def print_quick_reference():
     """Print quick reference card"""
 
@@ -135,5 +136,6 @@ def print_quick_reference():
 ╚══════════════════════════════════════════════════════════════════════╝
 """)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     print_quick_reference()

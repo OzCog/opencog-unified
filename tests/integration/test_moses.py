@@ -11,7 +11,8 @@ import unittest
 
 
 # Add paths for component testing
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'components'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "components"))
+
 
 class TestMosesIntegration(unittest.TestCase):
     """Test moses integration with OpenCog Unified"""
@@ -27,10 +28,11 @@ class TestMosesIntegration(unittest.TestCase):
         try:
             # Try to import moses-related modules
             import moses
+
             self.assertTrue(True, "moses module imported successfully")
         except ImportError:
             # If moses is not available, check if it's in the expected location
-            moses_path = os.path.join(os.path.dirname(__file__), '..', '..', 'moses')
+            moses_path = os.path.join(os.path.dirname(__file__), "..", "..", "moses")
             if os.path.exists(moses_path):
                 self.assertTrue(True, "moses directory exists, module may need build")
             else:
@@ -41,9 +43,9 @@ class TestMosesIntegration(unittest.TestCase):
         try:
             # Check if moses executable is available
             import subprocess
-            result = subprocess.run(['moses', '--help'],
-                                 capture_output=True, text=True, timeout=10)
-            if result.returncode == 0 or 'Usage:' in result.stdout:
+
+            result = subprocess.run(["moses", "--help"], capture_output=True, text=True, timeout=10)
+            if result.returncode == 0 or "Usage:" in result.stdout:
                 self.assertTrue(True, "moses executable is functional")
             else:
                 self.skipTest("moses executable not functional")
@@ -53,13 +55,12 @@ class TestMosesIntegration(unittest.TestCase):
     def test_moses_dependencies(self):
         """Test moses dependency integration"""
         # Check for required moses dependencies
-        required_deps = ['boost', 'gmp', 'mpfr']
+        required_deps = ["boost", "gmp", "mpfr"]
         missing_deps = []
 
         for dep in required_deps:
             try:
-                result = subprocess.run(['pkg-config', '--exists', dep],
-                                     capture_output=True)
+                result = subprocess.run(["pkg-config", "--exists", dep], capture_output=True)
                 if result.returncode != 0:
                     missing_deps.append(dep)
             except FileNotFoundError:
@@ -71,5 +72,6 @@ class TestMosesIntegration(unittest.TestCase):
         else:
             self.assertTrue(True, "All required moses dependencies are available")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
