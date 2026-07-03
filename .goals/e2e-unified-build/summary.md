@@ -7,29 +7,27 @@ OpenCog Unified build lifecycle into a phase-aware pipeline.
 
 ### Acceptance Criteria — All Met ✅
 
-| # | Criterion | Status |
-|---|-----------|--------|
-| 1 | `./build-e2e.sh` produces a complete build from clean checkout | ✅ |
-| 2 | Reads `component-config.json` for component/phase/dependency info | ✅ |
-| 3 | Builds phases 0→5 sequentially, halts on failure | ✅ |
-| 4 | Invokes phase-specific test scripts after each phase | ✅ |
-| 5 | Calls `validate-integration.py` after all phases | ✅ |
-| 6 | Writes JSON report to `build-reports/latest.json` | ✅ |
-| 7 | Prints human-readable summary to stdout | ✅ |
-| 8 | Supports `--phase N` for single-phase builds | ✅ |
-| 9 | Supports `--clean` for fresh rebuilds | ✅ |
-| 10 | Supports `--skip-tests` to omit test phase | ✅ |
-| 11 | Returns exit 0 on success, non-zero on failure | ✅ |
-| 12 | Follows shell conventions (set -euo pipefail, color, functions) | ✅ |
-| 13 | Script is executable with proper shebang | ✅ |
-| 14 | Composes existing tools — no logic duplication from build.sh | ✅ |
+- `./build-e2e.sh` produces a complete build from clean checkout — ✅
+- Reads `component-config.json` for component/phase/dependency info — ✅
+- Builds phases 0→5 sequentially, halts on failure — ✅
+- Invokes phase-specific test scripts after each phase — ✅
+- Calls `validate-integration.py` after all phases — ✅
+- Writes JSON report to `build-reports/latest.json` — ✅
+- Prints human-readable summary to stdout — ✅
+- Supports `--phase N` for single-phase builds — ✅
+- Supports `--clean` for fresh rebuilds — ✅
+- Supports `--skip-tests` to omit test phase — ✅
+- Returns exit 0 on success, non-zero on failure — ✅
+- Follows shell conventions (`set -euo pipefail`, color, functions) — ✅
+- Script is executable with proper shebang — ✅
+- Composes existing tools — no logic duplication from `build.sh` — ✅
 
 ## Iteration History
 
-| Iteration | Verdict | Issue |
-|-----------|---------|-------|
-| 1 | FAIL | Phase 0 jq query crashed on `metadata` entry in component-config.json |
-| 2 | PASS | Fix applied — defensive `select()` guards filter non-component entries |
+- Iteration 1 — **FAIL**: Phase 0 jq query crashed on `metadata` entry in
+  `component-config.json`.
+- Iteration 2 — **PASS**: Fix applied — defensive `select()` guards filter
+  non-component entries.
 
 ## Key Issues & Resolutions
 
