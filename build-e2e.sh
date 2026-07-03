@@ -487,7 +487,7 @@ run_all_tests() {
 
     for phase in $(seq 0 "${MAX_PHASE}"); do
         local bs="${PHASE_BUILD_STATUS[${phase}]:-unknown}"
-        if [[ "${bs}" == "pass" ]]; then
+        if [[ "${bs}" == "pass" || "${bs}" == "warn" ]]; then
             run_phase_tests "${phase}" || return 1
         else
             log_info "Phase ${phase}: skipping tests (build status: ${bs})"
