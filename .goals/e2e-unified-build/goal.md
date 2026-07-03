@@ -11,7 +11,7 @@ correct dependency order with validation at each stage.
 
 Create `build-e2e.sh` — a single entry-point orchestrator that chains the complete
 build lifecycle: prerequisite validation → component presence verification → phase-sequenced
-CMake builds (respecting the cogutil→atomspace→cogserver→extensions→logic→cognitive→advanced→language→integration
+CMake builds (respecting the CogUtil→AtomSpace→cogserver→extensions→logic→cognitive→advanced→language→integration
 dependency chain) → per-phase test execution → integration validation → structured build report.
 The script must compose existing tools (build.sh for cmake/make, validate-integration.py for
 structure checks, test-phase-*.sh scripts for testing) rather than duplicating their logic,
@@ -37,6 +37,7 @@ and must be aware of `component-config.json` for dependency ordering.
 ## Scope Boundaries
 
 **In scope:**
+
 - The `build-e2e.sh` orchestrator script
 - A `build-reports/` directory with JSON report output
 - Integration with existing scripts (build.sh, validate-integration.py, test-phase-*.sh)
@@ -45,10 +46,11 @@ and must be aware of `component-config.json` for dependency ordering.
 - Proper error handling and early-exit on failure
 
 **Out of scope:**
+
 - Modifying existing scripts (build.sh, validate-integration.py, test scripts)
 - Cloning components from GitHub (that's integrate-components.sh's job)
 - Docker image building
-- CI/CD workflow changes (.github/workflows/)
+- CI/CD workflow changes (.GitHub/workflows/)
 - Cross-platform (Windows/macOS) support — Linux only
 - Installing system dependencies (apt-get)
 - Modifying CMakeLists.txt or any C++ source code
@@ -56,23 +58,27 @@ and must be aware of `component-config.json` for dependency ordering.
 ## Applicable Project Conventions
 
 **Quality gate command:**
+
 - `./validate-integration.py` (structural validation)
 - `bash -n build-e2e.sh` (syntax check)
 - `shellcheck build-e2e.sh` (if available)
 
 **Commit convention:**
+
 - Conventional commits: `type(scope): description`
 - Role markers: `[B]` for Builder, `[I]` for Inspector
 - Trailer: `Assisted-by: Claude:Sonnet-4.6` (Builder) / `Claude:Haiku-4.5` (Inspector)
 - Title ≤72 characters, imperative mood
 
 **Guidelines:**
+
 - `.github/instructions/shell.instructions.md` — shell best practices (set -euo pipefail, functions, jq for JSON)
 - `.github/instructions/opencog-unified.instructions.md` — project conventions and component dependencies
 
 **Rules:**
+
 - Never cancel long-running builds (timeouts must be generous)
-- Follow component dependency order: cogutil → atomspace → cogserver → extensions → logic → cognitive → advanced → language → integration
+- Follow component dependency order: CogUtil → AtomSpace → cogserver → extensions → logic → cognitive → advanced → language → integration
 - Build times: 30-60 minutes full build is normal
 - Use `nproc` for parallel jobs
 - Existing `build.sh` supports: BUILD_TYPE, BUILD_DIR, PARALLEL_JOBS, USE_CCACHE, USE_NINJA env vars
@@ -80,6 +86,7 @@ and must be aware of `component-config.json` for dependency ordering.
 ## Technical Context
 
 **Existing infrastructure to compose:**
+
 - `build.sh` — handles cmake configure + build + test for flat builds (env-var configured)
 - `component-config.json` — defines all 17 components with: status, layer, phase, priority, dependencies[], build_requirements
 - `validate-integration.py` — Python validator checking structure, dependencies, cmake integration
@@ -87,8 +94,9 @@ and must be aware of `component-config.json` for dependency ordering.
 - Root `CMakeLists.txt` — conditionally includes components via `if(EXISTS ...)` pattern
 
 **Component layout:**
-- Root-level: cogutil/, atomspace/, cogserver/, attention/, spacetime/, pln/, unify/, ure/, moses/
-- components/ subdirectory: core/atomspace-rocks/, core/atomspace-restful/
+
+- Root-level: CogUtil/, AtomSpace/, cogserver/, attention/, spacetime/, pln/, unify/, ure/, moses/
+- components/ subdirectory: core/AtomSpace-rocks/, core/AtomSpace-restful/
 - component-config.json tracks which are "present" vs "pending"
 
 **Key constraint:** Only build components whose directories actually exist on disk (the script must gracefully handle partial installations where some components are "pending" in config but not yet cloned).
