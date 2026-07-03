@@ -11,9 +11,18 @@
 
 **VERDICT: FAIL**
 
-The `build-e2e.sh` script has a **critical bug** in its Phase 0 component discovery logic that causes the entire script to crash with exit code 5 when attempting to inventory Phase 0 components. This is a blocker: the script cannot execute in production because it fails during the prerequisite phase inventory stage before any builds can occur.
+The `build-e2e.sh` script has a **critical bug** in its Phase 0 component
+discovery logic that causes the entire script to crash with exit code 5 when
+attempting to inventory Phase 0 components. This is a blocker: the script
+cannot execute in production because it fails during the prerequisite phase
+inventory stage before any builds can occur.
 
-The bug is in the `get_phase_components()` function's Phase 0 jq query (lines 226–234). The query does not filter out non-component entries (metadata, integration_phases, build_requirements, etc.) that exist at the top level of the `opencog_unified_components` object in `component-config.json`. When jq attempts to traverse these non-component entries, it encounters a string value at line 282 of the JSON and fails with:
+The bug is in the `get_phase_components()` function's Phase 0 jq query
+(lines 226–234). The query does not filter out non-component entries
+(metadata, integration_phases, build_requirements, etc.) that exist at the top
+level of the `opencog_unified_components` object in `component-config.json`.
+When jq attempts to traverse these non-component entries, it encounters a
+string value at line 282 of the JSON and fails with:
 
 ```
 jq: error (at component-config.json:282): Cannot index string with string "integration_phase"
@@ -315,7 +324,10 @@ The script does not duplicate build.sh's logic; instead, it orchestrates cmake d
 **Location**: `get_phase_components()` function, lines 226–234
 
 **Why it fails**:
-- The `opencog_unified_components` object in `component-config.json` contains both component layers (foundation_layer, core_layer, etc.) AND metadata entries (metadata, integration_phases, build_requirements, testing_strategy, validation_checkpoints)
+- The `opencog_unified_components` object in `component-config.json`
+  contains both component layers (foundation_layer, core_layer, etc.) AND
+  metadata entries (metadata, integration_phases, build_requirements,
+  testing_strategy, validation_checkpoints)
 - The Phase 0 jq query does `to_entries[]` on all top-level keys without filtering
 - When it encounters "metadata" (a non-component entry), it tries to traverse its value with `to_entries[] | select(.value.integration_phase == 0)`
 - Metadata's value contains strings and non-object values that cannot be indexed with `"integration_phase"`
@@ -352,17 +364,25 @@ The script does not duplicate build.sh's logic; instead, it orchestrates cmake d
 **Failing Criteria**: 2/14 (14%)  
 **Partial Criteria**: 3/14 (21%)
 
-**Overall Assessment**: The script has strong fundamentals — correct architecture, proper shell conventions, good CLI parsing, and correct JSON report structure. However, a single **critical bug in the Phase 0 jq query** blocks all execution. The script cannot run on any system and crashes during prerequisite phase inventory before any builds begin.
+**Overall Assessment**: The script has strong fundamentals — correct
+architecture, proper shell conventions, good CLI parsing, and correct JSON
+report structure. However, a single **critical bug in the Phase 0 jq query**
+blocks all execution. The script cannot run on any system and crashes during
+prerequisite phase inventory before any builds begin.
 
 **Blocking Issue**: The Phase 0 component discovery jq query crashes with `set -e`, preventing the script from reaching the build stage. This is a must-fix issue.
 
-**Recommendation**: Fix the Phase 0 jq query to filter out non-component entries before resubmission. Once this is fixed, all 14 criteria should pass.
+**Recommendation**: Fix the Phase 0 jq query to filter out non-component
+entries before resubmission. Once this is fixed, all 14 criteria should pass.
 
 ---
 
 ## Final Verdict
 
-**FAIL** — The script is not production-ready due to the blocking Phase 0 jq bug. While 64% of criteria are fully implemented and the architecture is sound, the script cannot execute due to a crash during component inventory. This must be fixed before the script can be accepted.
+**FAIL** — The script is not production-ready due to the blocking Phase 0 jq
+bug. While 64% of criteria are fully implemented and the architecture is sound,
+the script cannot execute due to a crash during component inventory. This must
+be fixed before the script can be accepted.
 
 **Next steps for Builder**:
 1. Fix Phase 0 jq query to filter non-component entries
