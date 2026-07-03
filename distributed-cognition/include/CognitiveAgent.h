@@ -38,6 +38,7 @@ private:
     // Thread management
     std::unique_ptr<std::thread> cognitive_thread_;
     std::mutex state_mutex_;
+    std::mutex cycle_mutex_;  // Separate mutex for cycle sleep (avoids blocking coordination)
     std::condition_variable cycle_cv_;
     
     // Cognitive cycle parameters
@@ -102,6 +103,12 @@ public:
      * Get current cognitive state (thread-safe)
      */
     std::vector<double> get_cognitive_state() const;
+
+    /**
+     * Get last computed cognitive output (for inter-agent routing)
+     * This is the processed output, not the raw internal state.
+     */
+    std::vector<double> get_cognitive_output() const;
 
     /**
      * Set cognitive cycle frequency
