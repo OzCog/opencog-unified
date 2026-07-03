@@ -87,12 +87,12 @@ void AgentCoordinator::coordination_cycle()
     // Phase 4: Route inter-agent messages based on adjacency
     for (const auto& [id, agent] : agents_) {
         auto adjacent = agent->get_adjacent_agents();
-        auto output_state = agent->get_cognitive_state();
+        auto output = agent->get_cognitive_output();
 
         for (const auto& target_id : adjacent) {
             auto target_it = agents_.find(target_id);
             if (target_it != agents_.end()) {
-                target_it->second->receive_agent_input(id, output_state);
+                target_it->second->receive_agent_input(id, output);
             }
         }
     }

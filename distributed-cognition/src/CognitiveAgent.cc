@@ -103,11 +103,16 @@ void CognitiveAgent::update_internal_state(const std::vector<double>& state_upda
 
 std::vector<double> CognitiveAgent::get_cognitive_state() const
 {
-    // Note: const method, but we need a lock for thread safety
-    // Using const_cast pattern for mutable mutex
     auto* self = const_cast<CognitiveAgent*>(this);
     std::lock_guard<std::mutex> lock(self->state_mutex_);
     return internal_state_;
+}
+
+std::vector<double> CognitiveAgent::get_cognitive_output() const
+{
+    auto* self = const_cast<CognitiveAgent*>(this);
+    std::lock_guard<std::mutex> lock(self->state_mutex_);
+    return output_to_agents_;
 }
 
 void CognitiveAgent::cognitive_processing_loop()
@@ -130,14 +135,18 @@ void CognitiveAgent::cognitive_processing_loop()
 
         iteration++;
 
-        // Sleep for remaining cycle time
+        // Sleep for remaining cycle time using a separate condition variable mutex
+        // to avoid holding state_mutex_ during wait (which would block coordination)
         auto elapsed = std::chrono::steady_clock::now() - cycle_start;
         auto remaining = cycle_duration - elapsed;
         if (remaining.count() > 0) {
-            std::unique_lock<std::mutex> lock(state_mutex_);
+            std::unique_lock<std::mutex> lock(cycle_mutex_);
             cycle_cv_.wait_for(lock, remaining, [this]() { return !active_.load(); });
         }
     }
+
+    // Mark inactive when loop exits (max iterations reached or stopped)
+    active_.store(false);
 }
 
 std::vector<double> CognitiveAgent::process_cognitive_inputs(

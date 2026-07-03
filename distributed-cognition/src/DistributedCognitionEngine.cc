@@ -102,9 +102,10 @@ std::string DistributedCognitionEngine::spawn_agent(
         if (resource_manager_) {
             resource_manager_->register_agent(agent_id);
         }
-        if (engine_running_.load()) {
-            agent->start_cognitive_cycle();
-        }
+        // NOTE: Do NOT start the agent's own background loop here.
+        // The engine drives agents via coordination_cycle -> cognitive_iteration.
+        // Starting the agent's own loop would cause dual-execution (once from
+        // the agent's thread, once from the engine's coordination_cycle).
         return agent_id;
     }
     return "";

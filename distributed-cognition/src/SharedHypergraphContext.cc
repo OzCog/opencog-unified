@@ -97,17 +97,18 @@ bool SharedHypergraphContext::synchronize_context(
     std::unique_lock<std::shared_mutex> lock(context_mutex_);
 
     for (const auto& [key, values] : external_updates) {
-        // Merge with existing state using weighted average
-        auto it = hypergraph_nodes_.find(key);
-        if (it != hypergraph_nodes_.end()) {
+        // Merge into agent_states_ (these are agent state updates, not hypergraph nodes)
+        auto it = agent_states_.find(key);
+        if (it != agent_states_.end()) {
             auto& existing = it->second;
             size_t min_size = std::min(existing.size(), values.size());
             for (size_t i = 0; i < min_size; ++i) {
                 existing[i] = existing[i] * 0.7 + values[i] * 0.3;
             }
         } else {
-            hypergraph_nodes_[key] = values;
+            agent_states_[key] = values;
         }
+        last_update_times_[key] = std::chrono::steady_clock::now();
     }
 
     context_version_++;
@@ -167,31 +168,31 @@ SharedHypergraphContext::get_context_statistics() const
 std::vector<double> SharedHypergraphContext::compute_aggregated_state() const
 {
     // Aggregate all node and agent states into a single context vector
-    // using mean-pooling with dimensionality reduction
+    // using per-dimension mean-pooling (count contributions per dimension)
     const size_t target_dim = 32;
     std::vector<double> aggregated(target_dim, 0.0);
-    size_t count = 0;
+    std::vector<size_t> dim_counts(target_dim, 0);
 
     // Aggregate hypergraph node states
     for (const auto& [_, node_state] : hypergraph_nodes_) {
         for (size_t i = 0; i < node_state.size() && i < target_dim; ++i) {
             aggregated[i] += node_state[i];
+            dim_counts[i]++;
         }
-        count++;
     }
 
     // Aggregate agent states
     for (const auto& [_, agent_state] : agent_states_) {
         for (size_t i = 0; i < agent_state.size() && i < target_dim; ++i) {
             aggregated[i] += agent_state[i];
+            dim_counts[i]++;
         }
-        count++;
     }
 
-    // Normalize
-    if (count > 0) {
-        for (auto& val : aggregated) {
-            val /= static_cast<double>(count);
+    // Normalize each dimension by its actual contributor count
+    for (size_t i = 0; i < target_dim; ++i) {
+        if (dim_counts[i] > 0) {
+            aggregated[i] /= static_cast<double>(dim_counts[i]);
         }
     }
 
