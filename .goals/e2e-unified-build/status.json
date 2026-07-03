@@ -1,0 +1,13 @@
+{
+  "goal_id": "e2e-unified-build",
+  "status": "building",
+  "iteration": 1,
+  "builder_model": "Claude:Sonnet-4.6",
+  "inspector_model": "Claude:Haiku-4.5",
+  "initial_sha": "892fcaf5db4bcd2e36158376b4ba6e6a99e73637",
+  "created_at": "2026-07-03T07:23:00Z",
+  "inspection_completed_at": "2026-07-03T05:40:00Z",
+  "inspection_verdict": "FAIL",
+  "blocking_issue": "Phase 0 jq query crashes with 'Cannot index string' error due to non-component entries in component-config.json",
+  "history": []
+}
