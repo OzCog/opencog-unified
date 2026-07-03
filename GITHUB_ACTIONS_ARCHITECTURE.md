@@ -9,8 +9,8 @@ tensor shapes defined here.
 
 ## Cognitive Layer Hierarchy
 
-The OpenCog Unified build system is organised as a ten-layer cognitive stack.
-Each layer depends on the layers beneath it and is characterised by a tensor
+The OpenCog Unified build system is organized as a ten-layer cognitive stack.
+Each layer depends on the layers beneath it and is characterized by a tensor
 shape that encodes the dimensionality of the cognitive sub-space it occupies.
 
 ```mermaid
@@ -40,6 +40,10 @@ flowchart TD
 ```
 
 ## Layer Definitions
+
+> **Note — Degrees of Freedom (DoF):** The `dof` field is a layer-level
+> index (1–9) assigned by the workflow and represents the cognitive complexity
+> tier, not the rank (number of axes) of the tensor shape.
 
 ### Layer 0 — Foundation
 
