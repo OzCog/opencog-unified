@@ -227,9 +227,10 @@ get_phase_components() {
         jq -r '
           .opencog_unified_components
           | to_entries[]
+          | select(.key != "metadata")
           | .value
           | to_entries[]
-          | select(.value.integration_phase == 0)
+          | select(.value | type == "object" and has("integration_phase") and .integration_phase == 0)
           | .key
         ' "${CONFIG_FILE}" | sort
     else
