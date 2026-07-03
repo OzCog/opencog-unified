@@ -51,8 +51,9 @@ std::vector<double> CognitiveAgent::cognitive_iteration(
     std::lock_guard<std::mutex> lock(state_mutex_);
     processing_.store(true);
 
-    // Combine agent inputs with shared context
-    std::vector<double> combined_inputs = input_from_agents_;
+    // Consume and clear agent inputs, combine with shared context
+    std::vector<double> combined_inputs = std::move(input_from_agents_);
+    input_from_agents_.clear();
     combined_inputs.insert(combined_inputs.end(),
                           shared_context.begin(), shared_context.end());
 
