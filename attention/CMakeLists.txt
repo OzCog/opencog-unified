@@ -72,6 +72,7 @@ set(ATTENTION_SOURCES
     src/AttentionModule.cc
     src/ImportanceSpreadingAgent.cc
     src/ForgettingAgent.cc
+    src/OscillationDetector.cc
 )
 
 # Create attention library

@@ -13,6 +13,7 @@ include_directories(${CMAKE_SOURCE_DIR}/cogutil/opencog)
 include_directories(${CMAKE_SOURCE_DIR}/atomspace/opencog)
 include_directories(${CMAKE_SOURCE_DIR}/cogserver/opencog)
 include_directories(${CMAKE_SOURCE_DIR}/cognitive-patterns/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Source files for distributed cognition
 set(DISTRIBUTED_SOURCES
