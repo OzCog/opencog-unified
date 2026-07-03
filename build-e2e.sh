@@ -397,9 +397,10 @@ build_phase() {
 
         # Install build artifacts so downstream phases and tests can find them
         log_info "Installing phase ${phase} artifacts..."
-        cmake --install "${SCRIPT_DIR}/${BUILD_DIR}" --config "${BUILD_TYPE}" 2>&1 | tail -5 || {
-            log_warn "Phase ${phase} install step had issues (non-fatal)"
-        }
+        if ! cmake --install "${SCRIPT_DIR}/${BUILD_DIR}" --config "${BUILD_TYPE}" 2>&1 | tail -5; then
+            log_warn "Phase ${phase} install step failed — downstream tests may fail"
+            PHASE_BUILD_STATUS[${phase}]="warn"
+        fi
     else
         local elapsed=$(( $(date +%s) - phase_start ))
         log_err "Phase ${phase} (${PHASE_NAMES[${phase}]}) build FAILED after ${elapsed}s"
@@ -428,13 +429,22 @@ build_all_phases() {
     done
 
     local any_built=false
+    local any_install_warn=false
     for phase in $(seq 0 "${MAX_PHASE}"); do
-        [[ "${PHASE_BUILD_STATUS[${phase}]:-}" == "pass" ]] && any_built=true
+        case "${PHASE_BUILD_STATUS[${phase}]:-}" in
+            pass) any_built=true ;;
+            warn) any_built=true; any_install_warn=true ;;
+        esac
     done
 
     if [[ "${any_built}" == "true" ]]; then
-        BUILD_STATUS="pass"
-        log_ok "All phases (0–${MAX_PHASE}) built successfully"
+        if [[ "${any_install_warn}" == "true" ]]; then
+            BUILD_STATUS="warn"
+            log_warn "All phases built but one or more install steps failed"
+        else
+            BUILD_STATUS="pass"
+            log_ok "All phases (0–${MAX_PHASE}) built successfully"
+        fi
     else
         BUILD_STATUS="warn"
         log_warn "No components were found on disk — nothing was compiled"
@@ -654,7 +664,8 @@ print_summary() {
         return 0
     elif [[ "${overall_status}" == "warn" ]]; then
         log_warn "E2E build completed with warnings. See report and per-phase logs in ${BUILD_REPORTS_DIR}/"
-        return 0
+        # Warnings from validation log-parsing indicate real issues — exit non-zero for CI
+        return 1
     else
         log_err "E2E build finished with FAILURES. See report and per-phase logs in ${BUILD_REPORTS_DIR}/"
         return 1
