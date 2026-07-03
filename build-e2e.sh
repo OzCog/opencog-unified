@@ -234,9 +234,20 @@ get_phase_components() {
           | .key
         ' "${CONFIG_FILE}" | sort
     else
-        jq -r --argjson p "${phase}" \
-          '.integration_phases["phase_\($p)"].components[]' \
-          "${CONFIG_FILE}" 2>/dev/null || true
+        local jq_output jq_rc=0
+        jq_output=$(jq -r --argjson p "${phase}" \
+          '.integration_phases["phase_\($p)"].components[] // empty' \
+          "${CONFIG_FILE}" 2>&1) || jq_rc=$?
+        if [[ ${jq_rc} -ne 0 ]]; then
+            # Phase entry may not exist in config — this is acceptable for phases without entries
+            if [[ ${jq_rc} -eq 5 ]]; then
+                # jq exit 5 = unable to find path — phase not defined, return empty
+                return 0
+            fi
+            log_warn "jq query failed for phase ${phase} (exit ${jq_rc}): ${jq_output}"
+            return 0
+        fi
+        printf '%s\n' "${jq_output}"
     fi
 }
 
@@ -383,6 +394,12 @@ build_phase() {
         local elapsed=$(( $(date +%s) - phase_start ))
         log_ok "Phase ${phase} build succeeded (${elapsed}s)"
         PHASE_BUILD_STATUS[${phase}]="pass"
+
+        # Install build artifacts so downstream phases and tests can find them
+        log_info "Installing phase ${phase} artifacts..."
+        cmake --install "${SCRIPT_DIR}/${BUILD_DIR}" --config "${BUILD_TYPE}" 2>&1 | tail -5 || {
+            log_warn "Phase ${phase} install step had issues (non-fatal)"
+        }
     else
         local elapsed=$(( $(date +%s) - phase_start ))
         log_err "Phase ${phase} (${PHASE_NAMES[${phase}]}) build FAILED after ${elapsed}s"
@@ -410,8 +427,18 @@ build_all_phases() {
         }
     done
 
-    BUILD_STATUS="pass"
-    log_ok "All phases (0–${MAX_PHASE}) built successfully"
+    local any_built=false
+    for phase in $(seq 0 "${MAX_PHASE}"); do
+        [[ "${PHASE_BUILD_STATUS[${phase}]:-}" == "pass" ]] && any_built=true
+    done
+
+    if [[ "${any_built}" == "true" ]]; then
+        BUILD_STATUS="pass"
+        log_ok "All phases (0–${MAX_PHASE}) built successfully"
+    else
+        BUILD_STATUS="warn"
+        log_warn "No components were found on disk — nothing was compiled"
+    fi
 }
 
 # ─── Phase tests ──────────────────────────────────────────────────────────────
@@ -435,7 +462,7 @@ run_phase_tests() {
     log_step "Running phase ${phase} tests: ${script_name}"
     local test_log="${BUILD_REPORTS_DIR}/test-phase${phase}.log"
 
-    if bash "${script_path}" 2>&1 | tee "${test_log}"; then
+    if (cd "${SCRIPT_DIR}" && bash "${script_path}") 2>&1 | tee "${test_log}"; then
         log_ok "Phase ${phase} tests passed"
         PHASE_TEST_STATUS[${phase}]="pass"
     else
@@ -465,14 +492,20 @@ run_validation() {
     log_header "Integration Validation"
 
     local val_log="${BUILD_REPORTS_DIR}/validation.log"
+    local val_rc=0
 
     # --no-build: we already built; skip validate-integration.py's cmake test
-    if python3 "${SCRIPT_DIR}/validate-integration.py" --no-build 2>&1 | tee "${val_log}"; then
+    python3 "${SCRIPT_DIR}/validate-integration.py" --no-build 2>&1 | tee "${val_log}" || val_rc=$?
+
+    if [[ ${val_rc} -ne 0 ]]; then
+        log_err "Integration validation failed (exit code ${val_rc})"
+        VALIDATE_STATUS="fail"
+    elif grep -qiE "(FAIL|ERROR|CRITICAL)" "${val_log}" 2>/dev/null; then
+        log_warn "Integration validation reported issues — see ${val_log}"
+        VALIDATE_STATUS="warn"
+    else
         log_ok "Integration validation passed"
         VALIDATE_STATUS="pass"
-    else
-        log_warn "Integration validation reported issues (non-fatal) — see ${val_log}"
-        VALIDATE_STATUS="warn"
     fi
 }
 
@@ -535,6 +568,10 @@ write_report() {
         fi
     done
 
+    [[ "${BUILD_STATUS}" == "warn" && "${overall_status}" == "pass" ]] && overall_status="warn"
+    [[ "${VALIDATE_STATUS}" == "warn" && "${overall_status}" == "pass" ]] && overall_status="warn"
+    [[ "${VALIDATE_STATUS}" == "fail" ]] && overall_status="fail"
+
     jq -n \
         --arg  timestamp      "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
         --argjson total_time  "${total_time}" \
@@ -575,6 +612,10 @@ print_summary() {
         [[ "${PHASE_TEST_STATUS[${phase}]:-}" == "fail" ]] && overall_status="fail"
     done
 
+    [[ "${BUILD_STATUS}" == "warn" && "${overall_status}" == "pass" ]] && overall_status="warn"
+    [[ "${VALIDATE_STATUS}" == "warn" && "${overall_status}" == "pass" ]] && overall_status="warn"
+    [[ "${VALIDATE_STATUS}" == "fail" ]] && overall_status="fail"
+
     log_header "Build Summary"
     printf "  %-26s %s\n"  "Timestamp:"       "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     printf "  %-26s %ds\n" "Total time:"      "${total_time}"
@@ -582,6 +623,7 @@ print_summary() {
     printf "  %-26s %d\n"  "Phases built:"    "${n_pass}"
     printf "  %-26s %d\n"  "Phases failed:"   "${n_fail}"
     printf "  %-26s %d\n"  "Phases skipped:"  "${n_skip}"
+    printf "  %-26s %s\n"  "Build status:"    "${BUILD_STATUS}"
     printf "  %-26s %s\n"  "Validation:"      "${VALIDATE_STATUS}"
     echo ""
     echo "  Phase-level results:"
@@ -610,6 +652,9 @@ print_summary() {
     if [[ "${overall_status}" == "pass" ]]; then
         log_ok "E2E build completed successfully!"
         return 0
+    elif [[ "${overall_status}" == "warn" ]]; then
+        log_warn "E2E build completed with warnings. See report and per-phase logs in ${BUILD_REPORTS_DIR}/"
+        return 0
     else
         log_err "E2E build finished with FAILURES. See report and per-phase logs in ${BUILD_REPORTS_DIR}/"
         return 1
@@ -620,6 +665,8 @@ print_summary() {
 
 main() {
     parse_args "$@"
+    local pipeline_rc=0
+    local summary_rc=0
 
     mkdir -p "${BUILD_REPORTS_DIR}"
 
@@ -636,21 +683,27 @@ main() {
 
     inventory_phases
 
-    build_all_phases
+    build_all_phases || pipeline_rc=$?
 
     if [[ "${SKIP_TESTS}" == "true" ]]; then
         log_info "Skipping phase tests (--skip-tests)"
         for phase in $(seq 0 "${MAX_PHASE}"); do
             PHASE_TEST_STATUS[${phase}]="skipped"
         done
-    else
-        run_all_tests
+    elif [[ ${pipeline_rc} -eq 0 ]]; then
+        run_all_tests || pipeline_rc=$?
     fi
 
     run_validation
 
     write_report
-    print_summary
+    print_summary || summary_rc=$?
+
+    if [[ ${pipeline_rc} -ne 0 ]]; then
+        return "${pipeline_rc}"
+    fi
+
+    return "${summary_rc}"
 }
 
 main "$@"
