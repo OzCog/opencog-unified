@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entities — Metagraph Workbench</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='50,6 94,50 50,94 6,50' fill='none' stroke='%239085e9' stroke-width='8'/><circle cx='50' cy='50' r='12' fill='%23c98500'/></svg>">
+<style>
+  :root {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --raised: #232322;
+    --ink: #ffffff;
+    --ink2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --border: rgba(255,255,255,0.10);
+    --wash: rgba(255,255,255,0.04);
+    --wash2: rgba(255,255,255,0.08);
+    /* categorical, fixed order, validated dark steps */
+    --c-hw: #3987e5;
+    --c-net: #d95926;
+    --c-cluster: #199e70;
+    --c-wl: #c98500;
+    --c-pkg: #d55181;
+    --c-storage: #008300;
+    --c-ns: #9085e9;
+    --c-tenant: #e66767;
+    /* status (reserved) */
+    --s-good: #0ca30c;
+    --s-warn: #fab219;
+    --s-serious: #ec835a;
+    --s-crit: #d03b3b;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font: 13px/1.45 var(--sans);
+    overflow: hidden;
+  }
+  #app {
+    display: grid; height: 100vh;
+    grid-template-rows: 46px 1fr 26px;
+    grid-template-columns: 230px 1fr 280px;
+    grid-template-areas: "hdr hdr hdr" "left main right" "ftr ftr ftr";
+  }
+  /* ---------- header ---------- */
+  header {
+    grid-area: hdr; display: flex; align-items: center; gap: 10px;
+    padding: 0 12px; background: var(--surface); border-bottom: 1px solid var(--border);
+  }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; letter-spacing: .01em; white-space: nowrap; }
+  .brand .mark { color: var(--c-ns); font-size: 15px; }
+  .brand .sub { color: var(--muted); font-weight: 400; font-size: 12px; }
+  .seg { display: flex; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+  .seg button {
+    appearance: none; border: 0; background: transparent; color: var(--ink2);
+    padding: 5px 12px; font: 12px var(--sans); cursor: pointer; white-space: nowrap;
+  }
+  .seg button + button { border-left: 1px solid var(--border); }
+  .seg button[aria-pressed="true"] { background: var(--wash2); color: var(--ink); font-weight: 600; }
+  .seg button:hover { background: var(--wash); }
+  .htools { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  #search {
+    width: 200px; background: var(--page); color: var(--ink);
+    border: 1px solid var(--border); border-radius: 7px; padding: 5px 9px; font: 12px var(--sans);
+  }
+  #search::placeholder { color: var(--muted); }
+  #search:focus { outline: 1px solid var(--c-hw); }
+  .btn {
+    appearance: none; background: transparent; color: var(--ink2); border: 1px solid var(--border);
+    border-radius: 7px; padding: 5px 10px; font: 12px var(--sans); cursor: pointer; white-space: nowrap;
+  }
+  .btn:hover { background: var(--wash); color: var(--ink); }
+  .seed-wrap { display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: 12px; }
+  #seed { width: 52px; background: var(--page); color: var(--ink2); border: 1px solid var(--border); border-radius: 6px; padding: 4px 6px; font: 12px var(--mono); }
+  /* ---------- side panels ---------- */
+  aside { background: var(--surface); overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--axis) transparent; }
+  #left { grid-area: left; border-right: 1px solid var(--border); }
+  #right { grid-area: right; border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+  .panel { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  .panel h2 {
+    margin: 0 0 8px; font-size: 10px; font-weight: 600; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .lgroup { margin: 6px 0 2px; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); opacity: .8; }
+  .lrow {
+    display: flex; align-items: center; gap: 8px; padding: 4px 6px; margin: 0 -6px;
+    border-radius: 6px; cursor: pointer; user-select: none;
+  }
+  .lrow:hover { background: var(--wash); }
+  .lrow input { accent-color: var(--c-hw); margin: 0; }
+  .lrow .cnt { margin-left: auto; color: var(--muted); font: 11px var(--mono); }
+  .lrow .name { color: var(--ink2); }
+  .lrow input:checked ~ .name { color: var(--ink); }
+  /* type swatch shapes (secondary encoding echoed in UI) */
+  .sw { width: 11px; height: 11px; flex: 0 0 11px; display: inline-block; }
+  .sw.circle { border-radius: 50%; }
+  .sw.square { border-radius: 2px; }
+  .sw.diamond { transform: rotate(45deg) scale(.85); border-radius: 2px; }
+  .sw.triangle { clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+  .sw.hex { clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%); }
+  .sw.folder { clip-path: polygon(0 15%, 40% 15%, 50% 30%, 100% 30%, 100% 100%, 0 100%); }
+  .sw.cyl { border-radius: 4px 4px 3px 3px; border-top: 2.5px solid rgba(255,255,255,.45); }
+  .sw.ring { border-radius: 50%; background: transparent !important; border: 2.5px solid; }
+  .legend .lrow { cursor: default; }
+  .legend .line { width: 16px; height: 0; border-top: 2px solid; flex: 0 0 16px; }
+  .legend .line.dash { border-top-style: dashed; }
+  .legend .line.dot { border-top-style: dotted; }
+  .legend .hull { width: 16px; height: 12px; border-radius: 6px; flex: 0 0 16px; opacity: .55; }
+  .legend small { color: var(--muted); }
+  /* ---------- namespace tree ---------- */
+  #nstree { flex: 1 1 auto; overflow-y: auto; padding: 8px 8px 8px 6px; scrollbar-width: thin; scrollbar-color: var(--axis) transparent; }
+  #nstree h2 { margin: 4px 6px 8px; font-size: 10px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+  .trow {
+    display: flex; align-items: center; gap: 6px; padding: 3px 6px; border-radius: 6px;
+    cursor: pointer; user-select: none; white-space: nowrap; color: var(--ink2);
+  }
+  .trow:hover { background: var(--wash); color: var(--ink); }
+  .trow.sel { background: var(--wash2); color: var(--ink); box-shadow: inset 2px 0 0 var(--c-hw); }
+  .trow .chev { width: 12px; flex: 0 0 12px; color: var(--muted); font-size: 10px; text-align: center; transition: transform .12s; }
+  .trow .chev.open { transform: rotate(90deg); }
+  .trow .cnt { margin-left: auto; color: var(--muted); font: 10px var(--mono); }
+  .tkids { margin-left: 14px; border-left: 1px solid var(--grid); padding-left: 4px; }
+  .tkids.hidden { display: none; }
+  /* ---------- inspector ---------- */
+  #inspector { flex: 0 0 auto; max-height: 46%; overflow-y: auto; border-top: 1px solid var(--border); padding: 10px 12px; scrollbar-width: thin; }
+  #inspector .empty { color: var(--muted); font-size: 12px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border: 1px solid var(--border); border-radius: 20px; font-size: 11px; color: var(--ink2); }
+  #inspector h3 { margin: 6px 0 2px; font-size: 14px; }
+  #inspector .path { color: var(--muted); font: 11px var(--mono); margin-bottom: 8px; word-break: break-all; }
+  .tags { width: 100%; border-collapse: collapse; margin: 6px 0; }
+  .tags td { padding: 2px 4px; font-size: 12px; vertical-align: top; }
+  .tags td:first-child { color: var(--muted); width: 40%; }
+  .tags td:last-child { font-family: var(--mono); font-size: 11px; color: var(--ink2); word-break: break-all; }
+  .memb { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+  .memb .chip { cursor: pointer; }
+  .memb .chip:hover { background: var(--wash); color: var(--ink); }
+  .irow { display: flex; gap: 6px; margin-top: 10px; }
+  .util { height: 5px; background: var(--grid); border-radius: 3px; overflow: hidden; margin: 4px 0 2px; }
+  .util i { display: block; height: 100%; }
+  /* ---------- main ---------- */
+  #main { grid-area: main; position: relative; background: var(--page); }
+  #graph { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; }
+  #graph.dragging { cursor: grabbing; }
+  #tooltip {
+    position: absolute; pointer-events: none; z-index: 5; display: none; max-width: 260px;
+    background: var(--raised); border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 10px; font-size: 12px; box-shadow: 0 6px 24px rgba(0,0,0,.5);
+  }
+  #tooltip .tt-name { font-weight: 600; }
+  #tooltip .tt-type { color: var(--muted); font-size: 11px; }
+  #tooltip .tt-tags { margin-top: 3px; font: 11px var(--mono); color: var(--ink2); }
+  #toast {
+    position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 6;
+    background: var(--raised); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 14px; font-size: 12px; display: none; box-shadow: 0 6px 24px rgba(0,0,0,.5);
+  }
+  /* ---------- help overlay ---------- */
+  #help {
+    position: absolute; inset: 0; z-index: 10; display: none;
+    background: rgba(13,13,13,.72); backdrop-filter: blur(2px);
+  }
+  #help .card {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: min(660px, 90%); max-height: 84%; overflow-y: auto;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px;
+  }
+  #help h2 { margin: 0 0 4px; font-size: 15px; }
+  #help h3 { margin: 14px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+  #help p, #help li { color: var(--ink2); font-size: 12.5px; }
+  #help kbd {
+    font: 11px var(--mono); background: var(--raised); border: 1px solid var(--border);
+    border-bottom-width: 2px; border-radius: 4px; padding: 1px 5px;
+  }
+  #help pre { background: var(--page); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font: 11px var(--mono); color: var(--ink2); overflow-x: auto; }
+  /* ---------- footer ---------- */
+  footer {
+    grid-area: ftr; display: flex; align-items: center; gap: 16px; padding: 0 12px;
+    background: var(--surface); border-top: 1px solid var(--border);
+    color: var(--muted); font: 11px var(--mono); white-space: nowrap; overflow: hidden;
+  }
+  footer .hint { margin-left: auto; font-family: var(--sans); }
+  footer b { color: var(--ink2); font-weight: 600; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand"><span class="mark">◈</span> entities <span class="sub">metagraph workbench</span></div>
+    <div class="seg" id="modeSeg" role="group" aria-label="Projection mode">
+      <button data-mode="transport" aria-pressed="true" title="Network projection: topology, flows, roles">Transport</button>
+      <button data-mode="computation" aria-pressed="false" title="Netron projection: layered blocks, activations">Computation</button>
+    </div>
+    <div class="seg" id="hyperSeg" role="group" aria-label="Hyperedge rendering">
+      <button data-hyper="hull" aria-pressed="true" title="Hyperedges as convex hulls">Hulls</button>
+      <button data-hyper="junction" aria-pressed="false" title="Hyperedges as junction nodes (bipartite expansion)">Junctions</button>
+    </div>
+    <div class="htools">
+      <input id="search" type="search" placeholder="search name / tag…  (enter = zoom)" spellcheck="false">
+      <button class="btn" id="fitBtn" title="Fit graph to view (F)">Fit</button>
+      <button class="btn" id="loadBtn" title="Load model JSON (native schema or d9 Pkgs/Wlds)">Load</button>
+      <input id="fileInput" type="file" accept=".json,application/json" hidden>
+      <button class="btn" id="pngBtn" title="Export current view as PNG">PNG</button>
+      <span class="seed-wrap">seed <input id="seed" type="number" value="9" min="0" step="1"><button class="btn" id="regenBtn" title="Regenerate synthetic estate">↻</button></span>
+      <button class="btn" id="helpBtn" title="Help & schema">?</button>
+    </div>
+  </header>
+
+  <aside id="left">
+    <div class="panel" id="layersPanel">
+      <h2>Layers</h2>
+      <!-- populated by app.js -->
+    </div>
+    <div class="panel legend" id="legendPanel">
+      <h2>Legend</h2>
+      <!-- populated by app.js -->
+    </div>
+  </aside>
+
+  <div id="main">
+    <canvas id="graph"></canvas>
+    <div id="tooltip"></div>
+    <div id="toast"></div>
+    <div id="help">
+      <div class="card">
+        <h2>Metagraph workbench</h2>
+        <p>One typed metagraph, many projections. Layers composite like GIS; modes re-project the same model.</p>
+        <h3>Interaction</h3>
+        <ul>
+          <li>Scroll — zoom · drag background — pan · drag node — move &amp; pin · double-click node — unpin</li>
+          <li>Click — select node / hull · <kbd>Esc</kbd> — clear selection · <kbd>F</kbd> — fit view · <kbd>?</kbd> — this card</li>
+          <li>Search matches names and tag values; <kbd>Enter</kbd> zooms to matches.</li>
+          <li>Selecting a tenant (tree or hull) reveals its hull even when the tenancy layer is off.</li>
+        </ul>
+        <h3>Model schema (native)</h3>
+        <pre>{
+  "nodes":      [{ "id", "type", "name", "ns", "tags": { … } }],
+  "edges":      [{ "source", "target", "type", "tags": { "protocol", "rate", … } }],
+  "hyperedges": [{ "id", "type", "name", "members": [nodeId, …], "tags": { … } }]
+}
+node types: hw · net · cluster · workload · pkg · storage · ns · tenant(hyper-only)
+edge types: link · tunnel · flow · dep · nfs · sched · nsrel
+hyper types: dep (closure) · tenancy · mesh
+d9 dialect: { "Pkgs": [{FamNam,Version}], "Wlds": [{Id, Pkgs:[…]}] } is auto-detected.</pre>
+        <h3>API</h3>
+        <p><code style="font-family:var(--mono)">Workbench.load(model)</code> · <code style="font-family:var(--mono)">Workbench.importD9(json)</code> · <code style="font-family:var(--mono)">Workbench.model</code></p>
+        <p style="text-align:right"><button class="btn" id="helpClose">close</button></p>
+      </div>
+    </div>
+  </div>
+
+  <aside id="right">
+    <div id="nstree"><h2>Namespaces</h2></div>
+    <div id="inspector"><div class="empty">Select a node, hull, or namespace.</div></div>
+  </aside>
+
+  <footer>
+    <span id="stCounts"></span>
+    <span id="stZoom"></span>
+    <span id="stMode"></span>
+    <span id="stMatch"></span>
+    <span class="hint">drag · scroll · <b>esc</b> clear · <b>f</b> fit · <b>?</b> help</span>
+  </footer>
+</div>
+<script src="./d3.v7.min.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
