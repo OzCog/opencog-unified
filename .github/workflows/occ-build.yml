@@ -33,6 +33,7 @@ jobs:
   # Stage 1: Build CogUtil (Foundation)
   build-cogutil:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Build CogUtil
 
     steps:
@@ -125,6 +126,7 @@ jobs:
   # Stage 2: Build AtomSpace (depends on CogUtil)
   build-atomspace:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Build AtomSpace
     needs: build-cogutil
 
@@ -256,6 +258,7 @@ jobs:
   # Stage 3: Build AtomSpace Storage (depends on AtomSpace)
   build-atomspace-storage:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Build AtomSpace Storage
     needs: build-atomspace
 
@@ -362,6 +365,7 @@ jobs:
   # Stage 3b: Build AtomSpace Rocks (depends on AtomSpace Storage)
   build-atomspace-rocks:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Build AtomSpace RocksDB Storage
     needs: build-atomspace-storage
 
@@ -492,6 +496,7 @@ jobs:
   # Stage 4: Build CogServer (depends on AtomSpace)
   build-cogserver:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Build CogServer
     needs: build-atomspace-storage
 
@@ -620,6 +625,7 @@ jobs:
   # Stage 4b: Build AtomSpace Cog (depends on CogServer)
   build-atomspace-cog:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Build AtomSpace Cog Network Storage
     needs: build-cogserver
 
@@ -759,6 +765,7 @@ jobs:
   # Stage 5: Build Unify (depends on AtomSpace)
   build-unify:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Build Unify
     needs: build-atomspace
 
@@ -865,6 +872,7 @@ jobs:
   # Stage 6: Build URE (depends on AtomSpace and Unify)
   build-ure:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Build URE (Unified Rule Engine)
     needs: build-unify
 
@@ -982,6 +990,7 @@ jobs:
   # Stage 7: Build Miner (depends on URE)
   build-miner:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Build Miner
     needs: build-ure
 
@@ -1118,6 +1127,7 @@ jobs:
   # Stage 8: Build Attention (depends on CogServer)
   build-attention:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Build Attention
     needs: build-cogserver
 
@@ -1257,6 +1267,7 @@ jobs:
   # Stage 9: Build AS-MOSES (depends on AtomSpace and URE)
   build-asmoses:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Build AS-MOSES
     needs: build-ure
 
@@ -1392,6 +1403,7 @@ jobs:
   # Stage 10: Build Matrix (depends on AtomSpace)
   build-matrix:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Build Matrix
     needs: build-atomspace
 
@@ -1498,6 +1510,7 @@ jobs:
   # Stage 11: Build SpaceTime (depends on CogServer)
   build-spacetime:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Build SpaceTime
     needs: build-cogserver
 
@@ -1629,6 +1642,7 @@ jobs:
   # Stage 12: Build PLN (depends on URE and SpaceTime)
   build-pln:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Build PLN (Probabilistic Logic Networks)
     needs: [build-ure, build-spacetime]
 
@@ -1793,6 +1807,7 @@ jobs:
   # Stage 13: Build Learn (depends on CogServer)
   build-learn:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Build Learn
     needs: build-cogserver
 
@@ -1933,6 +1948,7 @@ jobs:
   # Final Stage: Package and Report
   package-and-report:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Package OCC Build
     needs:
       - build-miner

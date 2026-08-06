@@ -15,6 +15,7 @@ concurrency:
 jobs:
   comprehensive-verification:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     name: Comprehensive Implementation Verification
     steps:
       - name: Checkout repository
@@ -159,9 +160,10 @@ jobs:
         with:
           name: verification-report
           path: verification-report.txt
+          retention-days: 30
 
-  cognitive-enhancement:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     needs: comprehensive-verification
     name: Cognitive Enhancement Analysis
     steps:
@@ -237,9 +239,10 @@ jobs:
             recursive-feedback-report.json
             cognitive-enhancement-issue.md
             ontogenesis-state.json
+          retention-days: 30
 
-  build-verification:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     needs: [comprehensive-verification, cognitive-enhancement]
     name: Build System Verification
     steps:
@@ -270,6 +273,7 @@ jobs:
 
   cognitive-synergy-report:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     needs: [comprehensive-verification, cognitive-enhancement, build-verification]
     name: Cognitive Synergy Integration Report
     steps:

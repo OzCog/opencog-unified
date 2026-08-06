@@ -55,6 +55,7 @@ env:
 jobs:
   build-chocolatey-packages:
     runs-on: windows-latest
+    timeout-minutes: 60
     name: Build Chocolatey Package
 
     steps:

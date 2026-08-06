@@ -16,6 +16,7 @@ on:
 jobs:
   generate-cognitive-synergy-issues:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     if: ${{ inputs.create_issues }}
     steps:
       - name: Create Issues for Distributed Agentic Cognitive Grammar Network

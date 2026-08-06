@@ -31,6 +31,7 @@ jobs:
   entelechy-tests:
     name: Run Entelechy Framework Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     permissions:
       contents: read
       issues: write
@@ -67,10 +68,11 @@ jobs:
         with:
           name: entelechy-test-results
           path: test_output.txt
+          retention-days: 30
 
-  entelechy-introspection:
     name: Deep Introspection & Issue Generation
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     needs: entelechy-tests
     if: always()
     permissions:
@@ -328,8 +330,8 @@ jobs:
           path: |
             entelechy_report.json
             issues.json
+          retention-days: 30
 
-      - name: Summary
         run: |
           set -eu
           echo "## 🧠 Entelechy Assessment Complete" >> "${GITHUB_STEP_SUMMARY}"

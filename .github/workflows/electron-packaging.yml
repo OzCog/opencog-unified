@@ -22,6 +22,7 @@ env:
 jobs:
   build-electron-app:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]

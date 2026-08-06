@@ -43,6 +43,7 @@ jobs:
   cogutil:
     name: "🧬 CogUtil Foundation"
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     container:
       image: opencog/opencog-deps:latest
       options: --user root
@@ -192,6 +193,7 @@ jobs:
     name: "⚛️ AtomSpace Hypergraph"
     needs: [cogutil]
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     container:
       image: opencog/opencog-deps:latest
       options: --user root
@@ -369,6 +371,7 @@ jobs:
     name: "💾 AtomSpace Storage Layer"
     needs: [atomspace]
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     container:
       image: opencog/opencog-deps:latest
       options: --user root
@@ -519,6 +522,7 @@ jobs:
     name: "🪨 AtomSpace RocksDB Persistence"
     needs: [atomspace-storage]
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     container:
       image: opencog/opencog-deps:latest
       options: --user root
@@ -684,6 +688,7 @@ jobs:
     name: "🎭 Cognitive Pipeline Synthesis"
     needs: [atomspace-rocks]
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     if: always()
 
     steps:
@@ -853,6 +858,7 @@ jobs:
     name: "🧠 Meta-Cognitive Pipeline Evolution"
     needs: [cognitive-synthesis]
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     if: github.event_name == 'schedule' || contains(github.event.head_commit.message, '[evolve]')
 
     steps:

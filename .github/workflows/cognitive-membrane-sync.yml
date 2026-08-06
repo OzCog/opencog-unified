@@ -36,6 +36,7 @@ env:
 jobs:
   hypergraph-sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     outputs:
       tensor-shape: ${{ steps.tensor-config.outputs.shape }}
       membrane-state: ${{ steps.membrane-fold.outputs.state }}
@@ -381,6 +382,7 @@ jobs:
   cognitive-grammar-action:
     needs: hypergraph-sync
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     if: needs.hypergraph-sync.outputs.membrane-state == 'folded'
 
     steps:

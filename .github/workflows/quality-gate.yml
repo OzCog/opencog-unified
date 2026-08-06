@@ -177,6 +177,7 @@ jobs:
     name: Quality Gate Status
     if: always()
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     needs:
       - yaml-lint
       - action-lint

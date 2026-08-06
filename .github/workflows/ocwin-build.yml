@@ -26,6 +26,7 @@ env:
 jobs:
   build-cogutil:
     runs-on: windows-2022
+    timeout-minutes: 60
     name: Build CogUtil (Windows)
 
     defaults:
@@ -76,6 +77,7 @@ jobs:
 
   build-atomspace:
     runs-on: windows-2022
+    timeout-minutes: 60
     name: Build AtomSpace (Windows)
     needs: build-cogutil
 
@@ -139,6 +141,7 @@ jobs:
 
   build-cogserver:
     runs-on: windows-2022
+    timeout-minutes: 60
     name: Build CogServer (Windows)
     needs: build-atomspace
 
@@ -209,6 +212,7 @@ jobs:
 
   package-and-report:
     runs-on: windows-2022
+    timeout-minutes: 60
     name: Package OCC Windows Build
     needs:
       - build-cogserver
