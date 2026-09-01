@@ -1,6 +1,6 @@
 # Python dependencies for OpenCog Unified
 # Cognitive computation and tensor operations
-numpy>=2.4.6,<3.0.0
+numpy>=2.5.2,<3.0.0
 
 # Additional dependencies used in workflows
 torch>=2.12.0
